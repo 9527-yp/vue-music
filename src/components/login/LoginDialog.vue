@@ -1,6 +1,6 @@
 <template>
     <Teleport to="body">
-        <div v-if="loginDialog" class="loginDialog">
+        <div v-show="loginDialog" class="loginDialog">
             <div class="dialog">
                 <div class="login-mask"></div>
                 <div class="login-box">
@@ -25,9 +25,9 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="other-type">选择其他登录方式</div>
+                            <div class="other-type" @click="loginType = false">选择其他登录方式</div>
                         </div>
-                        <div>
+                        <div v-show="!loginType">
                             <div class="other-type-box">
                                 <div class="other-t">
                                     <div class="other-t-l">
@@ -38,7 +38,7 @@
                                     </div>
                                     <div class="other-t-r">
                                         <ul>
-                                            <li class="item">
+                                            <li class="item" @click="wechatLogin">
                                                 <i class="icon wechat"></i>
                                                 <span class="text">微信登录</span>
                                             </li>
@@ -73,7 +73,8 @@
                 </div>
             </div>
         </div>
-        <Message v-model:openMessage="openMessage" :content="content" />
+        <MessageSuccess v-model:openMessage="openMessageSuccess" :content="content" />
+        <MessageWarning v-model:openMessage="openMessageWarning" :content="content" />
     </Teleport>
 </template>
 
@@ -86,12 +87,13 @@ const loginDialog = defineModel("loginDialog", {
 })
 
 // 登录方式切换
-const loginType = ref(false);
+const loginType = ref(true);
 
 // 勾选框
 const changeBox = ref(false);
 
-const openMessage = ref(false)
+const openMessageSuccess = ref(false)
+const openMessageWarning = ref(false)
 
 const content = ref('')
 
@@ -105,16 +107,22 @@ function changeTypeCode(): void {
     if(changeBox.value){
         loginType.value = true;
     }else{
-
+        openMessageSuccess.value = true;
+        content.value = '请先勾选同意《服务条款》、《隐私政策》、《儿童隐私政策》'
     }
 }
 
 function login(): boolean | undefined {
     if(!changeBox.value) {
-        openMessage.value = true;
+        openMessageSuccess.value = true;
         content.value = '请先勾选同意《服务条款》、《隐私政策》、《儿童隐私政策》'
         return false
     }
+}
+
+function wechatLogin(): void {
+    openMessageWarning.value = true;
+    content.value = '暂不支持微信登录'
 }
 </script>
 

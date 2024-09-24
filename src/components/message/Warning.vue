@@ -22,8 +22,7 @@ defineProps({
 
 watch(
   openMessage,
-  (newId, oldId) => {
-    console.log('参数从', oldId, '变化到', newId);
+  (newId) => {
     if(newId){
       setTimeout(() => {
         openMessage.value = false
@@ -47,13 +46,15 @@ watch(
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2024101;
-    width: 320px;
-    padding: 15px 20px;
+    padding: 10px 15px;
+    width: 220px;
     line-height: 40px;
     text-align: center;
-    background:rgba(19, 19, 18, 0.8);
-    color: #fff;
+    background:#fff;
+    border: 1px solid #ccc;
+    color: #000;
     font-size: 16px;
     border-radius: 5px;
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
 }
 </style>
