@@ -7,14 +7,14 @@ import type { AxiosPromise } from 'axios';
  * @param { number } params.type - 资源类型(0为pc)
  */
 export const bannerImgUrl = (): AxiosPromise => {
-    const params = {
-      timestamp: new Date().getTime(),
-      type: 0
-    };
-  
-    return axios.request({
-      url: '/banner',
-      method: 'get',
-      params
-    });
+  const params = {
+    timestamp: new Date().getTime(),
+    type: 0
   };
+
+  return axios.request({
+    url: '/banner',
+    method: 'get',
+    params
+  });
+};

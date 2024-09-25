@@ -1,7 +1,10 @@
 <template>
     <Teleport to="body">
         <transition name="fade">
-            <div v-if="openMessage" class="message-box">{{content}}</div>
+            <div v-if="openMessage" class="message-box">
+                <span class="warning-icon"></span>
+                <div class="text">{{content}}</div>
+            </div>
         </transition>
     </Teleport>
 </template>
@@ -26,7 +29,7 @@ watch(
     if(newId){
       setTimeout(() => {
         openMessage.value = false
-      },1500)
+      },1000)
     }
   }
 );
@@ -48,7 +51,6 @@ watch(
     z-index: 2024101;
     padding: 10px 15px;
     width: 220px;
-    line-height: 40px;
     text-align: center;
     background:#fff;
     border: 1px solid #ccc;
@@ -56,5 +58,18 @@ watch(
     font-size: 16px;
     border-radius: 5px;
     box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+    .warning-icon{
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: url('@/assets/images/icon.png') no-repeat;
+        background-position: -25px -405px;
+        vertical-align: middle;
+        margin-right: 5px;
+    }
+    .text{
+        display: inline-block;
+        vertical-align: middle;
+    }
 }
 </style>
