@@ -9,12 +9,14 @@
                         <i class="clear-dialog" @click="cancel">×</i>
                     </div>
                     <div class="login-content">
+                        <!-- 扫码登录 -->
                         <Qrcode v-if="loginType" 
                          :qrcodeImgSrc="qrcodeImgSrc" 
                          :qrcodeLose="qrcodeLose"
                          :qrcodeAwaitVerify="qrcodeAwaitVerify"
                          @refresh="refreshBtn"
                          @updateLoginType="editLoginType"/>
+                         <!-- 其他登录 -->
                         <Othercode v-if="!loginType" @updateLoginType="editLoginType" />
                     </div>
                 </div>
@@ -64,7 +66,7 @@ function getQrcodeImg() {
         qrimg: true
     }).then( (res:ResponseType) => {
         qrcodeImgSrc.value = res.data.qrimg;
-        getQscodeCheck();
+        getQscodeCheck(false);
     })
 }
 
@@ -73,7 +75,8 @@ const qrcodeLose = ref(false);
 // 二维码待确认
 const qrcodeAwaitVerify = ref(false);
 
-function getQscodeCheck() {
+function getQscodeCheck(value: boolean): boolean | undefined {
+    if(value) return;
     qrcodeCheck({key: codeKey.value}).then((res: ResponseType) => {
         // 失效
         if(res.code === 800) {
@@ -109,14 +112,22 @@ function scanPolling(time: number): void {
   timer.value && clearTimeout(timer.value);
 
   timer.value = setTimeout(() => {
-    getQscodeCheck();
+    getQscodeCheck(false);
   }, time);
 }
 
 watch(loginDialog,
     (newId) => {
         if(newId){
+            // 登录弹框打开
             getQrcodeKey()
+        }else{
+            // 登录弹框关闭
+            getQscodeCheck(true);
+            clearTimeout(timer.value);
+            loginType.value = true;
+            codeKey.value = '';
+            qrcodeImgSrc.value = '';
         }
     }
 )
