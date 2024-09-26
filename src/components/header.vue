@@ -18,7 +18,14 @@
           <div class="create">
             <a class="link" href="">创作者中心</a>
           </div>
-          <div class="login" @click="login">登录</div>
+          <div class="login" v-if="isLogin">
+            <div class="user-avatar">
+              <img class="user-img" :src="userStore.getUserInfo?.profile?.avatarUrl" alt="头像"/>
+              <div class="msg-tag" v-if="msgCode > 0">{{ msgCode }}</div>
+            </div>
+          </div>
+          <div class="login" v-else @click="login">登录</div>
+          <div class="login" @click="loginout">退出</div>
         </div>
       </div>
     </div>
@@ -29,14 +36,55 @@
 
 <script setup lang="ts">
 import LoginDialog from '@/components/login/LoginDialog.vue'
+import useUserStore from '@/stores/modules/user.ts'
+import { getMsgCode } from '@/api/user.ts'
+import { logout } from '@/api/login.ts'
+import type { ResponseType } from '@/types/index';
+import { ref, computed, watch } from 'vue';
 
-import { ref } from 'vue';
+// 用户信息数据
+const userStore = useUserStore()
 
 const loginDialog = ref(false)
 
+const isLogin = computed<boolean>(() => userStore.getIsLogin)
+
+// 消息提示
+const msgCode = ref(0)
+
+function loadMessage(): void {
+  getMsgCode({ limit: 1, offset: 100 })
+    .then((res: ResponseType) => {
+      if (res?.code === 200) {
+        msgCode.value = res?.newMsgCount || 0;
+      }
+    })
+    .catch(() => ({}));
+}
+
+// 登录
 function login():void {
   loginDialog.value = true;
 }
+
+// 退出登录
+function loginout() {
+  logout().then( (res: ResponseType) => {
+    if(res?.code === 200) {
+      console.log('退出登录了')
+      userStore.setLogout();
+    }
+  })
+}
+
+watch(() => isLogin.value,
+  () => {
+    if(!isLogin.value){
+      return;
+    }
+    loadMessage()
+  },{immediate: true}
+)
 </script>
 
 
@@ -145,8 +193,44 @@ function login():void {
           color: #787878;
           vertical-align: middle;
           cursor: pointer;
-          &:hover{
-            text-decoration: underline;
+          .user-avatar{
+            position: relative;
+            height: 70px;
+            .user-img{
+              position: absolute;
+              top: 50%;
+              width: 30px;
+              height: 30px;
+              line-height: 30px;
+              cursor: default;
+              border-radius: 30px;
+              transform: translateY(-50%);
+            }
+            .msg-tag {
+              position: absolute;
+              top: 15px;
+              left: 20px;
+              display: inline-block;
+              height: 17px;
+              min-width: 17px;
+              padding: 0 4px;
+              font-size: 12px;
+              line-height: 16px;
+              color: #fff;
+              text-align: center;
+              white-space: nowrap;
+              background: #c20c0c;
+              border: 1px solid #242424;
+              border-radius: 18px;
+              box-sizing: border-box;
+            }
+            &:hover{
+              text-decoration: underline;
+
+              .msg-tag{
+                display: none;
+              }
+            }
           }
         }
       }

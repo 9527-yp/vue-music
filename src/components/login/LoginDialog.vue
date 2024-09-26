@@ -27,16 +27,19 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { qrcodeKey, qrcodeImg, qrcodeCheck } from '@/api/login.ts'
+import { qrcodeKey, qrcodeImg, qrcodeCheck, accountInfo, userInfo } from '@/api/login.ts'
 import type { ResponseType } from '@/types/index';
 import Qrcode from './qr-code/Qrcode.vue'
 import Othercode from './other-code/Othercode.vue'
+
+import useUserStore from '@/stores/modules/user.ts'
 
 const loginDialog = defineModel("loginDialog", {
     type: Boolean,
     default: false
 })
 
+const userStore = useUserStore()
 // 登录方式切换
 const loginType = ref(true);
 
@@ -94,9 +97,38 @@ function getQscodeCheck(value: boolean): boolean | undefined {
         }
         // 授权成功
         if(res.code === 803) {
-            
+            const cookie = res.cookie as string;
+            const cookieArr: string[] = cookie.split(';;');
+            cookieArr.forEach(item => {
+                document.cookie = item;
+            });
+            userStore.setToken(res.cookie);
+            getAccount()
         }
     })
+}
+
+// 获取账号信息
+function getAccount(): void {
+  accountInfo()
+    .then((res: ResponseType) => {
+      if (res.code === 200) {
+        getUserInfo(res?.account?.id);
+      }
+    })
+    .catch(() => ({}));
+}
+
+// 获取用户详情
+function getUserInfo(uid: number): void {
+  userInfo({ uid })
+    .then((res: ResponseType) => {
+      if (res.code === 200) {
+        userStore.setUserInfo(res);
+        loginDialog.value = false;
+      }
+    })
+    .catch(() => ({}));
 }
 
 // 刷新
