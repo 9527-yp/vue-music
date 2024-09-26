@@ -20,12 +20,16 @@
           </div>
           <div class="login" v-if="isLogin">
             <div class="user-avatar">
-              <img class="user-img" :src="userStore.getUserInfo?.profile?.avatarUrl" alt="头像"/>
-              <div class="msg-tag" v-if="msgCode > 0">{{ msgCode }}</div>
+              <div class="user-img">
+                <img :src="userStore.getUserInfo?.profile?.avatarUrl" alt="头像"/>
+                <div class="msg-tag" v-if="msgCode > 0">{{ msgCode }}</div>
+                <div class="user-box">
+                  <User :msgCode="msgCode" />
+                </div>
+              </div>
             </div>
           </div>
           <div class="login" v-else @click="login">登录</div>
-          <div class="login" @click="loginout">退出</div>
         </div>
       </div>
     </div>
@@ -36,9 +40,9 @@
 
 <script setup lang="ts">
 import LoginDialog from '@/components/login/LoginDialog.vue'
+import User from '@/views/user/User.vue'
 import useUserStore from '@/stores/modules/user.ts'
 import { getMsgCode } from '@/api/user.ts'
-import { logout } from '@/api/login.ts'
 import type { ResponseType } from '@/types/index';
 import { ref, computed, watch } from 'vue';
 
@@ -65,16 +69,6 @@ function loadMessage(): void {
 // 登录
 function login():void {
   loginDialog.value = true;
-}
-
-// 退出登录
-function loginout() {
-  logout().then( (res: ResponseType) => {
-    if(res?.code === 200) {
-      console.log('退出登录了')
-      userStore.setLogout();
-    }
-  })
 }
 
 watch(() => isLogin.value,
@@ -202,13 +196,44 @@ watch(() => isLogin.value,
               width: 30px;
               height: 30px;
               line-height: 30px;
-              cursor: default;
-              border-radius: 30px;
+              cursor: pointer;
+              position: relative;
               transform: translateY(-50%);
+              img{
+                width: 100%;
+                height: 100%;
+                border-radius: 30px;
+              }
+              .user-box{
+                display: none;
+                position: absolute;
+                top:30px;
+                right: -63px;
+                padding-top: 10px;
+                &::before {
+                  position: absolute;
+                  top: -6px;
+                  left: 50%;
+                  width: 0;
+                  height: 0;
+                  border: 8px solid;
+                  content: '';
+                  transform: translateX(-50%);
+                  border-color: transparent transparent #2b2b2b;
+                }
+              }
+              &:hover{
+                .msg-tag{
+                  display: none;
+                }
+                .user-box{
+                  display: block;
+                }
+              }
             }
             .msg-tag {
               position: absolute;
-              top: 15px;
+              top: 0px;
               left: 20px;
               display: inline-block;
               height: 17px;
@@ -226,10 +251,6 @@ watch(() => isLogin.value,
             }
             &:hover{
               text-decoration: underline;
-
-              .msg-tag{
-                display: none;
-              }
             }
           }
         }
