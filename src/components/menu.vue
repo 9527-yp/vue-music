@@ -1,29 +1,76 @@
 <template>
     <div class="sub-menu">
-      <div class="sub-menu-warp">
+      <div class="sub-menu-warp" v-if="menuIndex === 0">
         <ul class="nav">
-          <li class="item active-item">
-            <span class="link">推荐</span>
-          </li>
-          <li class="item">
-            <span class="link">排行榜</span>
-          </li>
-          <li class="item">
-            <span class="link">歌单</span>
-          </li>
-          <li class="item">
-            <span class="link">主播电台</span>
-          </li>
-          <li class="item">
-            <span class="link">歌手</span>
-          </li>
-          <li class="item">
-            <span class="link">新碟上架</span>
+          <li class="item"
+           v-for="(item, index) in subMenuList"
+           :key="index"
+           :class="subMenuIndex == index ? 'active-item' : ''"
+           @click="hanldSubMenu(item, index)">
+            <span class="link">{{item?.title}}</span>
           </li>
         </ul>
       </div>
     </div>
 </template>
+
+<script setup lang="ts">
+  import useUserStore from '@/stores/modules/user.ts';
+  import { ref, computed, watch } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+
+  const route = useRoute();
+  const router = useRouter();
+  const userStore = useUserStore();
+  const menuIndex = computed<number>(() => userStore.getMenuIndex);
+  const subMenuIndex = computed<number>(() => userStore.getSubMenuIndex);
+
+  type SubMenuItem = {
+    title: string,
+    path: string
+  };
+  const subMenuList = ref<SubMenuItem[]>([
+    {
+      title: '推荐',
+      path: '/'
+    },
+    {
+      title: '排行榜',
+      path: '/'
+    },
+    {
+      title: '歌单',
+      path: '/'
+    },
+    {
+      title: '主播电台',
+      path: '/'
+    },
+    {
+      title: '歌手',
+      path: '/'
+    },
+    {
+      title: '新碟上架',
+      path: '/'
+    },
+  ]);
+
+  // 切换
+  function hanldSubMenu(item: SubMenuItem, index: number) {
+    userStore.setSubMenuIndex(index)
+  }
+
+  // 监听路由变化，修改选中菜单
+  watch(() => route.path,
+    (path) => {
+      let index = subMenuList.value.findIndex(item => item.path == path )
+      if(index !== -1){
+        userStore.setSubMenuIndex(index);
+      }
+    },{immediate: true}
+  )
+</script>
 
 <style lang="scss" scoped>
 .sub-menu{

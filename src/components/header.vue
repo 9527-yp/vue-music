@@ -1,15 +1,18 @@
 <template>
     <div class="h-top">
       <div class="h-warp">
-        <div class="logo"></div>
+        <div class="logo" @click="logoJump"></div>
         <ul class="nav">
-          <li class="item active-item">发现音乐</li>
-          <li class="item">我的音乐</li>
-          <li class="item">关注</li>
-          <li class="item">商城</li>
-          <li class="item">音乐人</li>
-          <li class="item">云推歌</li>
-          <li class="item">下载客户端</li>
+          <li class="item"
+           v-for="(item, index) in menu"
+           :key="index"
+           :class="menuIndex == index ? 'active-item' : ''"
+           @click="hanldMenu(item, index)">
+            <router-link class="link" v-if="item?.path" :to="item?.path">
+              {{ item?.title }}
+            </router-link>
+            <a v-else class="link" :href="item?.href" target="_blank">{{ item?.title }}</a>
+          </li>
         </ul>
         <div class="other">
           <div class="search">
@@ -45,17 +48,66 @@ import useUserStore from '@/stores/modules/user.ts'
 import { getMsgCode } from '@/api/user.ts'
 import type { ResponseType } from '@/types/index';
 import { ref, computed, watch } from 'vue';
+import { useRouter, useRoute } from "vue-router";
 
 // 用户信息数据
-const userStore = useUserStore()
+const userStore = useUserStore();
 
-const loginDialog = ref(false)
+// 路由跳转
+const router = useRouter()
+const route = useRoute()
 
-const isLogin = computed<boolean>(() => userStore.getIsLogin)
+const loginDialog = ref(false);
+
+const isLogin = computed<boolean>(() => userStore.getIsLogin);
+const menuIndex = computed<number>(() => userStore.getMenuIndex);
+
+// header 菜单列表
+type MenuType = {
+  title: string,
+  path?: string,
+  href?: string,
+}
+const menu = ref<MenuType[]>([
+  {
+    title: '发现音乐',
+    path: '/',
+  },
+  {
+    title: '我的音乐',
+    path: '/my-music'
+  },
+  {
+    title: '关注',
+    path: '/friend'
+  },
+  {
+    title: '商城',
+    href: 'https://music.163.com/store/product'
+  },
+  {
+    title: '音乐人',
+    href: 'https://music.163.com/st/musician'
+  },
+  {
+    title: '云推歌',
+    href: 'https://music.163.com/st/ad-song'
+  },
+  {
+    title: '下载客户端',
+    path: '/download'
+  },
+])
+// 菜单切换
+function hanldMenu(item: MenuType, index: number){
+  if(!item?.path){
+    return ;
+  }
+  userStore.setMenuIndex(index)
+}
 
 // 消息提示
 const msgCode = ref(0)
-
 function loadMessage(): void {
   getMsgCode({ limit: 1, offset: 100 })
     .then((res: ResponseType) => {
@@ -64,6 +116,12 @@ function loadMessage(): void {
       }
     })
     .catch(() => ({}));
+}
+
+function logoJump() {
+  if(route.path !== '/'){
+    router.push('/')
+  }
 }
 
 // 登录
@@ -77,6 +135,15 @@ watch(() => isLogin.value,
       return;
     }
     loadMessage()
+  },{immediate: true}
+)
+
+watch(() => route.path,
+  (path) => {
+    let index = menu.value.findIndex(item => item.path == path )
+    if(index !== -1){
+      userStore.setMenuIndex(index);
+    }
   },{immediate: true}
 )
 </script>
@@ -112,13 +179,23 @@ watch(() => isLogin.value,
           display: inline-block;
           height: 100%;
           font-size: 14px;
-          color: #ccc;
-          line-height: 70px;
-          padding: 0 19px;
+          // color: #ccc;
+          // line-height: 70px;
+          // padding: 0 19px;
+          vertical-align: middle;
           cursor: pointer;
           &:hover{
             background: #000;
             color: #fff;
+          }
+          .link{
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            color: #ccc;
+            line-height: 70px;
+            padding: 0 19px;
+            vertical-align: middle;
           }
         }
         .active-item{

@@ -9,8 +9,31 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/',
         name: 'home',
-        component: () => import('../views/home/Home.vue'),
-      }
+        component: () => 
+        import( /* webpackChunkName: "home" */'../views/home/Home.vue'),
+      },
+      {
+        path: '/my-music',
+        name: 'my-music',
+        component: () =>
+          import(
+            /* webpackChunkName: "my-music" */ '../views/my-music/MyMusic.vue'
+          )
+      },
+      {
+        path: '/friend',
+        name: 'friend',
+        component: () =>
+          import(/* webpackChunkName: "friend" */ '../views/friend/Friend.vue')
+      },
+      {
+        path: '/download',
+        name: 'download',
+        component: () =>
+          import(
+            /* webpackChunkName: "download" */ '../views/download/Download.vue'
+          )
+      },
     ]
   }
 ]

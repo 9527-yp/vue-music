@@ -20,6 +20,8 @@ const userStore = defineStore("user", {
         token: localStorage.getItem('cookie') || '',
         userInfo: faultTolerant('userInfo') || {},
         isLogin: faultTolerant('isLogin') || false,
+        menuIndex: faultTolerant('menuIndex') || 0,
+        subMenuIndex: faultTolerant('subMenuIndex') || 0,
       };
     },
     
@@ -38,6 +40,16 @@ const userStore = defineStore("user", {
         this.isLogin = true;
         setLocalStorage('isLogin', true)
       },
+      // 保存menuIndex
+      setMenuIndex(value: number) {
+        this.menuIndex = value;
+        setLocalStorage('menuIndex', value)
+      },
+      // 保存 home menuIndex
+      setSubMenuIndex(value: number) {
+        this.subMenuIndex = value;
+        setLocalStorage('subMenuIndex', value)
+      },
       // 退出登录
       setLogout() {
         this.token = ''
@@ -52,6 +64,8 @@ const userStore = defineStore("user", {
         // 账号信息
         getUserInfo: state => state.userInfo,
         getIsLogin: state => state.isLogin,
+        getMenuIndex: state => state.menuIndex,
+        getSubMenuIndex: state => state.subMenuIndex,
     }
   });
   
