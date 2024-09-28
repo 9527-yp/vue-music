@@ -2,6 +2,7 @@
 import Header from '@/components/header.vue'
 import Menu from '@/components/menu.vue'
 import FootView from '@/views/foot-view/FootView.vue';
+import BackUpper from '@/components/back-upper/BackUpper.vue'
 </script>
 
 <template>
@@ -11,6 +12,7 @@ import FootView from '@/views/foot-view/FootView.vue';
   </div>
   <RouterView />
   <FootView />
+  <BackUpper />
 </template>
 
 <style lang="scss" scoped>
