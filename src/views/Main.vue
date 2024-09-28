@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import Header from '@/components/header.vue'
 import Menu from '@/components/menu.vue'
+import FootView from '@/views/foot-view/FootView.vue';
 </script>
 
 <template>
   <div class="header">
     <Header />
     <Menu />
-    <div class="">
-
-    </div>
   </div>
   <RouterView />
+  <FootView />
 </template>
 
 <style lang="scss" scoped>

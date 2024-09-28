@@ -1,6 +1,9 @@
 <template>
     <div class="home">
         <Banner />
+        <div class="home-container">
+
+        </div>
     </div>
 </template>
 
@@ -11,5 +14,15 @@ import Banner from './components/banner/Banner.vue'
 <style lang="scss" scoped>
 .home{
     background-color: #f5f5f5;
+}
+.home-container{
+    width: 980px;
+    min-height: 700px;
+    margin: 0 auto;
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #d3d3d3;
+    border-width: 0 1px;
+    background: url('@/assets/images/home/wrap1.png') repeat-y 100% 100%;
 }
 </style>
