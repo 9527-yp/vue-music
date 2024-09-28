@@ -2,6 +2,7 @@
 import Header from '@/components/header.vue'
 import Menu from '@/components/menu.vue'
 import FootView from '@/views/foot-view/FootView.vue';
+import MyPlay from '@/views/my-play/MyPlay.vue';
 import BackUpper from '@/components/back-upper/BackUpper.vue'
 </script>
 
@@ -11,8 +12,12 @@ import BackUpper from '@/components/back-upper/BackUpper.vue'
     <Menu />
   </div>
   <RouterView />
+  <!-- foot -->
   <FootView />
+  <!-- 回到顶部 -->
   <BackUpper />
+  <!-- 底部播放 -->
+  <MyPlay />
 </template>
 
 <style lang="scss" scoped>
