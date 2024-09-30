@@ -326,9 +326,9 @@ watch(() => route.path,
               border-radius: 18px;
               box-sizing: border-box;
             }
-            &:hover{
-              text-decoration: underline;
-            }
+          }
+          &:hover{
+            text-decoration: underline;
           }
         }
       }
