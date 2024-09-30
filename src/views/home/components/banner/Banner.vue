@@ -293,7 +293,7 @@ onUnmounted(() => {
                 display: block;
                 width: 20px;
                 height: 265px;
-                background: url('@/assets/image/home/banner/banner-download-shadow.png');
+                background: url('@/assets/images/home/banner/banner-download-shadow.png');
                 background-position: -1px 0;
             }
             .shadowr {
@@ -304,7 +304,7 @@ onUnmounted(() => {
                 display: block;
                 width: 20px;
                 height: 285px;
-                background: url('@/assets/image/home/banner/banner-download-shadow.png');
+                background: url('@/assets/images/home/banner/banner-download-shadow.png');
                 background-position: -20px 0;
             }
         }
