@@ -23,6 +23,10 @@
   i {
     font-style: normal;
   }
+
+  em{
+    font-style: normal;
+  }
   
   input {
     background-color: #fff;
