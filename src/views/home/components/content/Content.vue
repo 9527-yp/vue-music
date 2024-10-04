@@ -77,7 +77,7 @@
             </ul>
         </div>
         <!-- 个性化推荐 -->
-        <div class="item-content-box">
+        <div v-if="isLogin" class="item-content-box">
             <div class="item-c-h">
                 <div class="h-title">个性化推荐</div>
             </div>
