@@ -18,3 +18,108 @@ export const bannerImgUrl = (): AxiosPromise => {
     params
   });
 };
+
+/**
+ * @description 获取热门推荐 - 推荐歌单
+ * @param { Object } params
+ * @param { number } params.limit - 偏移量(默认为30)
+ */
+export const recommendSongList = ({ limit } : {limit: number}): AxiosPromise => {
+  const params = {
+    timestamp: new Date().getTime(),
+    limit
+  };
+
+  return axios.request({
+    url: '/personalized',
+    method: 'get',
+    params
+  });
+};
+
+/**
+ * @description 获取个性化推荐
+ * @param { Object } params
+ */
+export const recommendResource = (): AxiosPromise => {
+  const params = {
+    timestamp: new Date().getTime(),
+  };
+
+  return axios.request({
+    url: '/recommend/resource',
+    method: 'get',
+    params
+  });
+};
+
+/**
+ * @description 获取推荐电台
+ * @param { Object } params
+ */
+export const recommendDjprogram = (): AxiosPromise => {
+  const params = {
+    timestamp: new Date().getTime(),
+  };
+
+  return axios.request({
+    url: '/personalized/djprogram',
+    method: 'get',
+    params
+  });
+};
+
+/**
+ * @description 获取新碟上架
+ * @param { Object } params
+ */
+export const albumNewest = (): AxiosPromise => {
+  const params = {
+    timestamp: new Date().getTime(),
+  };
+
+  return axios.request({
+    url: '/album/newest',
+    method: 'get',
+    params
+  });
+};
+
+/**
+ * @description 获取所有榜单
+ */
+export const topList = (): AxiosPromise => {
+  const params = { timestamp: new Date().getTime() };
+
+  return axios.request({
+    url: '/toplist',
+    method: 'get',
+    params
+  });
+};
+
+/**
+ * @description 获取歌单详情
+ * @param { Object } params
+ * @param { number } params.id - 歌单id
+ * @param { number } [params.s] - 歌单最近收藏者(默认为8)
+ */
+export const playlistDetail = ({
+  id,
+  s
+}: {
+  id: number;
+  s?: number;
+}): AxiosPromise => {
+  const params = {
+    timestamp: new Date().getTime(),
+    id,
+    s
+  };
+
+  return axios.request({
+    url: '/playlist/detail',
+    method: 'get',
+    params
+  });
+};

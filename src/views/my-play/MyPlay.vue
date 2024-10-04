@@ -32,7 +32,7 @@
                     <div class="rdy"></div>
                     <!-- 播放进度 -->
                     <div class="cur">
-                      <span class="status-icon">
+                      <span @mousedown="mousedown" class="status-icon">
                         <i class="icon"></i>
                       </span>
                     </div>
@@ -78,6 +78,10 @@
 
     function handelLock() {
     lock.value = !lock.value;
+    }
+
+    function mousedown(e) {
+      console.log('鼠标按下')
     }
 </script>
 
@@ -297,6 +301,7 @@
                 margin-left: -11px;
                 background: url('@/assets/images/play/iconall.png') no-repeat 0 9999px;
                 background-position: 0 -250px;
+                cursor: pointer;
                 .icon{
                   position: absolute;
                   left: 5px;
