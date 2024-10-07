@@ -8,7 +8,7 @@
                 </div>
             </div>
             <div class="container-side">
-
+                <Side />
             </div>
         </div>
     </div>
@@ -17,6 +17,7 @@
 <script setup lang="ts">
 import Banner from './components/banner/Banner.vue'
 import Content from './components/content/Content.vue'
+import Side from './components/side/Side.vue'
 </script>
 
 <style lang="scss" scoped>

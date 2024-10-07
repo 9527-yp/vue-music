@@ -147,7 +147,6 @@
     
     watch(() => isLogin.value,
         (value) => {
-            console.log(value, "value")
             if (!value) {
                 return;
             }
