@@ -26,22 +26,7 @@
                   <span class="song song-sing">橘子海 (Orange Ocean)</span>
                   <i class="src" title="来自榜单"></i>
                 </div>
-                <div class="play-status-box">
-                  <div class="bag">
-                    <!-- 缓存 -->
-                    <div class="rdy"></div>
-                    <!-- 播放进度 -->
-                    <div class="cur">
-                      <span @mousedown="mousedown" class="status-icon">
-                        <i class="icon"></i>
-                      </span>
-                    </div>
-                  </div>
-                  <span class="time">
-                    <em>00:21</em>
-                    / 03:33
-                  </span>
-                </div>
+                <PlayProgress />
               </div>
               <div class="oper">
                 <i class="icn icn-pip" title="画中画歌词"></i>
@@ -50,14 +35,12 @@
               </div>
               <div class="ctrl">
                 <!-- 音量调节 -->
-                <div class="m-vol">
-                  <div class="barbg"></div>
-                  <div class="vbg">
-                    <div class="curr"></div>
-                    <i class="btn"></i>
-                  </div>
-                </div>
-                <i class="icn icn-vol"></i>
+                <PlayVolume 
+                 :volumeNum="volumeNum" 
+                 v-model:volume="volume" 
+                 @progressChange="volumeProgressChange"
+                />
+                <i class="icn icn-vol" @click="volumeShow"></i>
                 <i class="icn icn-one"></i>
                 <span class="add">
                   <span class="tip">已添加到播放列表</span>
@@ -73,15 +56,24 @@
 
 <script setup lang="ts">
     import { ref } from 'vue';
+    import PlayProgress from '@/components/play-progress/PlayProgress.vue'
+    import PlayVolume from '@/components/play-volume/PlayVolume.vue'
 
-    const lock = ref<boolean>(false)
+    const lock = ref<boolean>(true)
+    const volume = ref<boolean>(false)
+
+
+    const volumeNum = ref(1)
+    function volumeProgressChange(value: number) {
+      volumeNum.value = value;
+    }
 
     function handelLock() {
     lock.value = !lock.value;
     }
 
-    function mousedown(e) {
-      console.log('鼠标按下')
+    function volumeShow() {
+      volume.value = !volume.value
     }
 </script>
 
@@ -271,59 +263,6 @@
             }
           }
         }
-        .play-status-box{
-          width: 466px;
-          position: relative;
-          .bag{
-            width: 466px;
-            height: 9px;
-            background: url('@/assets/images/play/statbar.png') no-repeat 0 9999px;
-            background-position: right 0;
-            .rdy{
-              height: 9px;
-              background: url('@/assets/images/play/statbar.png') no-repeat 0 9999px;
-              background-position: right 0;
-            }
-            .cur{
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 9%;
-              height: 9px;
-              background: url('@/assets/images/play/statbar.png') no-repeat 0 9999px;
-              background-position: left -66px;
-              .status-icon{
-                position: absolute;
-                top: -7px;
-                right: -13px;
-                width: 22px;
-                height: 24px;
-                margin-left: -11px;
-                background: url('@/assets/images/play/iconall.png') no-repeat 0 9999px;
-                background-position: 0 -250px;
-                cursor: pointer;
-                .icon{
-                  position: absolute;
-                  left: 5px;
-                  top: 5px;
-                  width: 12px;
-                  height: 12px;
-                  background: url('@/assets/images/play/loading.gif');
-                }
-              }
-            }
-          }
-          .time{
-            position: absolute;
-            top: -5px;
-            right: -84px;
-            color: #797979;
-            text-shadow: 0 1px 0 #121212;
-            em{
-              color: #a1a1a1;
-            }
-          }
-        }
       }
       .oper{
         width: 87px;
@@ -364,58 +303,12 @@
         background: url('@/assets/images/play/playbar.png') no-repeat 0 9999px;
         background-position: -147px -238px;
         float: left;
-        .m-vol{
-          position: absolute;
-          top: -113px;
-          left: 9px;
-          clear: both;
-          width: 32px;
-          height: 113px;
-          .barbg{
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 32px;
-            height: 113px;
-            background: url('@/assets/images/play/playbar.png') no-repeat 0 9999px;
-            background-position: 0 -503px;
-          }
-          .vbg{
-            position: absolute;
-            left: 14px;
-            width: 4px;
-            height: 93px;
-            padding: 4px 0;
-            top: 7px;
-            .curr{
-              height: 74.4px;
-              width: 4px;
-              position: absolute;
-              top: auto;
-              bottom: 4px;
-              left: 0;
-              background: url('@/assets/images/play/playbar.png') no-repeat 0 9999px;
-              background-position: -40px bottom;
-              overflow: hidden;
-            }
-            .btn{
-              position: absolute;
-              top: 16.2px;
-              left: -7px;
-              display: block;
-              width: 18px;
-              height: 20px;
-              background: url('@/assets/images/play/iconall.png') no-repeat 0 9999px;
-              background-position: -40px -250px;
-              cursor: pointer;
-            }
-          }
-        }
         .icn{
           float: left;
           width: 25px;
           height: 25px;
           margin: 11px 2px 0 0;
+          cursor: pointer;
           text-indent: -9999px;
           background: url('@/assets/images/play/playbar.png') no-repeat 0 9999px;
         }
