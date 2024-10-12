@@ -27,7 +27,7 @@
                         </span>
                         <span class="text text-hov">{{i?.name}}</span>
                         <div class="oper">
-                            <i class="icn play-icn" title="播放"></i>
+                            <i class="icn play-icn" title="播放" @click="playBtn(i)"></i>
                             <i class="icn add-icn" title="添加到播放列表"></i>
                             <i class="icn collect-icn" title="收藏"></i>
                         </div>
@@ -45,7 +45,10 @@
 import { ref, computed, watch } from 'vue';
 import { topList, playlistDetail } from '@/api/home.ts'
 import type { ResponseType } from '@/types/index';
-import { getBigNumberTransform, getCurrentWeekday, getDate } from '@/utils/utils.ts';
+import usePlayStore from '@/stores/modules/play.ts'
+
+// 获取play 状态数据
+const playStore = usePlayStore()
 
 type songListItem = {
     id?: number;
@@ -61,6 +64,13 @@ type songListItem = {
         }[];
     };
 }
+
+function playBtn(item: object) {
+    let playSongItem = {}
+    playSongItem
+    console.log(item, 'item')
+}
+
 const songList = ref<songListItem[]>([])
 function getTopList() {
     topList().then((res: ResponseType) => {
