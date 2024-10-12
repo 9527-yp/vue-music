@@ -18,6 +18,38 @@
                 </div>
                 <div class="main-pc">
                     <div class="title">在电脑上听</div>
+                    <div class="pc-img">
+                        <img v-if="pcTitleIndex === 1" src="@/assets/images/download/new-pc.png" alt="">
+                        <img v-else src="@/assets/images/download/old-pc.png" alt="">
+                    </div>
+                    <div class="pc-text">
+                        {{pcTitleIndex ? '全新上线高清音质、个性皮肤、播放动效等' : '经典怀旧版，无法享受高清音质、黑胶皮肤、云盘管理等新版功能'}}
+                        </div>
+                    <div class="pc-button">
+                        <span class="pc-btn-left">
+                            <i class="pc-btn-icn"></i>
+                            {{ pcTitleIndex ? '下载新版本客户端' : '下载旧版本客户端' }}
+                        </span>
+                        <span class="pc-btn-line"></span>
+                        <span class="pc-btn-right" @click="pcToggle">
+                            <i class="pc-icn-unfold" v-if="!pcTooltip"></i>
+                            <i class="pc-icn-packup" v-if="pcTooltip"></i>
+                        </span>
+                        <div class="pc-download-select" v-if="pcTooltip">
+                            <div class="select-item select-item-new" @click="selectItemBtn(1)">
+                                新版本客户端
+                                <i class="pc-select-newtag"></i>
+                            </div>
+                            <div class="select-item-line"></div>
+                            <div class="select-item" @click="selectItemBtn(2)">旧版本客户端</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-mobile">
+                    <div class="title">在电脑上听</div>
+                    <div class="mobile-img">
+                        <img src="@/assets/images/download/mobile.png" alt="">
+                    </div>
                 </div>
             </div>
         </div>
@@ -32,6 +64,8 @@ type otherListItem = {
     title: string,
     iconPad?: string
 };
+
+// 其他操作系统切换
 const otherShow = ref(false);
 const otherList: otherListItem[] = [
     {
@@ -76,9 +110,23 @@ const otherList: otherListItem[] = [
         title: 'TV',
     },
 ];
-
 function handleOther() {
     otherShow.value = !otherShow.value
+};
+
+// pc端
+const pcTooltip = ref<boolean>(false);
+const pcTitleIndex = ref<number>(1);
+function pcToggle() {
+    pcTooltip.value = !pcTooltip.value
+};
+function selectItemBtn(value: number) {
+    if(value === 1) {
+        pcTitleIndex.value = 1
+    }else{
+        pcTitleIndex.value = 0
+    }
+    pcTooltip.value = false
 };
 </script>
 
@@ -111,8 +159,8 @@ function handleOther() {
     .content{
         position: relative;
         width: 100%;
-        height: 700px;
         padding-top: 80px;
+        padding-bottom: 112px;
         background: url("@/assets/images/download/content-bag.png") no-repeat;
         background-color: #222;
         background-size: cover;
@@ -235,6 +283,7 @@ function handleOther() {
                 width: 556px;
                 height: 100%;
                 text-align: center;
+                vertical-align: top;
                 .title{
                     width: 100%;
                     text-align: center;
@@ -242,6 +291,154 @@ function handleOther() {
                     opacity: 0.8;
                     color: #FFFFFF;
                     margin-bottom: 23px;
+                }
+                .pc-img{
+                    width: 464px;
+                    height: 273px;
+                    margin: 0 auto 3px;
+                    img{
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+                .pc-text{
+                    font-size: 14px;
+                    color: rgb(255, 255, 255);
+                    opacity: 0.7;
+                }
+                .pc-button{
+                    width: 300px;
+                    height: 65px;
+                    margin: 32px auto 0 auto;
+                    border-radius: 20px;
+                    background-color: #fff;
+                    color: #ff3a3a;
+                    font-size: 22px;
+                    line-height: 65px;
+                    text-align: center;
+                    cursor: pointer;
+                    box-sizing: content-box;
+                    position: relative;
+                    .pc-btn-left{
+                        padding-left: 20px;
+                        .pc-btn-icn{
+                            display: inline-block;
+                            width: 20px;
+                            height: 20px;
+                            margin-right: 3px;
+                            background: url('@/assets/images/download/pc-btn-icn.png') no-repeat center;
+                            background-size: contain;
+                            vertical-align: -3px;
+                        }
+                    }
+                    .pc-btn-line{
+                        margin: 0 0 0 20px;
+                        display: inline-block;
+                        background-color: #ff3a3a;
+                        opacity: 0.1;
+                        width: 1px;
+                        height: 21px;
+                        vertical-align: -3px;
+                    }
+                    .pc-btn-right{
+                        padding-left: 20px;
+                        .pc-icn-unfold{
+                            display: inline-block;
+                            width: 16px;
+                            height: 16px;
+                            background: url("@/assets/images/download/unfold.png") no-repeat;
+                            background-size: contain;
+                            opacity: 0.6;
+                            vertical-align: 3px;
+                            &:hover{
+                                opacity: 1;
+                            }
+                        }
+                        .pc-icn-packup{
+                            display: inline-block;
+                            width: 16px;
+                            height: 16px;
+                            background: url("@/assets/images/download/packup.png") no-repeat;
+                            background-size: contain;
+                            opacity: 0.6;
+                            vertical-align: -3px;
+                            &:hover{
+                                opacity: 1;
+                            }
+                        }
+                    }
+                }
+                .pc-download-select{
+                    position: absolute;
+                    right: 0px;
+                    top: 80px;
+                    box-sizing: border-box;
+                    width: 306px;
+                    height: 100px;
+                    background-color: #fff;
+                    border-radius: 20px;
+                    padding: 10px;
+                    font-weight: 400;
+                    .select-item{
+                        padding: 0px 15px;
+                        border-radius: 10px;
+                        width: 288px;
+                        height: 38px;
+                        line-height: 38px;
+                        font-size: 16px;
+                        color: #283248;
+                        text-align: left;
+                        cursor: pointer;
+                        box-sizing: border-box;
+                        .pc-select-newtag{
+                            display: inline-block;
+                            width: 30px;
+                            height: 30px;
+                            background: url("@/assets/images/download/pc-select-newtag.png") no-repeat center;
+                            background-size: contain;
+                            vertical-align: -10px;
+                            position: relative;
+                            left: 108px;
+                        }
+                        &:hover{
+                            background-color: #f5f5f5;
+                        }
+                    }
+                    .select-item-new{
+                        color: rgb(255, 58, 58);
+                    }
+                    .select-item-line{
+                        padding: 0px 15px;
+                        background-color: #283248;
+                        opacity: 0.06;
+                        height: 1px;
+                    }
+                }
+            }
+            .main-mobile{
+                position: relative;
+                display: inline-block;
+                margin-left: 220px;
+                width: 306px;
+                height: 100%;
+                text-align: center;
+                vertical-align: top;
+                .title{
+                    width: 100%;
+                    text-align: center;
+                    font-size: 22px;
+                    opacity: 0.8;
+                    color: #FFFFFF;
+                    margin-bottom: 23px;
+                }
+                .mobile-img{
+                    width: 246px;
+                    height: 273px;
+                    margin: 0 auto;
+                    img{
+                        width: 100%;
+                        height: 100%;
+                    }
                 }
             }
         }
