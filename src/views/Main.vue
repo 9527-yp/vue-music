@@ -4,9 +4,11 @@ import Menu from '@/components/menu.vue'
 import FootView from '@/views/foot-view/FootView.vue';
 import MyPlay from '@/views/my-play/MyPlay.vue';
 import BackUpper from '@/components/back-upper/BackUpper.vue'
+import LoginDialog from '@/components/login/LoginDialog.vue'
 </script>
 
 <template>
+<!-- 头部 -->
   <div class="header">
     <Header />
     <Menu />
@@ -18,6 +20,10 @@ import BackUpper from '@/components/back-upper/BackUpper.vue'
   <BackUpper />
   <!-- 底部播放 -->
   <MyPlay />
+  <!-- 登录弹框 -->
+  <teleport to="body">
+      <LoginDialog />
+    </teleport>
 </template>
 
 <style lang="scss" scoped>

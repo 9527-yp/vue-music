@@ -26,26 +26,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { qrcodeKey, qrcodeImg, qrcodeCheck, accountInfo, userInfo } from '@/api/login.ts'
 import type { ResponseType } from '@/types/index';
 import Qrcode from './qr-code/Qrcode.vue'
 import Othercode from './other-code/Othercode.vue'
-
 import useUserStore from '@/stores/modules/user.ts'
 
-const loginDialog = defineModel("loginDialog", {
-    type: Boolean,
-    default: false
-})
 
 const userStore = useUserStore()
+
+// 弹框显示|隐藏
+const loginDialog = computed(() => userStore.getLoginDialogShow)
 // 登录方式切换
 const loginType = ref(true);
 
 // 关闭
 function cancel(): void {
-    loginDialog.value = false;
+    userStore.setLoginDialogShow(false)
 }
 
 function editLoginType (value: boolean) {

@@ -13,15 +13,24 @@ function faultTolerant(name: string) {
 
 // defineStore方法执行会返回一个函数，函数的作用就是让组件可以获取到仓库数据
 const userStore = defineStore("user", {
-    
+
+    /**
+     * token: 登录获取的token
+     * userInfo：个人信息
+     * isLogin：是否登录
+     * menuIndex： 顶部菜单选中的index
+     * subMenuIndex：首页-菜单选中的index
+     * loginDialogShow：登录弹框
+     */
     // 存储数据state
     state: (): any => {
       return {
-        token: localStorage.getItem('cookie') || '',
+        token: localStorage.getItem('cookie') || '', 
         userInfo: faultTolerant('userInfo') || {},
         isLogin: faultTolerant('isLogin') || false,
         menuIndex: faultTolerant('menuIndex') || 0,
         subMenuIndex: faultTolerant('subMenuIndex') || 0,
+        loginDialogShow: false
       };
     },
     
@@ -50,6 +59,10 @@ const userStore = defineStore("user", {
         this.subMenuIndex = value;
         setLocalStorage('subMenuIndex', value)
       },
+      // 弹框关闭\显示
+      setLoginDialogShow(value: boolean) {
+        this.loginDialogShow = value;
+      },
       // 退出登录
       setLogout() {
         this.token = ''
@@ -66,6 +79,7 @@ const userStore = defineStore("user", {
         getIsLogin: state => state.isLogin,
         getMenuIndex: state => state.menuIndex,
         getSubMenuIndex: state => state.subMenuIndex,
+        getLoginDialogShow: state => state.loginDialogShow,
     }
   });
   

@@ -46,10 +46,71 @@
                     </div>
                 </div>
                 <div class="main-mobile">
-                    <div class="title">在电脑上听</div>
+                    <div class="title">在手机上听</div>
                     <div class="mobile-img">
                         <img src="@/assets/images/download/mobile.png" alt="">
                     </div>
+                    <div class="mobile-button">
+                        <span class="mobile-btn-left">
+                            <i class="mobile-btn-icn"></i>
+                            下载手机端
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="group quku">
+            <div class="group-container">
+                <div class="container-text-left">
+                    <h3 class="container-title">千万曲库  首首CD音质</h3>
+                    <p class="container-text">囊括百万无损SQ音乐，你在用手机听歌时，<br>也能感受到纤毫毕现的CD音质，更能免费离线收听</p>
+                </div>
+                <div class="container-img-right">
+                    <img src="../../assets/images/download/quku-img.jpg" alt="">
+                </div>
+            </div>
+        </div>
+        <div class="group star">
+            <div class="group-container">
+                <div class="container-text-right">
+                    <h3 class="container-title">千位明星  亲自推荐音乐</h3>
+                    <p class="container-text">韩红，戴佩妮等<em>千位明星已入驻</em>，亲自创建私房歌单，录制独 <br>家DJ节目，推荐他们心中的好音乐</p>
+                </div>
+                <div class="container-img-left">
+                    <img src="../../assets/images/download/star-img.jpg" alt="">
+                </div>
+            </div>
+        </div>
+        <div class="group relation">
+            <div class="group-container">
+                <div class="container-text-left">
+                    <h3 class="container-title">社交关系  发现全新音乐</h3>
+                    <p class="container-text">你可以<em>关注明星</em>、DJ和好友，通过浏览他们的动态、收藏和<br>分享，发现更多全新好音乐</p>
+                </div>
+                <div class="container-img-right">
+                    <img src="../../assets/images/download/relation-img.jpg" alt="">
+                </div>
+            </div>
+        </div>
+        <div class="group synchronization">
+            <div class="group-container">
+                <div class="container-text-right">
+                    <h3 class="container-title">手机电脑  歌单实时同步</h3>
+                    <p class="container-text">只要一个帐号，你就可以同步在手机、电脑上创建、收藏<br>的歌单，<em>随时随地畅享好音乐</em></p>
+                </div>
+                <div class="container-img-left">
+                    <img src="../../assets/images/download/synchronization-img.jpg" alt="">
+                </div>
+            </div>
+        </div>
+        <div class="group music">
+            <div class="group-container">
+                <div class="container-text-left">
+                    <h3 class="container-title">听歌识曲  助你疯狂猜歌</h3>
+                    <p class="container-text">歌曲很动听却不知道歌名，歌名在嘴边却想不起来……<br>用<em>听歌识曲</em>功能，几秒钟就知道歌名</p>
+                </div>
+                <div class="container-img-right">
+                    <img src="../../assets/images/download/music-img.jpg" alt="">
                 </div>
             </div>
         </div>
@@ -160,7 +221,7 @@ function selectItemBtn(value: number) {
         position: relative;
         width: 100%;
         padding-top: 80px;
-        padding-bottom: 112px;
+        padding-bottom: 196px;
         background: url("@/assets/images/download/content-bag.png") no-repeat;
         background-color: #222;
         background-size: cover;
@@ -440,7 +501,107 @@ function selectItemBtn(value: number) {
                         height: 100%;
                     }
                 }
+                .mobile-button{
+                    width: 300px;
+                    height: 65px;
+                    margin: 50px auto 0 auto;
+                    border-radius: 20px;
+                    background-color: #fff;
+                    color: #ff3a3a;
+                    font-size: 22px;
+                    line-height: 65px;
+                    text-align: center;
+                    cursor: pointer;
+                    box-sizing: content-box;
+                    position: relative;
+                    .mobile-btn-left{
+                        padding-left: 20px;
+                        .mobile-btn-icn{
+                            display: inline-block;
+                            width: 20px;
+                            height: 20px;
+                            margin-right: 3px;
+                            background: url('@/assets/images/download/mobile-btn-icn.png') no-repeat center;
+                            background-size: contain;
+                            vertical-align: -3px;
+                        }
+                    }
+                }
             }
+        }
+    }
+    .group{
+        background-color: #fff;
+        border-bottom: 1px solid #e3e3e3;
+        .group-container{
+            width: 982px;
+            margin: 0 auto;
+            .container-text-left{
+                float: left;
+                margin-left: 30px;
+            }
+            .container-text-right{
+                float: right;
+            }
+            .container-img-right{
+                float: right;
+                margin-right: 57px;
+            }
+            .container-img-left{
+                float: left;
+                margin-left: 30px;
+            }
+            .container-title{
+                font-size: 40px;
+                font-weight: normal;
+                padding: 45px 0 5px 0;
+                font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif;
+            }
+            .container-text{
+                font-size: 16px;
+                color: #666;
+                line-height: 24px;
+                font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif;
+            }
+        }
+    }
+    .quku{
+        box-sizing: border-box;
+        height: 437px;
+        padding-top: 120px;
+    }
+    .star{
+        background: #f8f8f8;
+        height: 437px;
+        padding-top: 106px;
+        box-sizing: border-box;
+        em{
+            color: #cc0000;
+        }
+    }
+    .relation{
+        height: 437px;
+        padding-top: 72px;
+        box-sizing: border-box;
+        em{
+            color: #cc0000;
+        }
+    }
+    .synchronization{
+        background: #f8f8f8;
+        height: 437px;
+        padding-top: 95px;
+        box-sizing: border-box;
+        em{
+            color: #cc0000;
+        }
+    }
+    .music{
+        height: 437px;
+        padding-top: 53px;
+        box-sizing: border-box;
+        em{
+            color: #cc0000;
         }
     }
 }

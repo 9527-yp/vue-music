@@ -36,13 +36,9 @@
         </div>
       </div>
     </div>
-    <teleport to="body">
-      <LoginDialog v-model:loginDialog="loginDialog"/>
-    </teleport>
 </template>
 
 <script setup lang="ts">
-import LoginDialog from '@/components/login/LoginDialog.vue'
 import User from '@/views/user/User.vue'
 import useUserStore from '@/stores/modules/user.ts'
 import { getMsgCode } from '@/api/user.ts'
@@ -56,8 +52,6 @@ const userStore = useUserStore();
 // 路由跳转
 const router = useRouter()
 const route = useRoute()
-
-const loginDialog = ref(false);
 
 const isLogin = computed<boolean>(() => userStore.getIsLogin);
 const menuIndex = computed<number>(() => userStore.getMenuIndex);
@@ -126,7 +120,7 @@ function logoJump() {
 
 // 登录
 function login():void {
-  loginDialog.value = true;
+  userStore.setLoginDialogShow(true)
 }
 
 watch(() => isLogin.value,
