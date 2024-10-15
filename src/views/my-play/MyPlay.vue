@@ -26,6 +26,7 @@
                   <span class="song song-sing">橘子海 (Orange Ocean)</span>
                   <i class="src" title="来自榜单"></i>
                 </div>
+                <!-- 播放条 -->
                 <PlayProgress />
               </div>
               <div class="oper">

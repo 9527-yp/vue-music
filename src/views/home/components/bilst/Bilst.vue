@@ -45,10 +45,10 @@
 import { ref, computed, watch } from 'vue';
 import { topList, playlistDetail } from '@/api/home.ts'
 import type { ResponseType } from '@/types/index';
-import usePlayStore from '@/stores/modules/play.ts'
+import { songType } from '@/hooks/methods/songFormat'
+import usePlaySong from '@/hooks/usePlaySong.ts'
+import useSongAddPlayList from '@/hooks/useSongAddPlayList.ts'
 
-// 获取play 状态数据
-const playStore = usePlayStore()
 
 type songListItem = {
     id?: number;
@@ -65,10 +65,9 @@ type songListItem = {
     };
 }
 
-function playBtn(item: object) {
-    let playSongItem = {}
-    playSongItem
-    console.log(item, 'item')
+function playBtn(item: songType) {
+    usePlaySong(item);
+    useSongAddPlayList(item);
 }
 
 const songList = ref<songListItem[]>([])
