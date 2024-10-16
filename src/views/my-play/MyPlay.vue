@@ -8,26 +8,38 @@
                 </div>
                 <div class="right"></div>
             </div>
+            <!-- 播放器实例组件 -->
+            <Audio
+              :src="playUrl"
+              :volume="volumeNum"
+              ref="audioRef"
+              @timeupdate="audioTimeUpdate"/>
             <div class="bg"></div>
             <div class="hand"></div>
             <div class="wrap">
               <div class="btns">
                 <i class="prev" title="上一首"></i>
-                <i class="play" title="播放/暂停"></i>
+                <i :class="playStatus.look ? 'pause' : 'play'" title="播放/暂停" @click="togglePlayStatus"></i>
                 <i class="nxt" title="下一首"></i>
               </div>
               <div class="head">
-                <img class="song-img" src="" alt="">
+                <img class="song-img" :src="playSongItem?.picUrl" alt="">
                 <i class="mask"></i>
               </div>
               <div class="play">
                 <div class="words">
-                  <span class="song song-name">卧室假日(Bedroom Holiday)</span>
-                  <span class="song song-sing">橘子海 (Orange Ocean)</span>
+                  <span class="song song-name">{{ playSongItem.name }}</span>
+                  <span class="song song-sing">
+                    <span v-for="(item, index) in playSongItem.artists" :key="item.id" :title="item.name">{{item.name}}<i v-show="index !== playSongItem.artists.length-1">/</i></span>
+                  </span>
                   <i class="src" title="来自榜单"></i>
                 </div>
                 <!-- 播放条 -->
-                <PlayProgress />
+                <PlayProgress
+                 :loading="playStatus.loading"
+                 :current="playProgress.progress" 
+                 :cache="playProgress.cacheProgress"
+                 @progressChange="audioProgressChange" />
               </div>
               <div class="oper">
                 <i class="icn icn-pip" title="画中画歌词"></i>
@@ -42,7 +54,10 @@
                  @progressChange="volumeProgressChange"
                 />
                 <i class="icn icn-vol" @click="volumeShow"></i>
-                <i class="icn icn-one"></i>
+                <i class="icn icn-one" title="单曲循环" v-if="mode.modeIndex === 1" @click="modeChange('单曲循环')"></i>
+                <i class="icn icn-loop" title="循环" v-if="mode.modeIndex === 2" @click="modeChange('循环')"></i>
+                <i class="icn icn-shuffle" title="随机" v-if="mode.modeIndex === 3" @click="modeChange('随机')"></i>
+                <div class="mode-tooltip" v-show="mode.visible">{{mode.modeName}}</div>
                 <span class="add">
                   <span class="tip">已添加到播放列表</span>
                   <i class="icn icn-list">1</i>
@@ -56,25 +71,140 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { ref, computed, reactive } from 'vue';
     import PlayProgress from '@/components/play-progress/PlayProgress.vue'
     import PlayVolume from '@/components/play-volume/PlayVolume.vue'
+    import Audio from '@/components/audio/Audio.vue'
+    import type { ResponseType } from '@/types/index';
+    import usePlayStore from '@/stores/modules/play.ts'
+    import { getSongPlayUrl } from '@/api/my-music.ts'
 
+    const playStore = usePlayStore()
+
+    // 当前播放的歌曲详情
+    const playSongItem = computed(() => playStore.getPlaySongItem)
+    // 播放显示/隐藏
     const lock = ref<boolean>(true)
+    // 音量条显示/隐藏
     const volume = ref<boolean>(false)
 
+    // 歌曲url
+    const playUrl = ref<string>('');
+    function getAudioPlayUrl() {
+      return getSongPlayUrl({id: playSongItem.value.id}).then((res: ResponseType) => {
+        if(res.code === 200) {
+          playUrl.value = res.data?.[0]?.url ?? '';
+        }
+      })
+    }
+    getAudioPlayUrl();
 
+    // 播放器实例组件ref
+    const audioRef = ref();
+
+    // 播放状态
+    const playStatus = ref({
+      loading: false,
+      look: false
+    });
+    // 播放/暂停操作
+    function togglePlayStatus() {
+      playStatus.value.loading = true;
+      playStatus.value.look = !playStatus.value.look
+
+      if(audioRef.value && playStatus.value.look) {
+        console.log('播放')
+        audioRef.value.ref.play();
+      }
+
+      if (audioRef.value && !playStatus.value.look) {
+        console.log('暂停')
+        audioRef.value.ref.pause();
+      }
+      playStatus.value.loading = false;
+
+    }
+
+    // 播放进度
+    const playProgress = ref({
+      currentTime: 0, // 当前播放时间位置
+      duration: 0, // 音频的长度
+      progress: 0, // 播放进度
+      cacheProgress: 0, // 缓存进度
+      manualUpdate: false
+    });
+
+    
+    function audioTimeUpdate(currentTime: number, duration: number, cache: number) {
+      if (playProgress.value.manualUpdate) {
+        return;
+      }
+      playProgress.value = {
+        ...playProgress.value,
+        currentTime: currentTime,
+        duration: duration,
+        progress: currentTime / duration,
+        cacheProgress: cache / duration
+      }
+    }
+
+    // 播放进度拖拽
+    function audioProgressChange(value: number): void {
+      playProgress.value.manualUpdate = true;
+
+      playProgress.value = {
+        ...playProgress.value,
+        currentTime: playProgress.value.duration * value,
+        progress: value,
+      }
+
+      // 更新播放时间
+      audioRef.value.ref.currentTime = playProgress.value.duration * value;
+
+      playProgress.value.manualUpdate = false;
+    }
+
+    // 音量加减操作
     const volumeNum = ref(1)
     function volumeProgressChange(value: number) {
       volumeNum.value = value;
     }
 
+    // 播放器显示/隐藏
     function handelLock() {
     lock.value = !lock.value;
     }
 
+    // 音量操作显示/隐藏
     function volumeShow() {
       volume.value = !volume.value
+    }
+
+    type ModeItem = {
+      modeIndex: number,
+      modeName: string,
+      visible: boolean,
+      timer: NodeJS.Timeout | null
+    }
+    // 播放模式切换
+    const mode = reactive<ModeItem>({
+      modeIndex: 1,
+      modeName: '单曲循环',
+      visible: false,
+      timer: null,
+    })
+    function modeChange(value: string) {
+      mode.modeName = value
+      mode.visible = true
+      if(mode.modeIndex !== 3){
+        mode.modeIndex++
+      }else{
+        mode.modeIndex = 1
+      }
+      mode.timer && clearTimeout(mode.timer)
+      mode.timer = setTimeout(() => {
+        mode.visible = false
+      }, 1000)
     }
 </script>
 
@@ -177,6 +307,7 @@
           margin-right: 8px;
           margin-top: 5px;
           text-indent: -9999px;
+          cursor: pointer;
           background: url('@/assets/images/play/playbar.png') no-repeat 0 9999px;
         }
         .prev{
@@ -192,6 +323,15 @@
           background-position: 0 -204px;
           &:hover{
             background-position: -40px -204px;
+          }
+        }
+        .pause{
+          width: 36px;
+          height: 36px;
+          margin-top: 0;
+          background-position: 0 -165px;
+          &:hover{
+            background-position: -40px -165px;
           }
         }
         .nxt{
@@ -384,6 +524,19 @@
               background: url('@/assets/images/play/audio-quality-hover.png');
             }
           }
+        }
+        .mode-tooltip{
+          position: absolute;
+          top: -35px;
+          left: 12px;
+          width: 81px;
+          height: 39px;
+          color: #fff;
+          text-align: center;
+          line-height: 34px;
+          clear: both;
+          background: url('@/assets/images/play/playbar.png') no-repeat 0 9999px;
+          background-position: 0 -457px;
         }
       }
     }

@@ -75,6 +75,7 @@ const userStore = defineStore("user", {
     // 计算属性，和vuex是使用一样，getters里面不是方法，是计算返回的结果值
     getters: {
         // 账号信息
+        getToken: state => state.token,
         getUserInfo: state => state.userInfo,
         getIsLogin: state => state.isLogin,
         getMenuIndex: state => state.menuIndex,

@@ -1,5 +1,6 @@
 
 import axios from 'axios';
+import useUserStore from '@/stores/modules/user.ts'
 
 // token的消息头
 const TOKEN_HEADER = 'Authorization'
@@ -16,6 +17,20 @@ const icemAxios = axios.create({
 icemAxios.interceptors.request.use(
     (config) => {
       config.headers['Content-Type'] = 'application/json;charset=UTF-8'
+
+      const userStore = useUserStore()
+
+      if (userStore.getIsLogin && config.method === 'get') {
+        config.params = Object.assign(config.params || {}, {
+          cookie: encodeURIComponent(userStore.getToken)
+        });
+      }
+
+      if (userStore.getIsLogin && config.method === 'post') {
+        config.params = Object.assign(config.data || {}, {
+          cookie: userStore.getToken
+        });
+      }
       return config
     },
     (error) => {

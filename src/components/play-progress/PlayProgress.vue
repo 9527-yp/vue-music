@@ -2,11 +2,11 @@
   <div id="progress" class="play-status-box" @click="handleProgressClick">
     <div class="bag">
       <!-- 缓存 -->
-      <div class="rdy"></div>
+      <div class="rdy" :style="{ width: cacheProgress }"></div>
       <!-- 播放进度 -->
-      <div class="cur" ref="currentProgressRef">
+      <div class="cur" ref="currentProgressRef" :style="{ width: currentProgress }">
         <span class="status-icon" ref="roundProgressRef">
-          <i class="icon-loading"></i>
+          <i class="icon-loading" v-show="loading"></i>
         </span>
       </div>
       <div class="total-progress" ref="totalProgressRef"></div>
@@ -19,8 +19,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
+import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
 
+const emits = defineEmits(['progressChange']);
+const props = defineProps({
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  current: {
+    type: Number,
+    default: 0
+  },
+  cache: {
+    type: Number,
+    default: 0
+  }
+})
 type ProgressRef = HTMLDivElement | HTMLElement | null;
 
 const roundProgressRef = ref<ProgressRef>(null);
@@ -39,6 +54,19 @@ const progress = reactive({
   isDown: false,
   isDrag: false
 });
+
+const currentProgress = computed(() => {
+  if(progress.isDrag){
+    // 拖动时停止更新进度条
+    return;
+  }
+
+  return props.current * 100 + '%';
+})
+
+const cacheProgress = computed(() => {
+  return props.cache * 100 + '%';
+})
 
 // 鼠标按下
 function mousedown(e: MouseEvent): void {
@@ -90,7 +118,7 @@ function mouseup() {
     }
     progress.isDown = false;
     progress.isDrag = false;
-    // emits('progressChange', progress.current);
+    emits('progressChange', progress.current);
 }
 
 // 点击
@@ -107,7 +135,7 @@ function handleProgressClick(e: MouseEvent): void {
     const totalOffestWidth = total.offsetWidth || 0;
     current.style.width = (e.offsetX / totalOffestWidth) * 100 + '%';
 
-    // emits('progressChange', e.offsetX / totalOffestWidth);
+    emits('progressChange', e.offsetX / totalOffestWidth);
 }
 onMounted(() => {
     const progressDom = document.querySelector('#progress') as HTMLDivElement;
@@ -137,7 +165,7 @@ onBeforeUnmount(() => {
     background: url("@/assets/images/play/statbar.png") no-repeat 0 9999px;
     background-position: right 0;
     .rdy {
-      width: 90%;
+      // width: 90%;
       height: 9px;
       background: url("@/assets/images/play/statbar.png") no-repeat 0 9999px;
       background-position: right -30px;
@@ -146,7 +174,7 @@ onBeforeUnmount(() => {
       position: absolute;
       top: 0;
       left: 0;
-      width: 9%;
+      // width: 9%;
       height: 9px;
       z-index: 2;
       background: url("@/assets/images/play/statbar.png") no-repeat 0 9999px;
