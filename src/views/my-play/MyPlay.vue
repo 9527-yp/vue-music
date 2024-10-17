@@ -13,14 +13,16 @@
               :src="playUrl"
               :volume="volumeNum"
               ref="audioRef"
-              @timeupdate="audioTimeUpdate"/>
+              @timeupdate="audioTimeUpdate"
+              @ended="audioTimeEnded" 
+            />
             <div class="bg"></div>
             <div class="hand"></div>
             <div class="wrap">
               <div class="btns">
-                <i class="prev" title="上一首"></i>
+                <i class="prev" title="上一首" @click="upPlaySong(mode.modeIndex)"></i>
                 <i :class="playStatus.look ? 'pause' : 'play'" title="播放/暂停" @click="togglePlayStatus"></i>
-                <i class="nxt" title="下一首"></i>
+                <i class="nxt" title="下一首" @click="nextPlatSong(mode.modeIndex)"></i>
               </div>
               <div class="head">
                 <img class="song-img" :src="playSongItem?.picUrl" alt="">
@@ -39,6 +41,8 @@
                  :loading="playStatus.loading"
                  :current="playProgress.progress" 
                  :cache="playProgress.cacheProgress"
+                 :currentTime="playProgress.currentTime"
+                 :duration="playProgress.duration"
                  @progressChange="audioProgressChange" />
               </div>
               <div class="oper">
@@ -58,12 +62,14 @@
                 <i class="icn icn-loop" title="循环" v-if="mode.modeIndex === 2" @click="modeChange('循环')"></i>
                 <i class="icn icn-shuffle" title="随机" v-if="mode.modeIndex === 3" @click="modeChange('随机')"></i>
                 <div class="mode-tooltip" v-show="mode.visible">{{mode.modeName}}</div>
-                <span class="add">
+                <span class="add" @click="playListChange">
                   <span class="tip">已添加到播放列表</span>
-                  <i class="icn icn-list">1</i>
+                  <i class="icn icn-list">{{playSongList.length}}</i>
                   <i class="icn icn-audioquality"></i>
                 </span>
               </div>
+              <!-- 播放列表 -->
+              <PlayList v-model:playListShow="playListShow" />
             </div>
         </div>
         </div>
@@ -71,18 +77,23 @@
 </template>
 
 <script setup lang="ts">
-    import { ref, computed, reactive } from 'vue';
+    import { ref, computed, reactive, watch } from 'vue';
     import PlayProgress from '@/components/play-progress/PlayProgress.vue'
     import PlayVolume from '@/components/play-volume/PlayVolume.vue'
     import Audio from '@/components/audio/Audio.vue'
+    import PlayList from '@/components/play-list/PlayList.vue'
     import type { ResponseType } from '@/types/index';
     import usePlayStore from '@/stores/modules/play.ts'
     import { getSongPlayUrl } from '@/api/my-music.ts'
+    import type { MusicItemType } from '@/hooks/methods/songFormat.ts'
+    import { upPlaySong, nextPlatSong } from './methods/methods'
 
     const playStore = usePlayStore()
 
     // 当前播放的歌曲详情
     const playSongItem = computed(() => playStore.getPlaySongItem)
+    // 播放列表数据
+    const playSongList = computed(() => playStore.playSongList)
     // 播放显示/隐藏
     const lock = ref<boolean>(true)
     // 音量条显示/隐藏
@@ -109,6 +120,9 @@
     });
     // 播放/暂停操作
     function togglePlayStatus() {
+      if(!playSongItem.value || playSongList.value.length === 0){
+        return ;
+      }
       playStatus.value.loading = true;
       playStatus.value.look = !playStatus.value.look
 
@@ -122,7 +136,6 @@
         audioRef.value.ref.pause();
       }
       playStatus.value.loading = false;
-
     }
 
     // 播放进度
@@ -134,7 +147,7 @@
       manualUpdate: false
     });
 
-    
+    // 播放时间更新
     function audioTimeUpdate(currentTime: number, duration: number, cache: number) {
       if (playProgress.value.manualUpdate) {
         return;
@@ -146,6 +159,15 @@
         progress: currentTime / duration,
         cacheProgress: cache / duration
       }
+    }
+
+    // 播放结束
+    function audioTimeEnded() {
+      if(mode.modeIndex === 1){
+        audioRef.value.ref.play();
+        return;
+      }
+      nextPlatSong(mode.modeIndex);
     }
 
     // 播放进度拖拽
@@ -163,6 +185,30 @@
 
       playProgress.value.manualUpdate = false;
     }
+
+    // 播放列表显示/隐藏
+    const playListShow = ref<boolean>(false);
+    function playListChange() {
+      playListShow.value = !playListShow.value
+    }
+
+    watch(() => playSongItem.value,
+    async () => {
+      if(!playSongItem.value) {
+        return;
+      }
+      playStatus.value.loading = true;
+      playProgress.value.progress = 0;
+      playProgress.value.cacheProgress = 0;
+      playProgress.value.manualUpdate = true;
+      audioRef.value.ref.pause();
+      playStatus.value.look = true;
+      await getAudioPlayUrl()
+      audioRef.value.ref.play();
+
+      playStatus.value.loading = false;
+      playProgress.value.manualUpdate = false;
+    })
 
     // 音量加减操作
     const volumeNum = ref(1)

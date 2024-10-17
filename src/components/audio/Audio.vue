@@ -33,7 +33,7 @@ defineExpose({
 });
 // 播放
 function play() {
-
+    emits('play');
 }
 // 播放时间更新
 function timeupdate(e: Event): void {
@@ -50,11 +50,11 @@ function timeupdate(e: Event): void {
 }
 // 播放暂停
 function pause() {
-
+    emits('pause');
 }
 // 播放结束
 function ended() {
-
+    emits('ended');
 }
 </script>
 

@@ -41,9 +41,29 @@ export function getCurrentWeekday() {
     return weekdays[weekday];
 }
 
-// 获取当前时间
+// 获取当前时间日期
 export function getDate() {
     var currentDate = new Date();   // 创建一个Date对象，表示当前时间
     var day = currentDate.getDate();   // 获取当前日期，即几号
     return day
+}
+
+/**
+ * @description 时间戳转视频时长
+ * @param timestamp 时间戳
+ * @returns 
+ */
+export function timeStampToDuration(timestamp: number) {
+    const hours = Math.floor(timestamp / 3600);
+    timestamp %= 3600;
+    const minutes = Math.floor(timestamp / 60);
+    const remainingSeconds = Math.floor(timestamp % 60);
+  
+    let result = '';
+    if (hours > 0) {
+        result += `${hours.toString().padStart(2, '0')}:`;
+    }
+    result += minutes.toString().padStart(2, '0') + ':' + remainingSeconds.toString().padStart(2, '0')
+  
+    return result;
 }

@@ -12,14 +12,15 @@
       <div class="total-progress" ref="totalProgressRef"></div>
     </div>
     <span class="time">
-      <em>00:21</em>
-      / 03:33
+      <em>{{ timeStampToDuration(currentTime) || '00:00' }}</em>
+      / {{ timeStampToDuration(duration) || '00:00' }}
     </span>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
+import { timeStampToDuration } from '@/utils/utils.ts'
 
 const emits = defineEmits(['progressChange']);
 const props = defineProps({
@@ -32,6 +33,14 @@ const props = defineProps({
     default: 0
   },
   cache: {
+    type: Number,
+    default: 0
+  },
+  currentTime: {
+    type: Number,
+    default: 0
+  },
+  duration: {
     type: Number,
     default: 0
   }

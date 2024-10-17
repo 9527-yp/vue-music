@@ -18,7 +18,7 @@ const playStore = defineStore("play", {
     state: (): any => {
       return {
         playSongItem: faultTolerant('playSongItem') || {}, // 当前播放的歌曲
-        playSongId: faultTolerant('playSongId') || {}, // 当前播放的歌曲id
+        playSongId: faultTolerant('playSongId') || 0, // 当前播放的歌曲id
         playSongList: faultTolerant('playSongList') || [], // 播放列表
       };
     },
