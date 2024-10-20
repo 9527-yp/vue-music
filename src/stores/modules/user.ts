@@ -25,7 +25,7 @@ const userStore = defineStore("user", {
     // 存储数据state
     state: (): any => {
       return {
-        token: localStorage.getItem('cookie') || '', 
+        token: localStorage.getItem('token') || '', 
         userInfo: faultTolerant('userInfo') || {},
         isLogin: faultTolerant('isLogin') || false,
         menuIndex: faultTolerant('menuIndex') || 0,

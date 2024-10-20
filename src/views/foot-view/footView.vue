@@ -1,5 +1,5 @@
 <template>
-    <div class="foot-box">
+    <div v-if="footShow" class="foot-box">
         <div class="foot-content">
             <ul class="enter">
                 <li class="unit"
@@ -58,7 +58,12 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { ref, watch } from 'vue';
+    import { useRoute } from 'vue-router'
+
+    const route = useRoute();
+    // 获取当前路由对象
+    const footShow = ref(true);
 
     type footListItem = {
         title: string,
@@ -102,6 +107,12 @@
             href: 'https://music.163.com/web/reward'
         },
     ])
+
+    watch(() => route.path, (path) => {
+        if(path === '/my-music'){
+            footShow.value = false
+        }
+    },{immediate: true})
 </script>
 
 <style lang="scss" scoped>

@@ -102,11 +102,14 @@
     // 歌曲url
     const playUrl = ref<string>('');
     function getAudioPlayUrl() {
-      return getSongPlayUrl({id: playSongItem.value.id}).then((res: ResponseType) => {
-        if(res.code === 200) {
-          playUrl.value = res.data?.[0]?.url ?? '';
-        }
-      })
+      // 初始化本地没有音乐不调用接口
+      if(playSongItem.value?.id){
+        return getSongPlayUrl({id: playSongItem.value.id}).then((res: ResponseType) => {
+          if(res.code === 200) {
+            playUrl.value = res.data?.[0]?.url ?? '';
+          }
+        })
+      }
     }
     getAudioPlayUrl();
 

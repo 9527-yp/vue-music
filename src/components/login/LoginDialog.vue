@@ -123,7 +123,7 @@ function getUserInfo(uid: number): void {
     .then((res: ResponseType) => {
       if (res.code === 200) {
         userStore.setUserInfo(res);
-        loginDialog.value = false;
+        userStore.setLoginDialogShow(false)
       }
     })
     .catch(() => ({}));

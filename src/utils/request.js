@@ -4,7 +4,7 @@ import useUserStore from '@/stores/modules/user.ts'
 
 // token的消息头
 const TOKEN_HEADER = 'Authorization'
-
+const userStore = useUserStore()
 // 创建axios对象
 const icemAxios = axios.create({
     baseURL: import.meta.env.VITE_AXIOS_BASE_URL,
@@ -17,8 +17,6 @@ const icemAxios = axios.create({
 icemAxios.interceptors.request.use(
     (config) => {
       config.headers['Content-Type'] = 'application/json;charset=UTF-8'
-
-      const userStore = useUserStore()
 
       if (userStore.getIsLogin && config.method === 'get') {
         config.params = Object.assign(config.params || {}, {

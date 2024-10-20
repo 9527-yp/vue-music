@@ -45,3 +45,7 @@
   textarea {
     background-color: #fff;
   }
+  :root {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
