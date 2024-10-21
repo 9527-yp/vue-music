@@ -11,6 +11,9 @@
     line-height: normal;
     background-color: #fff;
   }
+  .text-hov{
+    cursor: pointer;
+  }
   .text-hov:hover{
     text-decoration: underline;
   }
