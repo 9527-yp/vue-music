@@ -145,7 +145,6 @@ import useUserStore from '@/stores/modules/user.ts'
 
 const userStore = useUserStore();
 const isLogin = computed(() => userStore.getIsLogin)
-console.log(userStore.getToken, 'music')
 
 
 // 创建的歌单
