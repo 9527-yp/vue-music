@@ -48,4 +48,10 @@
   :root {
     overflow-y: auto;
     overflow-x: hidden;
-}
+  }
+  .thide{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-wrap: normal;
+  }
