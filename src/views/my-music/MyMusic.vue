@@ -127,9 +127,52 @@
                                 <span class="cover-msk"></span>
                             </div>
                             <div class="user-info-right">
-                                <div>
-
+                                <div class="song-name">
+                                    <i class="song-icn"></i>
+                                    <h2>我喜欢的音乐</h2>
                                 </div>
+                                <div class="user-info">
+                                    <img class="user-img" src="" alt="">
+                                    <span class="user-name thide text-hov">T信念y</span>
+                                    <span class="create-time">2018-01-06 创建</span>
+                                </div>
+                                <div class="btns">
+                                    <span class="play btns-bag" title="播放">
+                                        <i class="i-box btns-bag">
+                                            <i class="play-icn btns-bag"></i>
+                                            播放
+                                        </i>
+                                    </span>
+                                    <span class="add btns-bag" title="添加到播放列表"></span>
+                                    <span class="collect btns-bag btn-jointly">
+                                        <i class="collect-icn icn btns-bag">收藏</i>
+                                    </span>
+                                    <span class="share btns-bag btn-jointly">
+                                        <i class="share-icn icn btns-bag">分享</i>
+                                    </span>
+                                    <span class="down btns-bag btn-jointly">
+                                        <i class="down-icn icn btns-bag">下载</i>
+                                    </span>
+                                    <span class="review btns-bag btn-jointly">
+                                        <i class="review-icn icn btns-bag">评论</i>
+                                    </span>
+                                </div>
+                                <div class="tag-box">
+                                    <span class="tag-label">标签：</span>
+                                    <div class="tag-item">
+                                        <i class="text">华语</i>
+                                    </div>
+                                </div>
+                                <div class="introduce">
+                                    <span class="label">介绍：上课的话</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="song-list-box">
+                            <h3 class="title">歌曲列表</h3>
+                            <span class="song-num">134首歌</span>
+                            <div class="more">
+                                播放：<i class="num">4353535</i>次
                             </div>
                         </div>
                     </div>
@@ -408,6 +451,238 @@ function login():void {
                         width: 100%;
                         height: 147px;
                         margin-left: 30px;
+                        .song-name{
+                            margin: 0 0 12px;
+                            vertical-align: top;
+                            .song-icn{
+                                display: inline-block;
+                                vertical-align: top;
+                                width: 54px;
+                                height: 24px;
+                                margin-right: 6px;
+                                background: url('@/assets/images/icon.png') no-repeat;
+                                background-position: 0 -243px;
+                            }
+                            h2{
+                                display: inline-block;
+                                vertical-align: top;
+                                font-size: 20px;
+                                font-weight: normal;
+                                line-height: 24px;
+                                font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                word-wrap: normal;
+                            }
+                        }
+                        .user-info{
+                            width: 100%;
+                            height: 35px;
+                            margin: 0 0 20px;
+                            display: flex;
+                            align-items: center;
+                            .user-img{
+                                width: 35px;
+                                height: 35px;
+                                margin-right: 10px;
+                                cursor: pointer;
+                            }
+                            .user-name{
+                                max-width: 210px;
+                                margin-right: 15px;
+                                cursor: pointer;
+                                color: #0c73c2;
+                            }
+                            .create-time{
+                                color: #999;
+                            }
+                        }
+                        .btns{
+                            width: 100%;
+                            height: 31px;
+                            margin-bottom: 25px;
+                            display: flex;
+                            align-items: center;
+                            .btns-bag{
+                                background: url('@/assets/images/login/button-bag.png') no-repeat;
+                            }
+                            .play{
+                                padding: 0 5px 0 0;
+                                line-height: 29px;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-align: center;
+                                cursor: pointer;
+                                color: #fff;
+                                background-position: right -428px;
+                                .i-box{
+                                    display: inline-block;
+                                    height: 31px;
+                                    line-height: 29px;
+                                    padding: 0 7px 0 8px;
+                                    background-position: 0 -387px;
+                                    .play-icn{
+                                        display: inline-block;
+                                        vertical-align: top;
+                                        width: 20px;
+                                        height: 18px;
+                                        margin: 6px 2px 2px 0;
+                                        background-position: 0 -1622px;
+                                        overflow: hidden;
+                                    }
+                                }
+                                &:hover{
+                                    color: #fff;
+                                    background-position: right -510px;
+                                    .i-box{
+                                        background-position: 0 -469px;
+                                    }
+                                    .play-icn{
+                                        background-position: -28px -1622px;
+                                    }
+                                }
+                            }
+                            .add{
+                                margin-right: 5px;
+                                font-family: simsun, \5b8b\4f53;
+                                width: 31px;
+                                margin-left: -3px;
+                                height: 31px;
+                                line-height: 30px;
+                                min-width: 23px;
+                                cursor: pointer;
+                                background-position: 0 -1588px;
+                                &:hover{
+                                    background-position: -40px -1588px;
+                                }
+                            }
+                            .btn-jointly{
+                                margin-right: 6px;
+                                font-family: simsun, \5b8b\4f53;
+                                color: #333;
+                                padding: 0 5px 0 0;
+                                white-space: nowrap;
+                                cursor: pointer;
+                                .icn{
+                                    display: inline-block;
+                                    height: 31px;
+                                    line-height: 30px;
+                                    min-width: 23px;
+                                    padding-right: 2px;
+                                    padding-left: 28px;
+                                }
+                            }
+                            .collect{
+                                background-position: right -1192px;
+                                .collect-icn{
+                                    color: #bebebe;
+                                    background-position: 0 -1149px;
+                                    cursor: default;
+                                }
+                            }
+                            .share{
+                                background-position: right -1020px;
+                                .share-icn{
+                                    background-position: 0 -1225px;
+                                }
+                                &:hover{
+                                    background-position: right -1106px;
+                                    .share-icn{
+                                        background-position: 0 -1268px;
+                                    }
+                                }
+                            }
+                            .down{
+                                background-position: right -1020px;
+                                .down-icn{
+                                    background-position: 0 -2761px;
+                                }
+                                &:hover{
+                                    background-position: right -1106px;
+                                    .down-icn{
+                                        background-position: 0 -2805px;
+                                    }
+                                }
+                            }
+                            .review{
+                                background-position: right -1020px;
+                                .review-icn{
+                                    background-position: 0 -1465px;
+                                }
+                                &:hover{
+                                    background-position: right -1106px;
+                                    .review-icn{
+                                        background-position: 0 -1508px;
+                                    }
+                                }
+                            }
+                        }
+                        .tag-box{
+                            margin-bottom: 5px;
+                            display: flex;
+                            align-items: center;
+                            .tag-label{
+                                color: #666;
+                            }
+                            .tag-item{
+                                padding: 0 10px 0 0;
+                                height: 22px;
+                                line-height: 22px;
+                                text-shadow: 0 1px #fdfdfd;
+                                background: url('@/assets/images/login/button-bag.png') no-repeat;
+                                background-position: right -27px;
+                                color: #777;
+                                text-decoration: none;
+                                cursor: pointer;
+                                .text{
+                                    display: inline-block;
+                                    padding: 0 3px 0 13px;
+                                    background: url('@/assets/images/login/button-bag.png') no-repeat;
+                                    background-position: 0 0;
+                                    height: 22px;
+                                    line-height: 22px;
+                                }
+                                &:hover{
+                                    background-position: right -1430px;
+                                    .text{
+                                        background-position: 0 -1400px;
+                                    }
+                                }
+                            }
+                        }
+                        .introduce{
+                            margin-top: 4px;
+                            line-height: 18px;
+                            color: #666;
+                        }
+                    }
+                }
+                .song-list-box{
+                    width: 100%;
+                    height: 35px;
+                    border-bottom: 2px solid #c20c0c;
+                    box-sizing: border-box;
+                    padding: 0 10px 0 32px;
+                    .title{
+                        font-size: 20px;
+                        line-height: 28px;
+                        float: left;
+                        font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif;
+                        font-weight: normal;
+                    }
+                    .song-num{
+                        margin: 9px 0 0 20px;
+                        float: left;
+                        color: #666;
+                    }
+                    .more{
+                        margin-top: 5px;
+                        float: right;
+                        color: #666;
+                        .num{
+                            color: #c20c0c;
+                        }
                     }
                 }
             }
