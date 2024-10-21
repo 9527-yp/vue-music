@@ -47,7 +47,7 @@
                             <img class="item-img" :src="item?.picUrl" alt="">
                             <div class="info">
                                 <i class="info-icn"></i>
-                                <span class="num">{{item?.playCount}}</span>
+                                <span class="num">{{item?.playcount}}</span>
                                 <i class="info-icon-right" title="播放"></i>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                         <img class="item-img" :src="item?.picUrl" alt="">
                         <div class="info">
                             <i class="info-icn"></i>
-                            <span class="num">{{item?.playCount}}</span>
+                            <span class="num">{{item?.playcount}}</span>
                             <i class="info-icon-right" title="播放"></i>
                         </div>
                     </div>
@@ -203,8 +203,8 @@
         }
         recommendResource().then((res: ResponseType) => {
             if(res.code === 200) {
-                res?.recommend.forEach((item: {playCount: string | number}) => {
-                    item.playCount = getBigNumberTransform(item.playCount)
+                res?.recommend.forEach((item: {playcount: string | number}) => {
+                    item.playcount = getBigNumberTransform(item.playcount)
                 })
                 individualizat.value = res?.recommend || []
             }

@@ -5,7 +5,6 @@ export function getBigNumberTransform(value : number | string) :number | string{
 
     // 转为数字类型
     const newValue = Number(value);
-
     if(isNaN(newValue)){
         return value;
     }
