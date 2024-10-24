@@ -58,3 +58,8 @@
     white-space: nowrap;
     word-wrap: normal;
   }
+
+  textarea {
+    resize: none;
+    overflow: auto;
+  }

@@ -8,269 +8,46 @@
                 </div>
             </div>
         </div>
-        <div class="music-container">
+        <div v-else class="music-container">
             <div class="music-content">
                 <div class="musicsd">
                     <div>
-                        <h2 class="my-Singer">我的歌手(1)</h2>
-                        <div class="n-minelst">
-                            <h2>
-                                <div class="add-song-list">
-                                    <span class="text">新建</span>
-                                </div>
-                                <span class="rtitle">
-                                    <span class="tri" :class="foundSongListShow ? 'tri1' : 'tri1-hide'" @click="foundSongListChange"></span>
-                                    创建的歌单
-                                    <span>(11)</span>
-                                </span>
-                            </h2>
-                            <ul class="list-ul" v-show="foundSongListShow">
-                                <li class="item">
-                                    <div class="item-content">
-                                        <div class="item-img-box">
-                                            <img src="" alt="">
-                                        </div>
-                                        <p class="item-name">我喜欢的音乐</p>
-                                        <p class="item-num">28首</p>
-                                    </div>
-                                </li>
-                                <li class="item">
-                                    <div class="item-content">
-                                        <div class="item-img-box">
-                                            <img src="" alt="">
-                                        </div>
-                                        <p class="item-name">2023</p>
-                                        <p class="item-num">28首</p>
-                                    </div>
-                                </li>
-                                <li class="item">
-                                    <div class="item-content">
-                                        <div class="item-img-box">
-                                            <img src="" alt="">
-                                        </div>
-                                        <p class="item-name">2022</p>
-                                        <p class="item-num">28首</p>
-                                    </div>
-                                </li>
-                                <li class="item">
-                                    <div class="item-content">
-                                        <div class="item-img-box">
-                                            <img src="" alt="">
-                                        </div>
-                                        <p class="item-name">T信念y的2019年度歌单</p>
-                                        <p class="item-num">28首</p>
-                                    </div>
-                                    <span class="oper">
-                                        <i class="icn edit-icn"></i>
-                                        <i class="icn delete-icn"></i>
-                                    </span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="n-minelst">
-                            <h2>
-                                <span class="rtitle">
-                                    <span class="tri" :class="collectSongListShow ? 'tri1' : 'tri1-hide'" @click="collectSongListChange"></span>
-                                    收藏的歌单
-                                    <span>(11)</span>
-                                </span>
-                            </h2>
-                            <ul class="list-ul" v-show="collectSongListShow">
-                                <li class="item">
-                                    <div class="item-content">
-                                        <div class="item-img-box">
-                                            <img src="" alt="">
-                                        </div>
-                                        <p class="item-name">我喜欢的音乐</p>
-                                        <p class="item-num">28首</p>
-                                    </div>
-                                </li>
-                                <li class="item">
-                                    <div class="item-content">
-                                        <div class="item-img-box">
-                                            <img src="" alt="">
-                                        </div>
-                                        <p class="item-name">2023</p>
-                                        <p class="item-num">28首</p>
-                                    </div>
-                                </li>
-                                <li class="item">
-                                    <div class="item-content">
-                                        <div class="item-img-box">
-                                            <img src="" alt="">
-                                        </div>
-                                        <p class="item-name">2022</p>
-                                        <p class="item-num">28首</p>
-                                    </div>
-                                </li>
-                                <li class="item">
-                                    <div class="item-content">
-                                        <div class="item-img-box">
-                                            <img src="" alt="">
-                                        </div>
-                                        <p class="item-name">T信念y的2019年度歌单</p>
-                                        <p class="item-num">28首</p>
-                                    </div>
-                                    <span class="oper">
-                                        <i class="icn delete-icn"></i>
-                                    </span>
-                                </li>
-                            </ul>
-                        </div>
+                        <h2 class="my-Singer">我的歌手({{options.mySinger.count}})</h2>
+                        <SongList
+                         title="创建的歌单"
+                         :visible='options.createdSongSheet.visible'
+                         :songSheetId="songSheetId"
+                         :count="options.createdSongSheet.count"
+                         :list="songSheetList.createdSongSheet"
+                         @songListItem='songListItemChange'
+                        />
+                        <SongList
+                         title="收藏的歌单"
+                         :songSheetId="songSheetId"
+                         :visible='options.subSongSheet.visible'
+                         :count="options.subSongSheet.count"
+                         :list="songSheetList.collectSongSheet"
+                         @songListItem='songListItemChange'
+                        />
                     </div>
                 </div>
                 <div class="my-music-main">
                     <div class="song-header">
-                        <div class="song-shere-info">
-                            <div class="user-cover">
-                                <img src="" alt="">
-                                <span class="cover-msk"></span>
-                            </div>
-                            <div class="user-info-right">
-                                <div class="song-name">
-                                    <i class="song-icn"></i>
-                                    <h2>我喜欢的音乐</h2>
-                                </div>
-                                <div class="user-info">
-                                    <img class="user-img" src="" alt="">
-                                    <span class="user-name thide text-hov">T信念y</span>
-                                    <span class="create-time">2018-01-06 创建</span>
-                                </div>
-                                <div class="btns">
-                                    <span class="play btns-bag" title="播放">
-                                        <i class="i-box btns-bag">
-                                            <i class="play-icn btns-bag"></i>
-                                            播放
-                                        </i>
-                                    </span>
-                                    <span class="add btns-bag" title="添加到播放列表"></span>
-                                    <span class="collect btns-bag btn-jointly">
-                                        <i class="collect-icn icn btns-bag">收藏</i>
-                                    </span>
-                                    <span class="share btns-bag btn-jointly">
-                                        <i class="share-icn icn btns-bag">分享</i>
-                                    </span>
-                                    <span class="down btns-bag btn-jointly">
-                                        <i class="down-icn icn btns-bag">下载</i>
-                                    </span>
-                                    <span class="review btns-bag btn-jointly">
-                                        <i class="review-icn icn btns-bag">评论</i>
-                                    </span>
-                                </div>
-                                <div class="tag-box">
-                                    <span class="tag-label">标签：</span>
-                                    <div class="tag-item">
-                                        <i class="text">华语</i>
-                                    </div>
-                                </div>
-                                <div class="introduce">
-                                    <span class="label">介绍：上课的话</span>
-                                </div>
-                            </div>
-                        </div>
+                        <SongSheetInfo :playlist="songSheetDetail.playlist"/>
                     </div>
                     <div class="song-list-box">
                         <h3 class="title">歌曲列表</h3>
-                        <span class="song-num">134首歌</span>
+                        <span class="song-num">{{songSheetDetail?.playlist?.trackCount}}首歌</span>
                         <div class="more">
-                            播放：<i class="num">4353535</i>次
+                            播放：<i class="num">{{songSheetDetail?.playlist?.playCount}}</i>次
                         </div>
                     </div>
-                    <div class="music-table">
-                        <table class="song-list-table">
-                            <thead>
-                                <tr>
-                                    <th class="first th-1">
-                                        <div class="text"></div>
-                                    </th>
-                                    <th>
-                                        <div class="text">歌曲标题</div>
-                                    </th>
-                                    <th class="th-2">
-                                        <div class="text">时长</div>
-                                    </th>
-                                    <th class="th-3">
-                                        <div class="text">歌手</div>
-                                    </th>
-                                    <th class="th-4">
-                                        <div class="text">专辑</div>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="music-list-c even">
-                                    <td class="tr-index">
-                                        <div class="index-hd">
-                                            <span class="index">1</span>
-                                            <i class="play-icn"></i>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="song-name">
-                                            <span class="text-hov">安河桥</span>
-                                        </div>
-                                    </td>
-                                    <td class="song-time-box">
-                                        <span class="song-time">04:56</span>
-                                        <div class="btns">
-                                            <i class="add-icn" title="添加到播放列表"></i>
-                                            <i class="icn collect-icn" title="收藏"></i>
-                                            <i class="icn share-icn" title="分享"></i>
-                                            <i class="icn down-icn" title="下载"></i>
-                                            <i class="icn del-icn" title="删除"></i>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text">
-                                            <span class="text-hov">西语</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text">
-                                            <span class="text-hov">安和桥</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="music-list-c">
-                                    <td class="tr-index">
-                                        <div class="index-hd">
-                                            <span class="index">1</span>
-                                            <i class="play-icn"></i>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="song-name">
-                                            <div class="song-name-box">
-                                                <span class="text-hov">安河桥</span>
-                                                <span class="song-other"> - (电影《爱情无限Touch》主题曲)</span>
-                                                <i class="mv-icn"></i>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="song-time-box">
-                                        <span class="song-time">04:56</span>
-                                        <div class="btns">
-                                            <i class="add-icn" title="添加到播放列表"></i>
-                                            <i class="icn collect-icn" title="收藏"></i>
-                                            <i class="icn share-icn" title="分享"></i>
-                                            <i class="icn down-icn" title="下载"></i>
-                                            <i class="icn del-icn" title="删除"></i>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text">
-                                            <span class="text-hov">西语</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text">
-                                            <span class="text-hov">安和桥</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <!-- 歌曲列表Table -->
+                    <SongListTable :playlist="songSheetDetail.playlist"/>
+                    <!-- 评论 -->
+                    <Comment
+                     :playlist="songSheetDetail.playlist"
+                     :commentInfo="commentInfo" />
                 </div>
             </div>
         </div>
@@ -278,27 +55,127 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed }from 'vue';
+import { ref, computed, reactive }from 'vue';
 import useUserStore from '@/stores/modules/user.ts'
+import SongList from './components/SongList.vue'
+import SongSheetInfo from './components/SongSheeInfo.vue'
+import SongListTable from './components/SongListTable.vue'
+import Comment from '@/components/comment/Comment.vue'
+import { getSongSubcount, getSongList, getSongSheetInfo, getSongComment } from '@/api/my-music.ts'
+import type { ResponseType } from '@/types/index';
+import type { SongSheetList, typeSongSheet, songSheetDetail} from './types/type'
 
 const userStore = useUserStore();
 const isLogin = computed(() => userStore.getIsLogin)
+const userInfo = computed(() => userStore.getUserInfo)
 
-
-// 创建的歌单
-const foundSongListShow = ref<boolean>(true);
-function foundSongListChange() {
-    foundSongListShow.value = !foundSongListShow.value
-}
-
-// 收藏的歌单
-const collectSongListShow = ref<boolean>(true);
-function collectSongListChange() {
-    collectSongListShow.value = !collectSongListShow.value
-}
 // 登录
 function login():void {
   userStore.setLoginDialogShow(true)
+}
+
+const options = reactive({
+    mySinger: {
+        count: 0,
+        visible: false,
+    },
+    myVideo: {
+        count: 0,
+        visible: false,
+    },
+    createdSongSheet: {
+        visible: true,
+        count: 0,
+    },
+    subSongSheet: {
+        visible: false,
+        count: 0,
+    },
+});
+function getSongCount() {
+    getSongSubcount().then((res: ResponseType) => {
+        if(res.code === 200) {
+            options.mySinger.count = res.artistCount ?? 0;
+            options.myVideo.count = res.mvCount ?? 0;
+            options.createdSongSheet.count = res.createdPlaylistCount ?? 0;
+            options.subSongSheet.count = res.subPlaylistCount ?? 0;
+        }
+    })
+}
+getSongCount()
+
+// 歌单ID
+const songSheetId = ref(undefined)
+const songSheetList = reactive<typeSongSheet>({
+    createdSongSheet: [],
+    collectSongSheet: []
+})
+function getSongListData ()  {
+    getSongList({uid: userInfo.value?.profile?.userId}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            res.playlist?.forEach?.((item: SongSheetList) => {
+                if (item.name?.includes?.('喜欢的音乐')) {
+                    item.name = '我喜欢的音乐';
+                    songSheetId.value = item.id
+                }
+            });
+            
+            // 创建/收藏的歌单
+            songSheetList.createdSongSheet = res.playlist?.filter?.(
+            (item: SongSheetList) => !item.subscribed
+            );
+            songSheetList.collectSongSheet = res.playlist?.filter?.(
+            (item: SongSheetList) => item.subscribed
+            );
+            getSongInfo();
+            getSongCommentList();
+        }
+    })
+}
+getSongListData()
+
+// 切换歌单查看
+function songListItemChange(value: number) {
+    songSheetId.value = value
+    getSongInfo();
+    getSongCommentList();
+}
+
+const songSheetDetail = reactive<songSheetDetail>({
+    playlist: {},
+    privileges: []
+})
+// 歌单详情
+function getSongInfo() {
+    getSongSheetInfo({id: songSheetId.value}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            console.log(res, 'res')
+            if(res?.playlist?.name.includes('喜欢的音乐')){
+                res.playlist.name = '我喜欢的音乐';
+            }
+
+            songSheetDetail.playlist = res.playlist ?? {};
+            songSheetDetail.privileges = res.privileges ?? [];
+        }
+    })
+}
+
+// 评论数据
+const commentInfo = reactive({
+    offset: 0,
+    totalCount: 0,
+    hotCommentList: [], // 热门评论
+    newCommentList: [] // 最新评论
+})
+function getSongCommentList() {
+    getSongComment({
+        id: songSheetId.value,
+        offset: commentInfo.offset
+    }).then((res: ResponseType) => {
+        commentInfo.hotCommentList = res?.hotComments ?? []
+        commentInfo.newCommentList = res?.comments ?? []
+        commentInfo.totalCount = res?.total ?? 0
+    })
 }
 </script>
 
@@ -372,144 +249,6 @@ function login():void {
                 cursor: pointer;
                 font-family: simsun, \5b8b\4f53;
             }
-            .n-minelst{
-                margin-top: 8px;
-                font-size: 14px;
-                h2{
-                    padding:0 10px 12px 15px;
-                    font-size: 14px;
-                    color: #000;
-                    font-family: simsun, \5b8b\4f53;
-                    .add-song-list{
-                        width: 52px;
-                        height: 22px;
-                        background: url('@/assets/images/my-music/button.png') no-repeat 0 9999px;
-                        background-position: 0 -96px;
-                        float: right;
-                        cursor: pointer;
-                        color: #333;
-                        &:hover{
-                            background-position: -94px -39px;
-                        }
-                        .text{
-                            display: inline-block;
-                            line-height: 22px;
-                            overflow: hidden;
-                            padding-left: 20px;
-                            color: #515151;
-                            font-size: 12px;
-                            font-weight: normal;
-                        }
-                    }
-                    .rtitle{
-                        position: relative;
-                        zoom: 1;
-                        display: inline-block;
-                        cursor: pointer;
-                        vertical-align: top;
-                        .tri {
-                            display: inline-block;
-                            vertical-align: middle;
-                            margin: 0 2px 0 5px;
-                            cursor: pointer;
-                            font-size: 0;
-                            height: 0;
-                            line-height: 0;
-                        }
-                        .tri1{
-                            border-color: #ccc transparent transparent;
-                            border-style: solid dashed dashed;
-                            border-width: 8px 7px 0;
-                        }
-                        .tri1-hide{
-                            border: 8px solid #ccc;
-                            border-color: transparent transparent transparent #ccc;
-                            border-style: dashed dashed dashed solid;
-                            margin-right: 0;
-                        }
-                    }
-                }
-                .list-ul{
-                    cursor: pointer;
-                    vertical-align: middle;
-                    &:after {
-                        clear: both;
-                        content: '.';
-                        display: block;
-                        height: 0;
-                        visibility: hidden;
-                    }
-                    .item{
-                        position: relative;
-                        zoom: 1;
-                        height: 42px;
-                        padding: 6px 0 6px 20px;
-                        .item-content{
-                            padding-left: 50px;
-                            .item-img-box{
-                                float: left;
-                                margin-left: -50px;
-                                overflow: hidden;
-                                width: 40px;
-                                img{
-                                    width: 40px;
-                                    height: 40px;
-                                }
-                            }
-                            .item-name{
-                                width: 150px;
-                                text-overflow: ellipsis;
-                                white-space: nowrap;
-                                word-wrap: normal;
-                                overflow: hidden;
-                                margin-top: 2px;
-                                margin-bottom: 8px;
-                            }
-                            .item-num{
-                                width: 130px;
-                                color: #999;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                                white-space: nowrap;
-                                word-wrap: normal;
-                            }
-                        }
-                        .oper{
-                            display:none;
-                            position: absolute;
-                            bottom: 7px;
-                            right: 0;
-                            .icn{
-                                float: left;
-                                margin-right: 10px;
-                                overflow: hidden;
-                                background: url('@/assets/images/icon.png') no-repeat 0 9999px;
-                            }
-                            .edit-icn{
-                                width: 13px;
-                                height: 13px;
-                                background-position: 0 -270px;
-                                &:hover{
-                                    background-position: -20px -270px;
-                                }
-                            }
-                            .delete-icn{
-                                width: 13px;
-                                height: 14px;
-                                background-position: 0 -284px;
-                                &:hover{
-                                    background-position: -20px -284px;
-                                }
-                            }
-                        }
-                        &:hover{
-                            .oper{
-                                display: block;
-                            }
-                        }
-                    }
-                }
-            }
         }
         .my-music-main{
             height: 100%;
@@ -518,241 +257,6 @@ function login():void {
             padding-bottom: 50px;
             position: relative;
             zoom: 1;
-            .song-header{
-                .song-shere-info{
-                    padding: 40px;
-                    display: flex;
-                    .user-cover{
-                        position: relative;
-                        width: 200px;
-                        height: 200px;
-                        min-width: 200px;
-                        img{
-                            width: 100%;
-                            height: 100%;
-                        }
-                        .cover-msk{
-                            position: absolute;
-                            top: -4px;
-                            left: -4px;
-                            width: 208px;
-                            height: 208px;
-                            background: url('@/assets/images/home/name-D5CGUEo8.png') no-repeat;
-                            background-position: 0 -1285px;
-                        }
-                    }
-                    .user-info-right{
-                        width: 100%;
-                        height: 147px;
-                        margin-left: 30px;
-                        .song-name{
-                            margin: 0 0 12px;
-                            vertical-align: top;
-                            .song-icn{
-                                display: inline-block;
-                                vertical-align: top;
-                                width: 54px;
-                                height: 24px;
-                                margin-right: 6px;
-                                background: url('@/assets/images/icon.png') no-repeat;
-                                background-position: 0 -243px;
-                            }
-                            h2{
-                                display: inline-block;
-                                vertical-align: top;
-                                font-size: 20px;
-                                font-weight: normal;
-                                line-height: 24px;
-                                font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                                white-space: nowrap;
-                                word-wrap: normal;
-                            }
-                        }
-                        .user-info{
-                            width: 100%;
-                            height: 35px;
-                            margin: 0 0 20px;
-                            display: flex;
-                            align-items: center;
-                            .user-img{
-                                width: 35px;
-                                height: 35px;
-                                margin-right: 10px;
-                                cursor: pointer;
-                            }
-                            .user-name{
-                                max-width: 210px;
-                                margin-right: 15px;
-                                cursor: pointer;
-                                color: #0c73c2;
-                            }
-                            .create-time{
-                                color: #999;
-                            }
-                        }
-                        .btns{
-                            width: 100%;
-                            height: 31px;
-                            margin-bottom: 25px;
-                            display: flex;
-                            align-items: center;
-                            .btns-bag{
-                                background: url('@/assets/images/login/button-bag.png') no-repeat;
-                            }
-                            .play{
-                                padding: 0 5px 0 0;
-                                line-height: 29px;
-                                white-space: nowrap;
-                                overflow: hidden;
-                                text-align: center;
-                                cursor: pointer;
-                                color: #fff;
-                                background-position: right -428px;
-                                .i-box{
-                                    display: inline-block;
-                                    height: 31px;
-                                    line-height: 29px;
-                                    padding: 0 7px 0 8px;
-                                    background-position: 0 -387px;
-                                    .play-icn{
-                                        display: inline-block;
-                                        vertical-align: top;
-                                        width: 20px;
-                                        height: 18px;
-                                        margin: 6px 2px 2px 0;
-                                        background-position: 0 -1622px;
-                                        overflow: hidden;
-                                    }
-                                }
-                                &:hover{
-                                    color: #fff;
-                                    background-position: right -510px;
-                                    .i-box{
-                                        background-position: 0 -469px;
-                                    }
-                                    .play-icn{
-                                        background-position: -28px -1622px;
-                                    }
-                                }
-                            }
-                            .add{
-                                margin-right: 5px;
-                                font-family: simsun, \5b8b\4f53;
-                                width: 31px;
-                                margin-left: -3px;
-                                height: 31px;
-                                line-height: 30px;
-                                min-width: 23px;
-                                cursor: pointer;
-                                background-position: 0 -1588px;
-                                &:hover{
-                                    background-position: -40px -1588px;
-                                }
-                            }
-                            .btn-jointly{
-                                margin-right: 6px;
-                                font-family: simsun, \5b8b\4f53;
-                                color: #333;
-                                padding: 0 5px 0 0;
-                                white-space: nowrap;
-                                cursor: pointer;
-                                .icn{
-                                    display: inline-block;
-                                    height: 31px;
-                                    line-height: 30px;
-                                    min-width: 23px;
-                                    padding-right: 2px;
-                                    padding-left: 28px;
-                                }
-                            }
-                            .collect{
-                                background-position: right -1192px;
-                                .collect-icn{
-                                    color: #bebebe;
-                                    background-position: 0 -1149px;
-                                    cursor: default;
-                                }
-                            }
-                            .share{
-                                background-position: right -1020px;
-                                .share-icn{
-                                    background-position: 0 -1225px;
-                                }
-                                &:hover{
-                                    background-position: right -1106px;
-                                    .share-icn{
-                                        background-position: 0 -1268px;
-                                    }
-                                }
-                            }
-                            .down{
-                                background-position: right -1020px;
-                                .down-icn{
-                                    background-position: 0 -2761px;
-                                }
-                                &:hover{
-                                    background-position: right -1106px;
-                                    .down-icn{
-                                        background-position: 0 -2805px;
-                                    }
-                                }
-                            }
-                            .review{
-                                background-position: right -1020px;
-                                .review-icn{
-                                    background-position: 0 -1465px;
-                                }
-                                &:hover{
-                                    background-position: right -1106px;
-                                    .review-icn{
-                                        background-position: 0 -1508px;
-                                    }
-                                }
-                            }
-                        }
-                        .tag-box{
-                            margin-bottom: 5px;
-                            display: flex;
-                            align-items: center;
-                            .tag-label{
-                                color: #666;
-                            }
-                            .tag-item{
-                                padding: 0 10px 0 0;
-                                height: 22px;
-                                line-height: 22px;
-                                text-shadow: 0 1px #fdfdfd;
-                                background: url('@/assets/images/login/button-bag.png') no-repeat;
-                                background-position: right -27px;
-                                color: #777;
-                                text-decoration: none;
-                                cursor: pointer;
-                                .text{
-                                    display: inline-block;
-                                    padding: 0 3px 0 13px;
-                                    background: url('@/assets/images/login/button-bag.png') no-repeat;
-                                    background-position: 0 0;
-                                    height: 22px;
-                                    line-height: 22px;
-                                }
-                                &:hover{
-                                    background-position: right -1430px;
-                                    .text{
-                                        background-position: 0 -1400px;
-                                    }
-                                }
-                            }
-                        }
-                        .introduce{
-                            margin-top: 4px;
-                            line-height: 18px;
-                            color: #666;
-                        }
-                    }
-                }
-            }
             .song-list-box{
                 width: 100%;
                 height: 35px;
@@ -777,187 +281,6 @@ function login():void {
                     color: #666;
                     .num{
                         color: #c20c0c;
-                    }
-                }
-            }
-            .music-table{
-                width: 100%;
-                height: 600px;
-                .song-list-table{
-                    width: 100%;
-                    border: 1px solid #d9d9d9;
-                    border-collapse: collapse;
-                    border-spacing: 0;
-                    table-layout: fixed;
-                    th{
-                        height: 38px;
-                        background-color: #f7f7f7;
-                        background: url('@/assets/images/my-music/table.png');
-                        background-position: 0 0;
-                        background-repeat: repeat-x;
-                        vertical-align: top;
-                        text-align: left;
-                        font-weight: normal;
-                        color: #666;
-                        .text{
-                            height: 18px;
-                            line-height: 18px;
-                            padding: 8px 10px;
-                            background: url('@/assets/images/my-music/table.png') no-repeat;
-                            background-position: 0 -56px;
-                        }
-                    }
-                    td{
-                        padding: 6px 10px;
-                        line-height: 18px;
-                        text-align: left;
-                        background: url('@/assets/images/my-music/table.png') no-repeat 0 9999px;
-                    }
-                    .first{
-                        width: 74px;
-                        .text{
-                            background: none;
-                        }
-                    }
-                    .th-2{
-                        width: 111px;
-                    }
-                    .th-3{
-                        width: 14%;
-                    }
-                    .th-4{
-                        width: 20%;
-                    }
-                    .music-list-c{
-                        color: #333;
-                        .tr-index{
-                            .index-hd{
-                                height: 18px;
-                                .index{
-                                    margin-left: 5px;
-                                    color: #999;
-                                }
-                                .play-icn{
-                                    float: right;
-                                    width: 17px;
-                                    height: 17px;
-                                    cursor: pointer;
-                                    background: url('@/assets/images/my-music/table.png') no-repeat 0 9999px;
-                                    background-position: 0 -103px;
-                                }
-                            }
-                        }
-                        .song-name{
-                            height: 18px;
-                            margin-right: 20px;
-                            .song-name-box{
-                                position: relative;
-                                display: inline-block;
-                                padding-right: 25px;
-                                margin-right: -25px;
-                                max-width: 99%;
-                                height: 20px;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                                white-space: nowrap;
-                                .song-other{
-                                    color: #aeaeae;
-                                }
-                                .mv-icn{
-                                    position: absolute;
-                                    top: 0;
-                                    right: 0;
-                                    width: 23px;
-                                    height: 17px;
-                                    margin: 1px 0 0 0;
-                                    background: url('@/assets/images/my-music/table.png') no-repeat 0 9999px;
-                                    background-position: 0 -151px;
-                                    cursor: pointer;
-                                    &:hover{
-                                        background-position: -30px -151px;
-                                    }
-                                }
-                            }
-                        }
-                        .song-time-box{
-                            .song-time{
-                                color: #666;
-                            }
-                            .btns{
-                                float: left;
-                                display: none;
-                                .add-icn{
-                                    margin-top: 2px;
-                                    float: left;
-                                    overflow: hidden;
-                                    vertical-align: middle;
-                                    width: 13px;
-                                    height: 13px;
-                                    background: url('@/assets/images/icon.png') no-repeat;
-                                    background-position: 0 -700px;
-                                    cursor: pointer;
-                                    &:hover{
-                                        background-position: -22px -700px;
-                                    }
-                                }
-                                .icn{
-                                    float: left;
-                                    width: 18px;
-                                    height: 16px;
-                                    margin: 2px 0 0 4px;
-                                    overflow: hidden;
-                                    text-indent: -999px;
-                                    background: url('@/assets/images/my-music/table.png') no-repeat;
-                                    cursor: pointer;
-                                }
-                                .collect-icn{
-                                    background-position: 0 -174px;
-                                    &:hover{
-                                        background-position: -20px -174px;
-                                    }
-                                }
-                                .share-icn{
-                                    background-position: 0 -195px;
-                                    &:hover{
-                                        background-position: -20px -195px;
-                                    }
-                                }
-                                .down-icn{
-                                    background-position: -81px -174px;
-                                    &:hover{
-                                        background-position: -104px -174px;
-                                    }
-                                }
-                                .del-icn{
-                                    background-position: 0 -217px;
-                                    &:hover{
-                                        background-position: -20px -217px;
-                                    }
-                                }
-                            }
-                        }
-                        .text{
-                            width: 100%;
-                            position: relative;
-                            zoom: 1;
-                            overflow: hidden;
-                            white-space: nowrap;
-                            text-overflow: ellipsis;
-                        }
-                        &:hover{
-                            .song-time-box{
-                                padding-right: 0px;
-                            }
-                            .song-time{
-                                display: none;
-                            }
-                            .btns{
-                                display: block;
-                            }
-                        }
-                    }
-                    .even{
-                        background-color: #f7f7f7;
                     }
                 }
             }

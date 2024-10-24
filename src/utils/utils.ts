@@ -66,3 +66,30 @@ export function timeStampToDuration(timestamp: number) {
   
     return result;
 }
+
+export function formatDateTime(timestamp : number, format: string): string {
+    // 创建一个 Date 对象
+    const date = new Date(timestamp * 1000);
+  
+    // 定义格式化的映射 
+    const formatMap: Record<string, string | number> = { 
+        'Y': date.getFullYear().toString(),
+        'M': String(date.getMonth() + 1).padStart(2, '0'), // 月份从0开始，需要+1  
+        'D': String(date.getDate()).padStart(2, '0'),  
+        'H': String(date.getHours()).padStart(2, '0'),  
+        'm': String(date.getMinutes()).padStart(2, '0'),  
+        's': String(date.getSeconds()).padStart(2, '0'),  
+        'q': Math.floor((date.getMonth() + 3) / 3).toString(), // 季度  
+        'S': String(date.getMilliseconds()).padStart(3, '0') // 毫秒  
+    };  
+  
+    // 使用正则表达式替换格式字符串中的占位符  
+    let formattedDate = format;  
+    for (const key in formatMap) {  
+        if (formatMap.hasOwnProperty(key)) {  
+            const regex = new RegExp(key, 'g');  
+            formattedDate = formattedDate.replace(regex, formatMap[key] as string);  
+        }  
+    }
+    return formattedDate;  
+}
