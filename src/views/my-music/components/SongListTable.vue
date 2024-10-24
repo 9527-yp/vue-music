@@ -42,7 +42,7 @@
                         </div>
                     </td>
                     <td class="song-time-box">
-                        <span class="song-time">04:56</span>
+                        <span class="song-time">{{ timeStampToDuration(item.dt / 1000) || '00:00' }}</span>
                         <div class="btns" v-if="!item?.noCopyrightRcmd">
                             <i class="add-icn" title="添加到播放列表"></i>
                             <i class="icn collect-icn" title="收藏"></i>
@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-
+import { timeStampToDuration } from '@/utils/utils.ts'
 defineProps({
     playlist: {
         type: Object,

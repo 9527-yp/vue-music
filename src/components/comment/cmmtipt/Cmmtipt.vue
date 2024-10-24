@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="u-txtwrap">
+        <div class="u-txtwrap" :class="{'u-recover' : isRecover}">
             <textarea class="u-text" v-model="replay.text" rows="3" placeholder="评论"></textarea>
         </div>
         <div class="m-btns">
@@ -30,7 +30,12 @@
 import { reactive, ref, onMounted, onUnmounted, watch } from 'vue';
 import { expressionList } from './emo'
 
-
+defineProps({
+    isRecover: {
+        type: Boolean,
+        default: false
+    }
+})
 type ExpressionItem = {
     total: number,
     pageSize: number,
@@ -123,6 +128,12 @@ onUnmounted(() => {
         &:focus{
             outline: none;
         }
+    }
+}
+.u-recover{
+    .u-text{
+        height: 20px;
+        display: block;
     }
 }
 .m-btns{

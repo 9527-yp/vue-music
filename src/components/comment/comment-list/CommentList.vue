@@ -1,31 +1,62 @@
 <template>
     <ul class="comment-ul">
-        <li class="hot-item">
+        <li class="hot-item" v-for="(item, index) in list" :key="index">
             <div class="item-header">
-                <img class="user-img" src="" alt="">
+                <img class="user-img" :src="item?.user?.avatarUrl" alt="">
             </div>
             <div class="cntwrap">
                 <div class="cntwrap-top cntwrap-brk">
-                    <span class="user-name text-hov">情窦00初开</span>
-                    <img class="brand-vip" src="@/assets/images/my-music/vip-6.png" alt="">
-                    <span>：老人与海往上的歌可以移除了</span>
+                    <span class="user-name text-hov">{{item?.user?.nickname}}</span>
+                    <img
+                     class="brand-vip"
+                     v-if="item?.user?.vipRights?.redplus"
+                     :src="item?.user?.vipRights?.redplus?.iconUrl"
+                     alt=""
+                    >
+                    <img
+                     class="brand-vip"
+                     v-else-if="item?.user?.vipRights?.associator"
+                     :src="item?.user?.vipRights?.associator?.iconUrl"
+                     alt=""
+                    >
+                    <span>：{{item?.content}}</span>
                 </div>
+                <template v-if="item?.beReplied">
+                    <div class="cntwrap-center cntwrap-brk" v-for="(i, key) in item?.beReplied" :key="key">
+                        <span class="user-name text-hov">{{i?.user?.nickname}}</span>
+                        <img
+                         class="brand-vip"
+                         v-if="i?.user?.vipRights?.redplus"
+                         :src="i?.user?.vipRights?.redplus?.iconUrl"
+                         alt=""
+                          >
+                        <img
+                         class="brand-vip"
+                         v-else-if="i?.user?.vipRights?.associator"
+                         :src="i?.user?.vipRights?.associator?.iconUrl"
+                         alt=""
+                        >
+                        <span>：{{i.content}}</span>
+                    </div>
+                </template>
                 <div class="cntwrap-bottom">
-                    <div class="time">2023年3月6日</div>
-                    <span class="del">
+                    <div class="time">{{item.timeStr}}</div>
+                    <span class="del" v-if="item?.ipLocation?.userId === userInfo?.profile?.userId">
                         <span class="review text-hov">删除</span>
                         <span class="line">|</span>
                     </span>
                     <span class="give text-hov">
-                        <i class="icn no-like-icn"></i>
-                        (145)
+                        <i class="icn" :class="item.liked ? 'like-icn' : 'no-like-icn'"></i>
+                        <template v-if="item.likedCount">
+                            ({{item.likedCount}})
+                        </template>
                     </span>
                     <span class="line">|</span>
-                    <span class="review text-hov">回复</span>
+                    <span class="review text-hov" @click="commentBtn(item)">回复</span>
                 </div>
-                <div class="comment-reply">
+                <div class="comment-reply" v-if="item?.commentText">
                     <div class="comment-content">
-                        <Cmmtipt />
+                        <Cmmtipt :isRecover="true"/>
                         <div class="comment-corr">
                             <span class="arrline">◆</span>
                             <span class="arrclr">◆</span>
@@ -34,66 +65,27 @@
                 </div>
             </div>
         </li>
-        <li class="hot-item">
-            <div class="item-header">
-                <img class="user-img" src="" alt="">
-            </div>
-            <div class="cntwrap">
-                <div class="cntwrap-top cntwrap-brk">
-                    <span class="user-name text-hov">情窦00初开</span>
-                    <img class="brand-vip" src="@/assets/images/my-music/vip-6.png" alt="">
-                    <span>：老人与海往上的歌可以移除了</span>
-                </div>
-                <div class="cntwrap-bottom">
-                    <div class="time">2023年3月6日</div>
-                    <span class="del">
-                        <span class="review text-hov">删除</span>
-                        <span class="line">|</span>
-                    </span>
-                    <span class="give text-hov">
-                        <i class="icn like-icn"></i>
-                        (145)
-                    </span>
-                    <span class="line">|</span>
-                    <span class="review text-hov">回复</span>
-                </div>
-            </div>
-        </li>
-        <li class="hot-item">
-            <div class="item-header">
-                <img class="user-img" src="" alt="">
-            </div>
-            <div class="cntwrap">
-                <div class="cntwrap-top cntwrap-brk">
-                    <span class="user-name text-hov">情窦00初开</span>
-                    <img class="brand-vip" src="@/assets/images/my-music/vip-6.png" alt="">
-                    <span>：老人与海往上的歌可以移除了</span>
-                </div>
-                <div class="cntwrap-center cntwrap-brk">
-                    <span class="user-name text-hov">情窦00初开</span>
-                    <img class="brand-vip" src="@/assets/images/my-music/vip-6.png" alt="">
-                    <span>：老人与海往上的歌可以移除了</span>
-                </div>
-                <div class="cntwrap-bottom">
-                    <div class="time">2023年3月6日</div>
-                    <span class="del">
-                        <span class="review text-hov">删除</span>
-                        <span class="line">|</span>
-                    </span>
-                    <span class="give text-hov">
-                        <i class="icn like-icn"></i>
-                        (145)
-                    </span>
-                    <span class="line">|</span>
-                    <span class="review text-hov">回复</span>
-                </div>
-            </div>
-        </li>
     </ul>
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from 'vue';
 import Cmmtipt from '../cmmtipt/Cmmtipt.vue'
+import useUserStore from '@/stores/modules/user.ts';
+
+const userStore = useUserStore();
+const userInfo = computed(() => userStore.getUserInfo)
+
+defineProps({
+    list: {
+        type: Array,
+        default: []
+    }
+})
+
+function commentBtn(item) {
+    item.commentText = !item.commentText
+}
 </script>
 <style lang="scss" scoped>
 .hot-item{
@@ -145,6 +137,9 @@ import Cmmtipt from '../cmmtipt/Cmmtipt.vue'
                 float: left;
                 margin: 0 !important;
                 color: #999;
+            }
+            .del{
+                display: none;
             }
             .give{
                 cursor: pointer;
@@ -215,6 +210,11 @@ import Cmmtipt from '../cmmtipt/Cmmtipt.vue'
                     }
                 }
             }
+        }
+    }
+    &:hover{
+        .del{
+            display: inline-block !important;
         }
     }
 }

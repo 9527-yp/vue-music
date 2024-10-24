@@ -172,8 +172,15 @@ function getSongCommentList() {
         id: songSheetId.value,
         offset: commentInfo.offset
     }).then((res: ResponseType) => {
+        console.log(commentInfo, 'commentInfo')
         commentInfo.hotCommentList = res?.hotComments ?? []
+        commentInfo.hotCommentList.forEach(item => {
+            item.commentText = false;
+        })
         commentInfo.newCommentList = res?.comments ?? []
+        commentInfo.newCommentList.forEach(item => {
+            item.commentText = false;
+        })
         commentInfo.totalCount = res?.total ?? 0
     })
 }

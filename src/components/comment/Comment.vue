@@ -17,9 +17,13 @@
                     </div>
                 </div>
             </div>
-            <div class="hot-comment">
+            <div class="hot-comment" v-if="commentInfo.hotCommentList.length > 0">
                 <h3 class="title">精彩评论</h3>
-                <CommentList />
+                <CommentList :list="commentInfo.hotCommentList" />
+            </div>
+            <div class="hot-comment" v-if="commentInfo.newCommentList.length > 0">
+                <h3 class="title">最新评论({{commentInfo.totalCount}})</h3>
+                <CommentList :list="commentInfo.newCommentList" />
             </div>
         </div>
     </div>
@@ -36,6 +40,10 @@ const userInfo = computed(() => userStore.getUserInfo)
 
 defineProps({
     playlist: {
+        type: Object,
+        default: {}
+    },
+    commentInfo: {
         type: Object,
         default: {}
     }
