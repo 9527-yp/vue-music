@@ -58,10 +58,13 @@
 </template>
 
 <script setup lang="ts">
-    import { ref, watch } from 'vue';
+    import { ref, watch, computed } from 'vue';
     import { useRoute } from 'vue-router'
+    import useUserStore from '@/stores/modules/user.ts'
 
     const route = useRoute();
+    const userStore = useUserStore()
+    const isLogin = computed(() => userStore.getIsLogin)
     // 获取当前路由对象
     const footShow = ref(true);
 
@@ -109,7 +112,7 @@
     ])
 
     watch(() => route.path, (path) => {
-        if(path === '/my-music'){
+        if(path === '/my-music' && isLogin.value){
             footShow.value = false
         }
     },{immediate: true})

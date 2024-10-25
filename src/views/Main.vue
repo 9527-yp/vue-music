@@ -22,8 +22,8 @@ import LoginDialog from '@/components/login/LoginDialog.vue'
   <MyPlay />
   <!-- 登录弹框 -->
   <teleport to="body">
-      <LoginDialog />
-    </teleport>
+    <LoginDialog />
+  </teleport>
 </template>
 
 <style lang="scss" scoped>
