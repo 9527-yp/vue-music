@@ -76,30 +76,3 @@ export const getSongSheetInfo = ({id}: {id :string | number}): AxiosPromise => {
         params
     })
 }
-
-/**
- * @description 获取歌单评论
- * @param param.id  歌单id
- * @param param.offset  偏移数量 , 用于分页 , 如 :( 评论页数 -1)*20, 其中 20 为 limit 的值
- * @returns 
- */
-
-type ParamItem = {
-    id: string | number,
-    offset: number,
-    limit: number
-}
-export const getSongComment = ({id, offset, limit}: ParamItem): AxiosPromise => {
-    const params = {
-        timestamp: new Date().getTime(),
-        id,
-        offset,
-        limit
-    };
-
-    return axios.request({
-        url: '/comment/playlist',
-        method: 'get',
-        params
-    })
-}

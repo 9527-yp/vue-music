@@ -71,7 +71,8 @@ import SongSheetInfo from './components/SongSheeInfo.vue'
 import SongListTable from './components/SongListTable.vue'
 import Page from '@/components/page/Page.vue'
 import Comment from '@/components/comment/Comment.vue'
-import { getSongSubcount, getSongList, getSongSheetInfo, getSongComment } from '@/api/my-music.ts'
+import { getSongSubcount, getSongList, getSongSheetInfo } from '@/api/my-music.ts'
+import { getSongComment } from '@/api/comment.ts'
 import type { ResponseType } from '@/types/index';
 import type { SongSheetList, typeSongSheet, songSheetDetail} from './types/type'
 
@@ -174,6 +175,7 @@ function getSongInfo() {
 // 评论数据
 const commentInfo = reactive({
     id: songSheetId.value,
+    type: 2,
     offset: 1,
     limit: 20,
     totalCount: 0,
