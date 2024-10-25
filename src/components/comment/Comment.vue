@@ -10,7 +10,7 @@
                     <img :src="userInfo?.profile?.avatarUrl" alt="">
                 </div>
                 <div class="m-cmmtipt">
-                    <Cmmtipt />
+                    <Cmmtipt @publish="publish"/>
                     <div class="corr">
                         <span class="arrline">◆</span>
                         <span class="arrclr">◆</span>
@@ -38,8 +38,8 @@ import CommentList from './comment-list/CommentList.vue'
 
 const userStore = useUserStore();
 const userInfo = computed(() => userStore.getUserInfo)
-
-defineProps({
+const emit = defineEmits(['publishComment'])
+const props = defineProps({
     playlist: {
         type: Object,
         default: {}
@@ -49,6 +49,15 @@ defineProps({
         default: {}
     }
 })
+
+function publish(value: string) {
+    let param = {
+        id: props.commentInfo.id,
+        content: value,
+        type: props.commentInfo.type,
+    }
+    emit('publishComment', param)
+}
 </script>
 <style lang="scss" scoped>
 .song-list-box{

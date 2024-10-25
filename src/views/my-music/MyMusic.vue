@@ -46,8 +46,9 @@
                     <SongListTable :playlist="songSheetDetail.playlist"/>
                     <!-- 评论 -->
                     <Comment
-                     :playlist="songSheetDetail.playlist"
-                     :commentInfo="commentInfo" 
+                      :playlist="songSheetDetail.playlist"
+                      :commentInfo="commentInfo" 
+                      @publishComment="publishComment"
                     />
                     <!-- 底部分页 -->
                     <Page
@@ -72,9 +73,9 @@ import SongListTable from './components/SongListTable.vue'
 import Page from '@/components/page/Page.vue'
 import Comment from '@/components/comment/Comment.vue'
 import { getSongSubcount, getSongList, getSongSheetInfo } from '@/api/my-music.ts'
-import { getSongComment } from '@/api/comment.ts'
+import { getSongComment, addComment } from '@/api/comment.ts'
 import type { ResponseType } from '@/types/index';
-import type { SongSheetList, typeSongSheet, songSheetDetail} from './types/type'
+import type { SongSheetList, TypeSongSheet, SongSheetDetail} from './types/type.ts'
 
 const userStore = useUserStore();
 const isLogin = computed(() => userStore.getIsLogin)
@@ -117,7 +118,7 @@ getSongCount()
 
 // 歌单ID
 const songSheetId = ref(undefined)
-const songSheetList = reactive<typeSongSheet>({
+const songSheetList = reactive<TypeSongSheet>({
     createdSongSheet: [],
     collectSongSheet: []
 })
@@ -153,7 +154,7 @@ function songListItemChange(value: number) {
     getSongCommentList();
 }
 
-const songSheetDetail = reactive<songSheetDetail>({
+const songSheetDetail = reactive<SongSheetDetail>({
     playlist: {},
     privileges: []
 })
@@ -174,7 +175,7 @@ function getSongInfo() {
 
 // 评论数据
 const commentInfo = reactive({
-    id: songSheetId.value,
+    id: null,
     type: 2,
     offset: 1,
     limit: 20,
@@ -183,13 +184,13 @@ const commentInfo = reactive({
     newCommentList: [] // 最新评论
 })
 function getSongCommentList() {
+    commentInfo.id = songSheetId.value;
     const params = {
         id: songSheetId.value,
         offset: (commentInfo.offset - 1) * commentInfo.limit,
         limit: commentInfo.limit
     }
     getSongComment(params).then((res: ResponseType) => {
-        console.log(commentInfo, 'commentInfo')
         commentInfo.hotCommentList = res?.hotComments ?? []
         commentInfo.hotCommentList.forEach(item => {
             item.commentText = false;
@@ -206,6 +207,16 @@ function getSongCommentList() {
 function changePage(value: number) {
     commentInfo.offset = value;
     getSongCommentList();
+}
+
+// 评论操作
+function publishComment(param) {
+    console.log(param, 'param')
+    addComment(param).then((res: ResponseType) => {
+        if(res.code === 200) {
+            getSongCommentList();
+        }
+    })
 }
 </script>
 

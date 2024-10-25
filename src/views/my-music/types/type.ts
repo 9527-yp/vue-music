@@ -10,12 +10,12 @@ export type SongSheetList = {
         avatarUrl: string
     }
 }
-export type typeSongSheet = {
+export type TypeSongSheet = {
     createdSongSheet: SongSheetList[],
     collectSongSheet: SongSheetList[],
 }
 
-export type songSheetDetail = {
+export type SongSheetDetail = {
     playlist: {
         coverImgUrl?: string,
         name?: string,

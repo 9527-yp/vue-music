@@ -28,6 +28,12 @@
                 </div>
             </div>
         </div>
+        <teleport to="body">
+            <div class="warning-tip" v-if="warningInfo.visible">
+                <i class="warning-icn"></i>
+                <span class="text">{{warningInfo.text}}</span>
+            </div>
+        </teleport>
     </div>
 </template>
 
@@ -35,6 +41,7 @@
 import { reactive, ref, onMounted, onUnmounted, watch } from 'vue';
 import { expressionList } from './emo'
 
+const emit = defineEmits(['publish'])
 defineProps({
     isRecover: {
         type: Boolean,
@@ -84,8 +91,27 @@ function chooseEmoj(index: number) {
 }
 
 // 评论
+const warningInfo = reactive({
+    text: '',
+    visible: false,
+    time: null
+})
 function reviewBtn() {
-
+    // 超出文本大小 || 未输入
+    if(replay.length < 0 || replay.text === ''){
+        if(replay.text === ''){
+            warningInfo.text = '输入点内容再提交吧';
+        }else{
+            warningInfo.text = '输入不能超过140个字符';
+        }
+        warningInfo.visible = true;
+        warningInfo.time && clearTimeout( warningInfo.time);
+        warningInfo.time = setTimeout(() => {
+            warningInfo.visible = false;
+        }, 1500);
+        return;
+    }
+    emit('publish', replay.text)
 }
 
 // 上一页
@@ -271,6 +297,34 @@ onUnmounted(() => {
         display: block;
         height: 0;
         visibility: hidden;
+    }
+}
+.warning-tip{
+    width: 280px;
+    background: #fff;
+    color: #333;
+    line-height: 52px;
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    position: absolute;
+    top:50%;
+    left: 50%;
+    margin-top: -40px;
+    margin-left: -140px;
+    vertical-align: middle;
+    .warning-icn{
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 3px;
+        background: url('@/assets/images/icon.png') no-repeat;
+        background-position: -24px -406px;
+    }
+    .text{
+        display: inline-block;
+        vertical-align: middle;
     }
 }
 
