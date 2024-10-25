@@ -83,12 +83,18 @@ export const getSongSheetInfo = ({id}: {id :string | number}): AxiosPromise => {
  * @param param.offset  偏移数量 , 用于分页 , 如 :( 评论页数 -1)*20, 其中 20 为 limit 的值
  * @returns 
  */
-export const getSongComment = ({id, offset}: {id :string | number,offset: string | number}): AxiosPromise => {
+
+type ParamItem = {
+    id: string | number,
+    offset: number,
+    limit: number
+}
+export const getSongComment = ({id, offset, limit}: ParamItem): AxiosPromise => {
     const params = {
         timestamp: new Date().getTime(),
         id,
         offset,
-        limit: 20
+        limit
     };
 
     return axios.request({

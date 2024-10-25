@@ -17,7 +17,8 @@
                     </div>
                 </div>
             </div>
-            <div class="hot-comment" v-if="commentInfo.hotCommentList.length > 0">
+            <!-- 精彩评论只有在第一页时才显示 -->
+            <div class="hot-comment" v-if="commentInfo.hotCommentList.length > 0 && commentInfo.offset === 1">
                 <h3 class="title">精彩评论</h3>
                 <CommentList :list="commentInfo.hotCommentList" />
             </div>

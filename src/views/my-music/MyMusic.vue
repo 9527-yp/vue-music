@@ -47,7 +47,16 @@
                     <!-- 评论 -->
                     <Comment
                      :playlist="songSheetDetail.playlist"
-                     :commentInfo="commentInfo" />
+                     :commentInfo="commentInfo" 
+                    />
+                    <!-- 底部分页 -->
+                    <Page
+                      v-if="commentInfo.totalCount > commentInfo.limit"
+                      :total="commentInfo.totalCount"
+                      :pageSize="commentInfo.limit"
+                      :page="commentInfo.offset"
+                      @changePage="changePage"
+                    />
                 </div>
             </div>
         </div>
@@ -60,6 +69,7 @@ import useUserStore from '@/stores/modules/user.ts'
 import SongList from './components/SongList.vue'
 import SongSheetInfo from './components/SongSheeInfo.vue'
 import SongListTable from './components/SongListTable.vue'
+import Page from '@/components/page/Page.vue'
 import Comment from '@/components/comment/Comment.vue'
 import { getSongSubcount, getSongList, getSongSheetInfo, getSongComment } from '@/api/my-music.ts'
 import type { ResponseType } from '@/types/index';
@@ -136,7 +146,8 @@ getSongListData()
 
 // 切换歌单查看
 function songListItemChange(value: number) {
-    songSheetId.value = value
+    songSheetId.value = value;
+    commentInfo.offset = 1; // 切换歌单重置分页
     getSongInfo();
     getSongCommentList();
 }
@@ -162,16 +173,20 @@ function getSongInfo() {
 
 // 评论数据
 const commentInfo = reactive({
-    offset: 0,
+    id: songSheetId.value,
+    offset: 1,
+    limit: 20,
     totalCount: 0,
     hotCommentList: [], // 热门评论
     newCommentList: [] // 最新评论
 })
 function getSongCommentList() {
-    getSongComment({
+    const params = {
         id: songSheetId.value,
-        offset: commentInfo.offset
-    }).then((res: ResponseType) => {
+        offset: (commentInfo.offset - 1) * commentInfo.limit,
+        limit: commentInfo.limit
+    }
+    getSongComment(params).then((res: ResponseType) => {
         console.log(commentInfo, 'commentInfo')
         commentInfo.hotCommentList = res?.hotComments ?? []
         commentInfo.hotCommentList.forEach(item => {
@@ -183,6 +198,12 @@ function getSongCommentList() {
         })
         commentInfo.totalCount = res?.total ?? 0
     })
+}
+
+// 分页点击获取当前页评论
+function changePage(value: number) {
+    commentInfo.offset = value;
+    getSongCommentList();
 }
 </script>
 
