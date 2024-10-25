@@ -6,13 +6,18 @@
         <div class="m-btns">
             <i class="icn emo-icn" @click="emoClick"></i>
             <i class="icn rel-icn"></i>
-            <div class="review-btn">评论</div>
+            <div class="review-btn" @click="reviewBtn">评论</div>
             <span class="review-num"  :class="{ 'words-beyond': replay.length < 0 }">{{replay.length}}</span>
             <div class="m-emo" v-if="expressionShow">
                 <div class="emo-box">
                     <div class="emo-content">
                         <span class="emtitm" v-for="(item, index) in expression.list" :key="index" :title="item.title">
-                            <img class="emtitm-img" :src="`http://s1.music.126.net/style/web2/emt/emoji_${item.num}.png`" alt="">
+                            <img
+                              class="emtitm-img"
+                              :src="`http://s1.music.126.net/style/web2/emt/emoji_${item.num}.png`"
+                              alt=""
+                              @click="chooseEmoj(index)"
+                            />
                         </span>
                     </div>
                     <div class="page">
@@ -71,6 +76,16 @@ getEmoList()
 
 function emoClick() {
     expressionShow.value = !expressionShow.value
+}
+
+function chooseEmoj(index: number) {
+    const list = JSON.parse(JSON.stringify(expression.list));
+    replay.text += `[${list[index].title}]`
+}
+
+// 评论
+function reviewBtn() {
+
 }
 
 // 上一页
