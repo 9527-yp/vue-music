@@ -73,7 +73,7 @@ import SongListTable from './components/SongListTable.vue'
 import Page from '@/components/page/Page.vue'
 import Comment from '@/components/comment/Comment.vue'
 import { getSongSubcount, getSongList, getSongSheetInfo } from '@/api/my-music.ts'
-import { getSongComment, addComment } from '@/api/comment.ts'
+import { getSongComment } from '@/api/comment.ts'
 import type { ResponseType } from '@/types/index';
 import type { SongSheetList, TypeSongSheet, SongSheetDetail} from './types/type.ts'
 
@@ -210,13 +210,10 @@ function changePage(value: number) {
 }
 
 // 评论操作
-function publishComment(param) {
-    console.log(param, 'param')
-    addComment(param).then((res: ResponseType) => {
-        if(res.code === 200) {
-            getSongCommentList();
-        }
-    })
+async function publishComment() {
+    // 需先调详情接口，评论数据才获取最新的数据
+    await getSongSheetInfo({id: songSheetId.value});
+    getSongCommentList();
 }
 </script>
 

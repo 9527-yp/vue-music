@@ -19,7 +19,8 @@
                      :src="item?.user?.vipRights?.associator?.iconUrl"
                      alt=""
                     >
-                    <span>：{{item?.content}}</span>
+                    <span>:</span>
+                    <span v-html="item?.content"></span>
                 </div>
                 <template v-if="item?.beReplied">
                     <div class="cntwrap-center cntwrap-brk" v-for="(i, key) in item?.beReplied" :key="key">
@@ -36,13 +37,14 @@
                          :src="i?.user?.vipRights?.associator?.iconUrl"
                          alt=""
                         >
-                        <span>：{{i.content}}</span>
+                        <span>:</span>
+                        <span v-html="i?.content"></span>
                     </div>
                 </template>
                 <div class="cntwrap-bottom">
-                    <div class="time">{{item.timeStr}}</div>
+                    <div class="time">{{formatDate(item.time)}}</div>
                     <span class="del" v-if="item?.ipLocation?.userId === userInfo?.profile?.userId">
-                        <span class="review text-hov">删除</span>
+                        <span class="review text-hov" @click="handelDeleteComment(item.commentId)">删除</span>
                         <span class="line">|</span>
                     </span>
                     <span class="give text-hov">
@@ -56,7 +58,14 @@
                 </div>
                 <div class="comment-reply" v-if="item?.commentText">
                     <div class="comment-content">
-                        <Cmmtipt :isRecover="true"/>
+                        <Cmmtipt
+                          @publish="publish"
+                          :isRecover="true"
+                          :t="t"
+                          :id="id"
+                          :type="type"
+                          :commentId="item.commentId"
+                        />
                         <div class="comment-corr">
                             <span class="arrline">◆</span>
                             <span class="arrclr">◆</span>
@@ -72,19 +81,51 @@
 import { computed, ref } from 'vue';
 import Cmmtipt from '../cmmtipt/Cmmtipt.vue'
 import useUserStore from '@/stores/modules/user.ts';
+import type { ResponseType } from '@/types/index';
+import { deleteComment } from '@/api/comment.ts';
+import { formatDate } from '@/utils/utils.ts';
 
 const userStore = useUserStore();
 const userInfo = computed(() => userStore.getUserInfo)
+const emit = defineEmits(['recoverComment'])
 
-defineProps({
+const props = defineProps({
     list: {
         type: Array,
         default: []
+    },
+    id: { // 对应类型id
+        type: Number || String,
+        default: 0
+    },
+    type: { // 资源类型,对应歌曲：0, mv：1,歌单：2, 专辑：3, 电台：4, 视频：5, 动态：6
+        type: Number,
+        default: 0
+    },
+    t: {
+        type: String,
+        default: 1
     }
 })
 
 function commentBtn(item) {
     item.commentText = !item.commentText
+}
+
+function handelDeleteComment(commentId: number | string) {
+    deleteComment({
+        id: props.id,
+        type: props.type,
+        commentId
+    }).then((res: ResponseType) => {
+        if(res.code === 200) {
+            emit('recoverComment')
+        }
+    })
+}
+
+function publish() {
+    emit('recoverComment')
 }
 </script>
 <style lang="scss" scoped>

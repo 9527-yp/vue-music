@@ -30,7 +30,8 @@
         </div>
         <teleport to="body">
             <div class="warning-tip" v-if="warningInfo.visible">
-                <i class="warning-icn"></i>
+                <i v-if="warningInfo.type" class="success-icn"></i>
+                <i v-else class="warning-icn"></i>
                 <span class="text">{{warningInfo.text}}</span>
             </div>
         </teleport>
@@ -40,13 +41,32 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, onUnmounted, watch } from 'vue';
 import { expressionList } from './emo'
+import type { ResponseType } from '@/types/index';
+import { addComment, replyComment } from '@/api/comment.ts'
 
 const emit = defineEmits(['publish'])
-defineProps({
-    isRecover: {
+const props = defineProps({
+    isRecover: { // 是否评论或回复，输入框高度变化
         type: Boolean,
         default: false
+    },
+    id: { // 对应类型id
+        type: Number || String,
+        default: 0
+    },
+    type: { // 资源类型,对应歌曲：0, mv：1,歌单：2, 专辑：3, 电台：4, 视频：5, 动态：6
+        type: Number,
+        default: 0
+    },
+    t: {
+        type: String,
+        default: 1
+    },
+    commentId: { // 回复评论id
+        type: Number || String,
+        default: 0
     }
+
 })
 type ExpressionItem = {
     total: number,
@@ -56,6 +76,13 @@ type ExpressionItem = {
         title: string,
         num: number
     }[],
+}
+
+type ParamItem = {
+    id: number | string,
+    content: string,
+    type: number | string,
+    commentId?: number | string,
 }
 
 // 评论数据
@@ -94,6 +121,7 @@ function chooseEmoj(index: number) {
 const warningInfo = reactive({
     text: '',
     visible: false,
+    type:0, // 0:警告 ，1：成功
     time: null
 })
 function reviewBtn() {
@@ -104,6 +132,7 @@ function reviewBtn() {
         }else{
             warningInfo.text = '输入不能超过140个字符';
         }
+        warningInfo.type = 0;
         warningInfo.visible = true;
         warningInfo.time && clearTimeout( warningInfo.time);
         warningInfo.time = setTimeout(() => {
@@ -111,7 +140,48 @@ function reviewBtn() {
         }, 1500);
         return;
     }
-    emit('publish', replay.text)
+
+    let param: ParamItem = {
+        id: props.id,
+        content: replay.text,
+        type: props.type,
+    }
+
+    if(props.t === '1') {
+        // 1：评论
+        addComment(param).then((res: ResponseType) => {
+            if(res.code === 200) {
+                warningInfo.type = 1;
+                warningInfo.text = '评论成功';
+                warningInfo.visible = true;
+                warningInfo.time && clearTimeout( warningInfo.time);
+                warningInfo.time = setTimeout(() => {
+                    warningInfo.visible = false;
+                }, 1500);
+                // 通知父组件更新评论
+                emit('publish')
+                replay.text = ''
+            }
+        })
+    }else if(props.t === '2') {
+        // 2：回复
+        param.commentId = props.commentId
+        replyComment(param).then((res: ResponseType) => {
+            if(res.code === 200) {
+                warningInfo.type = 1;
+                warningInfo.text = '评论成功';
+                warningInfo.visible = true;
+                warningInfo.time && clearTimeout( warningInfo.time);
+                warningInfo.time = setTimeout(() => {
+                    warningInfo.visible = false;
+                }, 1500);
+                // 通知父组件更新评论
+                emit('publish')
+                replay.text = ''
+            }
+        })
+    }
+    
 }
 
 // 上一页
@@ -321,6 +391,15 @@ onUnmounted(() => {
         margin-right: 3px;
         background: url('@/assets/images/icon.png') no-repeat;
         background-position: -24px -406px;
+    }
+    .success-icn{
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 3px;
+        background: url('@/assets/images/icon.png') no-repeat;
+        background-position: -24px -430px;
     }
     .text{
         display: inline-block;

@@ -10,7 +10,7 @@
                     <img :src="userInfo?.profile?.avatarUrl" alt="">
                 </div>
                 <div class="m-cmmtipt">
-                    <Cmmtipt @publish="publish"/>
+                    <Cmmtipt @publish="publish" t="1" :id="commentInfo.id" :type="commentInfo.type" />
                     <div class="corr">
                         <span class="arrline">◆</span>
                         <span class="arrclr">◆</span>
@@ -20,11 +20,23 @@
             <!-- 精彩评论只有在第一页时才显示 -->
             <div class="hot-comment" v-if="commentInfo.hotCommentList.length > 0 && commentInfo.offset === 1">
                 <h3 class="title">精彩评论</h3>
-                <CommentList :list="commentInfo.hotCommentList" />
+                <CommentList
+                  :list="commentInfo.hotCommentList"
+                  t="2"
+                  :id="commentInfo.id"
+                  :type="commentInfo.type"
+                  @recoverComment="publish" 
+                />
             </div>
             <div class="hot-comment" v-if="commentInfo.newCommentList.length > 0">
                 <h3 class="title">最新评论({{commentInfo.totalCount}})</h3>
-                <CommentList :list="commentInfo.newCommentList" />
+                <CommentList
+                  :list="commentInfo.newCommentList"
+                  t="2"
+                  :id="commentInfo.id"
+                  :type="commentInfo.type"
+                  @recoverComment="publish" 
+                />
             </div>
         </div>
     </div>
@@ -50,13 +62,8 @@ const props = defineProps({
     }
 })
 
-function publish(value: string) {
-    let param = {
-        id: props.commentInfo.id,
-        content: value,
-        type: props.commentInfo.type,
-    }
-    emit('publishComment', param)
+function publish() {
+    emit('publishComment')
 }
 </script>
 <style lang="scss" scoped>

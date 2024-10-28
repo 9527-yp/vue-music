@@ -67,6 +67,11 @@ export function timeStampToDuration(timestamp: number) {
     return result;
 }
 
+/**
+ * @description 时间戳转 日期格式
+ * @param timestamp  时间戳
+ * @param format 日期格式 YYYY-MM-DD
+ */
 export function formatDateTime(timestamp : number, format: string): string {
     // 创建一个 Date 对象
     const date = new Date(timestamp * 1000);
@@ -92,4 +97,108 @@ export function formatDateTime(timestamp : number, format: string): string {
         }  
     }
     return formattedDate;  
+}
+
+
+/**
+ * @description 时间戳转换日期时间
+ * @param timestamp 时间戳
+ */
+export function formatDate(timestamp: string | number): string {
+    const arrTimestamp = timestamp.toString().split('');
+
+    // 缺少补0
+    for(let i = 0; i < 13 ; i++) {
+        if(!arrTimestamp[i]){
+            arrTimestamp[i] = '0'
+        }
+    }
+
+    timestamp = Number(arrTimestamp.join(''))
+
+    // 当前时间
+    const now = new Date().getTime()
+
+    // 当前时间 - 传入时间
+    const diffValue = now - timestamp
+
+
+    if(diffValue < 0) {
+        return '不久前'
+    }
+
+    // 一分钟
+    const minute = 1000 * 60;
+
+    // 判断较当前时间差多少分钟
+    const minC = diffValue / minute
+
+    const timeDate = new Date(timestamp)
+
+    // 计算上一年的年份  时间戳
+    const lastYear = new Date().getFullYear() - 1;
+    const lastYearEndDate = new Date(lastYear, 11, 31, 23, 59, 59).getTime(); 
+
+    // 小于上一年12月31号23:59:59 
+    if(timestamp < lastYearEndDate) {
+        return `${timeDate.getFullYear()}年${timeDate.getMonth() + 1}月${timeDate.getDate()}日`
+    }
+
+    // 三天前 
+    // 获取三天前23:59:59的时间戳  
+    const threeTimestamp = getTimestamp(3);
+    if(timestamp < threeTimestamp) {
+        return `${timeDate.getMonth() + 1}月${timeDate.getDate()}日 ${convertTime(timeDate.getHours())}:${convertTime(timeDate.getMinutes())}`
+    }
+        
+    // 获取前天23:59:59的时间戳  
+    const beforeTimestamp = getTimestamp(2);
+    if(timestamp < beforeTimestamp) {
+        return `前天 ${convertTime(timeDate.getHours())}:${convertTime(timeDate.getMinutes())}`
+    }
+
+    // 获取昨天23:59:59的时间戳  
+    const yesterdayTimestamp = getTimestamp(1);
+
+    if(timestamp < yesterdayTimestamp) {
+        return `昨天 ${convertTime(timeDate.getHours())}:${convertTime(timeDate.getMinutes())}`
+    }
+
+    // 超过1小时
+    if(minC >= 60) {
+        return `${convertTime(timeDate.getHours())}:${convertTime(timeDate.getMinutes())}`
+    }
+
+    // 超过1分钟
+    if(minC >= 1) {
+        return `${minC.toFixed(0)} 分钟前`
+    }
+
+    // 小于一分钟
+    return '刚刚'
+}
+
+// 时间缺少补0
+function convertTime(value: string | number) : string | number {
+    if(value >= 10) {
+        return value
+    }else {
+        return '0' + value
+    }
+}
+
+function getTimestamp(value : number = 0) : number {
+    // 创建一个新的Date对象，表示当前时间  
+    const now = new Date();  
+    
+    // 设置时间为几天前（当前日期减2）  
+    now.setDate(now.getDate() - value);  
+        
+    // 设置时间为当天的23:59:59  
+    now.setHours(23, 59, 59, 0); // 第四个参数是毫秒，设置为0  
+        
+    // 获取23:59:59的时间戳  
+    const timestamp = now.getTime();  
+        
+    return timestamp;  
 }
