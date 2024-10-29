@@ -75,6 +75,7 @@ import Comment from '@/components/comment/Comment.vue'
 import { getSongSubcount, getSongList, getSongSheetInfo } from '@/api/my-music.ts'
 import { getSongComment } from '@/api/comment.ts'
 import type { ResponseType } from '@/types/index';
+import { handleCommentList } from '@/components/comment/handleCommentList.ts'
 import type { SongSheetList, TypeSongSheet, SongSheetDetail} from './types/type.ts'
 
 const userStore = useUserStore();
@@ -191,15 +192,13 @@ function getSongCommentList() {
         limit: commentInfo.limit
     }
     getSongComment(params).then((res: ResponseType) => {
-        commentInfo.hotCommentList = res?.hotComments ?? []
-        commentInfo.hotCommentList.forEach(item => {
-            item.commentText = false;
-        })
-        commentInfo.newCommentList = res?.comments ?? []
-        commentInfo.newCommentList.forEach(item => {
-            item.commentText = false;
-        })
-        commentInfo.totalCount = res?.total ?? 0
+        const result = handleCommentList(res)
+        console.log(result, 'resultresultresult')
+        commentInfo.hotCommentList = result?.hotComments ?? []
+        
+        commentInfo.newCommentList = result?.comments ?? []
+        
+        commentInfo.totalCount = result?.total ?? 0
     })
 }
 
