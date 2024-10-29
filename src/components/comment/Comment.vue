@@ -2,7 +2,7 @@
     <div class="song-sheet-review">
         <div class="song-list-box">
             <h3 class="title">评论</h3>
-            <span class="song-num">共{{playlist?.commentCount}}条评论</span>
+            <span class="song-num">共{{commentInfo?.totalCount}}条评论</span>
         </div>
         <div class="review-box">
             <div class="iptarea">
