@@ -47,7 +47,7 @@
                         <span class="review text-hov" @click="handelDeleteComment(item.commentId)">删除</span>
                         <span class="line">|</span>
                     </span>
-                    <span class="give text-hov">
+                    <span class="give text-hov" @click="handelLikeComment(item)">
                         <i class="icn" :class="item.liked ? 'like-icn' : 'no-like-icn'"></i>
                         <template v-if="item.likedCount">
                             ({{item.likedCount}})
@@ -94,7 +94,7 @@ import Cmmtipt from '../cmmtipt/Cmmtipt.vue'
 import Dialog from '@/components/dialog/dialog.vue';
 import useUserStore from '@/stores/modules/user.ts';
 import type { ResponseType } from '@/types/index';
-import { deleteComment } from '@/api/comment.ts';
+import { deleteComment, likeComment } from '@/api/comment.ts';
 import { formatDate } from '@/utils/utils.ts';
 
 const userStore = useUserStore();
@@ -137,6 +137,21 @@ function deleteConfirm() {
 }
 function deleteCancel() {
     deleteCommentDialog.value = false;
+}
+
+// 点赞
+function handelLikeComment(item) {
+    const param = {
+        id: props.id,
+        type: props.type,
+        cid: item.commentId,
+        t: item.liked ? 0 : 1
+    }
+    likeComment(param).then( (res: ResponseType) => {
+        if(res.code === 200) {
+            emit('recoverComment')
+        }
+    })
 }
 
 function commentBtn(item) {

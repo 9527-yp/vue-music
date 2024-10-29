@@ -119,3 +119,33 @@ export const deleteComment = ({id, type, commentId}: DeleteComment): AxiosPromis
         params
     })
 }
+
+/**
+ * @description 点赞
+ * @param param.id  对应类型id
+ * @param param.type  资源类型,对应歌曲：0, mv：1,歌单：2, 专辑：3, 电台：4, 视频：5, 动态：6
+ * @param param.t  1 为点赞 ,0 为取消点赞
+ * @param param.commentId  当前评论id
+ * @returns 
+ */
+type LickCommentItem = {
+    id: string | number,
+    type: number,
+    cid: string | number,
+    t: number | string
+}
+export const likeComment = ({id, type, cid, t}: LickCommentItem): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+        id,
+        type,
+        cid,
+        t
+    };
+
+    return axios.request({
+        url: '/comment/like',
+        method: 'get',
+        params
+    })
+}
