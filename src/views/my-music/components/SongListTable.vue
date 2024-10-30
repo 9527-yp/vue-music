@@ -21,15 +21,20 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="music-list-c"
-                 :class="{'even' : index % 2 === 0, 'list-disabled' : item?.noCopyrightRcmd }"
-                 v-for="(item, index) in playlist?.tracks"
-                 :key="item.id"
+                <tr
+                  class="music-list-c"
+                  v-for="(item, index) in playlist?.tracks"
+                  :key="item.id"
+                  :class="{
+                  'even' : index % 2 === 0,
+                  'list-disabled' : item?.noCopyrightRcmd,
+                  'no-mySong-disabled' : item?.noCopyrightRcmd && playlist?.userId !== userInfo?.userPoint?.userId
+                   }"
                 >
                     <td class="tr-index">
                         <div class="index-hd">
                             <span class="index">{{index+1}}</span>
-                            <i class="play-icn"></i>
+                            <i class="play-icn" :class="{'play-z-slt' : playSongId === item.id}" @click="playMusic(item)"></i>
                         </div>
                     </td>
                     <td>
@@ -44,14 +49,14 @@
                     <td class="song-time-box">
                         <span class="song-time">{{ timeStampToDuration(item.dt / 1000) || '00:00' }}</span>
                         <div class="btns" v-if="!item?.noCopyrightRcmd">
-                            <i class="add-icn" title="添加到播放列表"></i>
+                            <i class="add-icn" title="添加到播放列表" @click="addMusic(item)"></i>
                             <i class="icn collect-icn" title="收藏"></i>
                             <i class="icn share-icn" title="分享"></i>
                             <i class="icn down-icn" title="下载"></i>
-                            <i class="icn del-icn" title="删除"></i>
+                            <i class="icn del-icn" v-if="playlist?.userId === userInfo?.userPoint?.userId" title="删除"></i>
                         </div>
                         <div class="btns" v-else>
-                            <i class="icn del-icn" title="删除"></i>
+                            <i class="icn del-icn" v-if="playlist?.userId === userInfo?.userPoint?.userId" title="删除"></i>
                         </div>
                     </td>
                     <td>
@@ -70,16 +75,82 @@
             </tbody>
         </table>
     </div>
+    <!-- 播放权限弹框 -->
+    <Dialog 
+      :visible="playDialog"
+      showCustomButton
+      @cancel='playCancel'
+    >
+    因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归
+    </Dialog>
 </template>
 
 <script setup lang="ts">
-import { timeStampToDuration } from '@/utils/utils.ts'
+import Dialog from '@/components/dialog/dialog.vue';
+import { timeStampToDuration } from '@/utils/utils.ts';
+import useUserStore from '@/stores/modules/user.ts';
+import usePlayStore from '@/stores/modules/play.ts';
+import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
+import usePlaySong from '@/hooks/usePlaySong.ts';
+import type { songType } from '@/hooks/methods/songFormat.ts';
+import { computed, ref } from 'vue';
 defineProps({
     playlist: {
         type: Object,
         default: {}
     }
 })
+
+const userStore = useUserStore();
+const playStore = usePlayStore();
+
+const userInfo = computed(() => userStore.getUserInfo);
+
+// 播放显示/隐藏
+const lock = computed(() => playStore.getplayLock);
+// 当前播放歌曲ID
+const playSongId = computed(() => playStore.getPlaySongId);
+
+// 添加到播放列表
+let timer = null;
+function addMusic(item: songType) {
+    useSongAddPlaylist(item)
+    playStore.setAddPlayListTip(true)
+    playStore.setAddPlayListTipText('已添加到播放列表')
+    if(!lock.value){
+        playStore.setPlayLock(true)
+    }
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => {
+        playStore.setPlayLock(false)
+        playStore.setAddPlayListTip(false)
+    }, 1500)
+}
+
+// 播放
+// 提示弹框
+const playDialog = ref(false);
+function playCancel(value: boolean) {
+    playDialog.value = value;
+}
+function playMusic(item: songType) {
+    if(item?.noCopyrightRcmd){
+        playDialog.value = true;
+        return;
+    }
+    usePlaySong(item);
+    useSongAddPlaylist(item);
+    playStore.setAddPlayListTip(true)
+    playStore.setAddPlayListTipText('已开始播放')
+    if(!lock.value){
+        playStore.setPlayLock(true)
+    }
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => {
+        playStore.setPlayLock(false)
+        playStore.setAddPlayListTip(false)
+    }, 1500)
+}
 </script>
 
 
@@ -148,6 +219,9 @@ defineProps({
                         cursor: pointer;
                         background: url('@/assets/images/my-music/table.png') no-repeat 0 9999px;
                         background-position: 0 -103px;
+                    }
+                    .play-z-slt{
+                        background-position: -20px -128px;
                     }
                 }
             }
@@ -270,6 +344,16 @@ defineProps({
                     .play-icn{
                         cursor: default;
                     }
+                }
+            }
+        }
+        .no-mySong-disabled{
+            &:hover{
+                .song-time{
+                    display: block;
+                }
+                .btns{
+                    display: none;
                 }
             }
         }

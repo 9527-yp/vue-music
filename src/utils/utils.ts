@@ -180,7 +180,7 @@ export function formatDate(timestamp: string | number): string {
 
 // 时间缺少补0
 function convertTime(value: string | number) : string | number {
-    if(value >= 10) {
+    if(Number(value) >= 10) {
         return value
     }else {
         return '0' + value

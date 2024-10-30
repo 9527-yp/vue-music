@@ -5,8 +5,8 @@ import { toRawType } from '@/utils/tool';
 import { ref, computed } from 'vue';
 
 /**
- * 
- * @param songs 歌曲数据
+ * @description 将歌曲添加到播放列表
+ * @param songs 歌曲数据 单个歌曲或者歌曲列表
  * @param options.clear 是否清空播放列表
  */
 function useSongAddPlaylist(songs: songType[] | songType,

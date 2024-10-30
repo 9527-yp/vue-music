@@ -5,13 +5,20 @@
             <div class="dialog-title">{{ title }} <span class="dialog-close"  @click="cancel">x</span></div>
             <div class="dialog-content">
                 <div class="content">
-                    <slot></slot>
+                    <div class="content-text">
+                        <slot></slot>
+                    </div>
                     <div class="content-btn" v-if="showConfirmButton || showCancelButton">
                         <div class="ok-btn btn" @click="confirm">
                             <i>{{ confirmtext }}</i>
                         </div>
                         <div class="Cancel-btn btn" @click="cancel">
                             <i>{{ canceltext }}</i>
+                        </div>
+                    </div>
+                    <div class="content-btn customText"  v-if="showCustomButton">
+                        <div class="ok-btn btn" @click="cancel">
+                            <i>{{ customText }}</i>
                         </div>
                     </div>
                 </div>
@@ -34,27 +41,35 @@ defineOptions({
 defineProps({
     visible: {
         type: Boolean,
-        defalut: false
+        default: false
     },
     title: {
         type: String,
-        defalut: '提示'
+        default: '提示'
     },
     confirmtext: {
         type: String,
-        defalut: '确定'
+        default: '确定'
     },
     canceltext: {
         type: String,
-        defalut: '取消'
+        default: '取消'
+    },
+    customText: {
+        type: String,
+        default: '我知道了'
     },
     showConfirmButton: {
         type: Boolean,
-        defalut: false
+        default: false
     },
     showCancelButton: {
         type: Boolean,
-        defalut: false
+        default: false
+    },
+    showCustomButton: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -208,6 +223,9 @@ function cancel() {
                     }
                 }
 
+            }
+            .customText{
+                text-align: center;
             }
         }
     }

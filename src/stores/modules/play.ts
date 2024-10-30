@@ -20,6 +20,9 @@ const playStore = defineStore("play", {
         playSongItem: faultTolerant('playSongItem') || {}, // 当前播放的歌曲
         playSongId: faultTolerant('playSongId') || 0, // 当前播放的歌曲id
         playSongList: faultTolerant('playSongList') || [], // 播放列表
+        playLock: faultTolerant('playLock') || false, // 底部播放显示隐藏
+        addPlayListTip: false,
+        addPlayListTipText: '',
       };
     },
     
@@ -37,6 +40,18 @@ const playStore = defineStore("play", {
       setPlaySongList(playSongList: MusicItemType[]) {
         this.playSongList = playSongList
         setLocalStorage('playSongList', playSongList)
+      },
+      // 底部播放显示隐藏
+      setPlayLock(lockShow: boolean) {
+        this.playLock = lockShow
+        setLocalStorage('playLock', lockShow)
+      },
+      // 添加到播放列表提示
+      setAddPlayListTip(addPlayListTip: boolean) {
+        this.addPlayListTip = addPlayListTip
+      },
+      setAddPlayListTipText(text: string) {
+        this.addPlayListTipText = text
       }
     },
     // 计算属性，和vuex是使用一样，getters里面不是方法，是计算返回的结果值
@@ -44,6 +59,9 @@ const playStore = defineStore("play", {
         getPlaySongId: state => state.playSongId,
         getPlaySongItem: state => state.playSongItem,
         getplaySongList: state => state.playSongList,
+        getplayLock: state => state.playLock,
+        getAddPlayListTip: state => state.addPlayListTip,
+        getAddPlayListTipText: state => state.addPlayListTipText,
         
     }
   });

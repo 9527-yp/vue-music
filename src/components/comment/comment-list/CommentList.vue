@@ -24,26 +24,31 @@
                 </div>
                 <template v-if="item?.beReplied">
                     <div class="cntwrap-center cntwrap-brk" v-for="(i, key) in item?.beReplied" :key="key">
-                        <span class="user-name text-hov">{{i?.user?.nickname}}</span>
-                        <img
-                         class="brand-vip"
-                         v-if="i?.user?.vipRights?.redplus"
-                         :src="i?.user?.vipRights?.redplus?.iconUrl"
-                         alt=""
-                          >
-                        <img
-                         class="brand-vip"
-                         v-else-if="i?.user?.vipRights?.associator"
-                         :src="i?.user?.vipRights?.associator?.iconUrl"
-                         alt=""
-                        >
-                        <span>:</span>
-                        <span v-html="i?.content"></span>
+                        <template v-if="i.status === -5">
+                            <span>该评论已删除</span>
+                        </template>
+                        <template v-else>
+                            <span class="user-name text-hov">{{i?.user?.nickname}}</span>
+                            <img
+                              class="brand-vip"
+                              v-if="i?.user?.vipRights?.redplus"
+                              :src="i?.user?.vipRights?.redplus?.iconUrl"
+                              alt=""
+                            >
+                            <img
+                            class="brand-vip"
+                            v-else-if="i?.user?.vipRights?.associator"
+                            :src="i?.user?.vipRights?.associator?.iconUrl"
+                            alt=""
+                            >
+                            <span>:</span>
+                            <span v-html="i?.content"></span>
+                        </template>
                     </div>
                 </template>
                 <div class="cntwrap-bottom">
                     <div class="time">{{formatDate(item.time)}}</div>
-                    <span class="del" v-if="item?.ipLocation?.userId === userInfo?.profile?.userId">
+                    <span class="del" v-if="item?.user?.userId === userInfo?.profile?.userId">
                         <span class="review text-hov" @click="handelDeleteComment(item.commentId)">删除</span>
                         <span class="line">|</span>
                     </span>
@@ -101,6 +106,14 @@ const userStore = useUserStore();
 const userInfo = computed(() => userStore.getUserInfo)
 const emit = defineEmits(['recoverComment'])
 
+type CommentItem = {
+    commentId: number | string,
+    commentText: boolean,
+    content: string | undefined,
+    liked: boolean,
+    likedCount: number
+}
+
 const props = defineProps({
     list: {
         type: Array,
@@ -140,12 +153,20 @@ function deleteCancel() {
 }
 
 // 点赞
-function handelLikeComment(item) {
+function handelLikeComment(item: CommentItem) {
     const param = {
         id: props.id,
         type: props.type,
         cid: item.commentId,
         t: item.liked ? 0 : 1
+    }
+    item.liked ? item.likedCount+1 : item.likedCount-1
+    if(item.liked){
+        item.likedCount = item.likedCount-1
+        item.liked = false
+    }else{
+        item.likedCount = item.likedCount+1
+        item.liked = true
     }
     likeComment(param).then( (res: ResponseType) => {
         if(res.code === 200) {
@@ -154,7 +175,7 @@ function handelLikeComment(item) {
     })
 }
 
-function commentBtn(item) {
+function commentBtn(item: CommentItem) {
     item.commentText = !item.commentText
 }
 

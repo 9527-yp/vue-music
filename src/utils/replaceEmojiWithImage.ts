@@ -1,7 +1,10 @@
 
 import { expressionList } from '@/components/comment/cmmtipt/emo.ts'
 
-export function replaceEmojiWithImage(inputString: string) {  
+export function replaceEmojiWithImage(inputString: string | undefined): string {
+    if(!inputString){
+        return '';
+    }
     // 定义一个替换函数，将匹配到的内容替换成 <img> 标签  
     function replaceMatch(match: string) {  
         // 获取匹配到的内容（即 [] 内的内容）  

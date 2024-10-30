@@ -63,7 +63,7 @@
                 <i class="icn icn-shuffle" title="随机" v-if="mode.modeIndex === 3" @click="modeChange('随机')"></i>
                 <div class="mode-tooltip" v-show="mode.visible">{{mode.modeName}}</div>
                 <span class="add" @click="playListChange">
-                  <span class="tip">已添加到播放列表</span>
+                  <span class="tip" v-show="addPlayListTip">{{ addPlayListTipText }}</span>
                   <i class="icn icn-list">{{playSongList.length}}</i>
                   <i class="icn icn-audioquality"></i>
                 </span>
@@ -88,21 +88,24 @@
     import type { MusicItemType } from '@/hooks/methods/songFormat.ts'
     import { upPlaySong, nextPlatSong } from './methods/methods'
 
-    const playStore = usePlayStore()
+    const playStore = usePlayStore();
 
     // 当前播放的歌曲详情
-    const playSongItem = computed(() => playStore.getPlaySongItem)
+    const playSongItem = computed(() => playStore.getPlaySongItem);
     // 播放列表数据
-    const playSongList = computed(() => playStore.playSongList)
+    const playSongList = computed(() => playStore.playSongList);
     // 播放显示/隐藏
-    const lock = ref<boolean>(true)
+    const lock = computed(() => playStore.getplayLock);
+    // 添加到播放列表提示
+    const addPlayListTip = computed(() => playStore.addPlayListTip);
+    const addPlayListTipText = computed(() => playStore.addPlayListTipText);
     // 音量条显示/隐藏
-    const volume = ref<boolean>(false)
+    const volume = ref<boolean>(false);
 
     // 歌曲url
     const playUrl = ref<string>('');
     function getAudioPlayUrl() {
-      // 初始化本地没有音乐不调用接口
+      // 本地缓存没有音乐不调用接口
       if(playSongItem.value?.id){
         return getSongPlayUrl({id: playSongItem.value.id}).then((res: ResponseType) => {
           if(res.code === 200) {
@@ -221,7 +224,7 @@
 
     // 播放器显示/隐藏
     function handelLock() {
-    lock.value = !lock.value;
+      lock.value ? playStore.setPlayLock(false) : playStore.setPlayLock(true)
     }
 
     // 音量操作显示/隐藏
@@ -533,7 +536,7 @@
           position: relative;
           zoom: 1;
           .tip{
-            display: none;
+            // display: none;
             position: absolute;
             top: -51px;
             left: -65px;
