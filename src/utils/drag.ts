@@ -25,9 +25,6 @@ export const drag = {
                     let left = event.clientX - mouseX
                     let top = event.clientY - mouseY
 
-                    console.log(left, 'left');
-                    console.log(top, 'top');
-
                     // offsetWidth、offsetHeight 当前元素的宽度
                     // innerWidth、innerHeight 浏览器可视区的宽度和高度
 

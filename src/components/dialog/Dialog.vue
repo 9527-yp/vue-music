@@ -5,9 +5,7 @@
             <div class="dialog-title">{{ title }} <span class="dialog-close"  @click="cancel">x</span></div>
             <div class="dialog-content">
                 <div class="content">
-                    <div class="content-text">
-                        <slot></slot>
-                    </div>
+                    <slot name="content"></slot>
                     <div class="content-btn" v-if="showConfirmButton || showCancelButton">
                         <div class="ok-btn btn" @click="confirm">
                             <i>{{ confirmtext }}</i>
@@ -107,8 +105,8 @@ function cancel() {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 530px;
-    height: 200px;
+    width: 480px;
+    // height: 200px;
     max-width: 100%;
     overflow: hidden;
     background-color: #fff;
@@ -161,11 +159,6 @@ function cancel() {
         .content{
             padding: 40px 0;
             text-align: center;
-            .content-text{
-                padding: 0 20px;
-                line-height: 22px;
-                font-size: 14px;
-            }
             .content-btn{
                 margin-top: 30px;
                 .btn{
@@ -228,6 +221,11 @@ function cancel() {
                 text-align: center;
             }
         }
+    }
+}
+.song-dialog{
+    .content{
+        padding: 0 !important;
     }
 }
 </style>

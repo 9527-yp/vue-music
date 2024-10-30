@@ -76,3 +76,30 @@ export const getSongSheetInfo = ({id}: {id :string | number}): AxiosPromise => {
         params
     })
 }
+
+/**
+ * @description 歌单歌曲添加 、 删除
+ * @param param.pid  歌单id
+ * @param param.tracks  歌曲 id,可多个,用逗号隔开
+ * @param param.op  从歌单增加单曲为 add, 删除为 del
+ * @returns 
+ */
+type SongAddorDel = {
+    op: string,
+    pid: number | string,
+    tracks: string | number
+}
+export const songAddorDel = ({op, pid, tracks }:SongAddorDel): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+        op,
+        pid,
+        tracks
+    };
+
+    return axios.request({
+        url: '/playlist/tracks',
+        method: 'get',
+        params
+    })
+}

@@ -89,7 +89,9 @@
       @confirm='deleteConfirm'
       @cancel='deleteCancel'
     >
-    <p class="content-text">确定删除评论？</p>
+    <template #content>
+        <p class="content-text">确定删除评论？</p>
+    </template>
     </Dialog>
 </template>
 
@@ -320,5 +322,10 @@ function publish() {
             display: inline-block !important;
         }
     }
+}
+.content-text{
+    padding: 0 20px;
+    line-height: 22px;
+    font-size: 14px;
 }
 </style>

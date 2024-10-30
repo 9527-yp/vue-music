@@ -43,7 +43,7 @@
                         </div>
                     </div>
                     <!-- 歌曲列表Table -->
-                    <SongListTable :playlist="songSheetDetail.playlist"/>
+                    <SongListTable :playlist="songSheetDetail.playlist" :songList="songSheetList.createdSongSheet" @delSong="delSong"/>
                     <!-- 评论 -->
                     <Comment
                       :playlist="songSheetDetail.playlist"
@@ -213,6 +213,10 @@ async function publishComment() {
     // 需先调详情接口，评论数据才获取最新的数据
     await getSongSheetInfo({id: songSheetId.value});
     getSongCommentList();
+}
+
+function delSong() {
+    getSongInfo()
 }
 </script>
 

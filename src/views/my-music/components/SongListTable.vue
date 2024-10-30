@@ -50,13 +50,13 @@
                         <span class="song-time">{{ timeStampToDuration(item.dt / 1000) || '00:00' }}</span>
                         <div class="btns" v-if="!item?.noCopyrightRcmd">
                             <i class="add-icn" title="添加到播放列表" @click="addMusic(item)"></i>
-                            <i class="icn collect-icn" title="收藏"></i>
+                            <i class="icn collect-icn" title="收藏" @click="collectMusic(item)"></i>
                             <i class="icn share-icn" title="分享"></i>
                             <i class="icn down-icn" title="下载"></i>
-                            <i class="icn del-icn" v-if="playlist?.userId === userInfo?.userPoint?.userId" title="删除"></i>
+                            <i class="icn del-icn" v-if="playlist?.userId === userInfo?.userPoint?.userId" title="删除" @click="delSong(item)"></i>
                         </div>
                         <div class="btns" v-else>
-                            <i class="icn del-icn" v-if="playlist?.userId === userInfo?.userPoint?.userId" title="删除"></i>
+                            <i class="icn del-icn" v-if="playlist?.userId === userInfo?.userPoint?.userId" title="删除" @click="delSong(item)"></i>
                         </div>
                     </td>
                     <td>
@@ -81,7 +81,48 @@
       showCustomButton
       @cancel='playCancel'
     >
-    因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归
+    <template #content>
+        <p class="content-text">因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归</p>
+    </template>
+    </Dialog>
+    <!-- 删除歌曲弹框 -->
+    <Dialog 
+      :visible="deleteSongDialog"
+      :confirmtext="'确定'"
+      :canceltext="'取消'"
+      showConfirmButton
+      showCancelButton
+      @confirm='deleteConfirm'
+      @cancel='deleteCancel'
+    >
+    <template #content>
+        <p class="content-text">确定删除歌曲？</p>
+    </template>
+    </Dialog>
+    <!-- 歌单弹框 -->
+    <Dialog 
+      :visible="songDialog"
+      title="添加到歌单"
+      @cancel='songCancel'
+      class="song-dialog"
+    >
+    <template #content>
+        <div class="song-box">
+            <div class="song-add">
+                <i class="add-song-icn"></i>
+                新歌单
+            </div>
+            <div class="song-item" v-for="item in songList" :key="item.id" @click="addMusicSongList(item)">
+                <div class="song-img">
+                    <img :src="item?.coverImgUrl" alt="">
+                </div>
+                <div class="song-right">
+                    <p class="song-name thide">{{item.name}}</p>
+                    <p class="song-num">{{item.trackCount}}首</p>
+                </div>
+            </div>
+        </div>
+    </template>
     </Dialog>
 </template>
 
@@ -93,13 +134,22 @@ import usePlayStore from '@/stores/modules/play.ts';
 import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
 import usePlaySong from '@/hooks/usePlaySong.ts';
 import type { songType } from '@/hooks/methods/songFormat.ts';
+import type { ResponseType } from '@/types/index';
+import { songAddorDel } from '@/api/my-music.ts'
 import { computed, ref } from 'vue';
-defineProps({
+
+const props = defineProps({
     playlist: {
         type: Object,
         default: {}
+    },
+    songList: {
+        type: Array,
+        default: []
     }
 })
+
+const emit = defineEmits(['delSong'])
 
 const userStore = useUserStore();
 const playStore = usePlayStore();
@@ -150,6 +200,51 @@ function playMusic(item: songType) {
         playStore.setPlayLock(false)
         playStore.setAddPlayListTip(false)
     }, 1500)
+}
+
+// 删除歌曲
+const deleteSongDialog = ref(false);
+const songId = ref(undefined);
+function delSong(item: songType) {
+    songId.value = item.id;
+    deleteSongDialog.value = true;
+}
+
+function deleteConfirm() {
+    songAddorDel({
+        op: 'del',
+        pid: props.playlist.id,
+        tracks: songId.value
+    }).then((res: ResponseType) => {
+        if(res.status === 200) {
+            emit('delSong')
+            deleteSongDialog.value = false
+        }
+    })
+}
+function deleteCancel() {
+    deleteSongDialog.value = false
+}
+
+// 收藏
+const songDialog = ref(false);
+function collectMusic(item: songType) {
+    songDialog.value = true;
+}
+function songCancel() {
+    songDialog.value = false;
+}
+type SongList = {
+    name: string,
+    id: number | string,
+    coverImgUrl: string,
+    trackCount: number | string,
+}
+function addMusicSongList(item: SongList) {
+    if(item.id === props.playlist.id) {
+        return
+    }
+    
 }
 </script>
 
@@ -355,6 +450,70 @@ function playMusic(item: songType) {
                 .btns{
                     display: none;
                 }
+            }
+        }
+    }
+}
+.content-text{
+    padding: 0 20px;
+    line-height: 22px;
+    font-size: 14px;
+}
+.song-dialog{
+    .song-box{
+        overflow-y: auto;
+        height: 374px;
+        padding-bottom: 15px;
+        .song-add{
+            padding: 10px 0 10px 35px;
+            background: #e6e6e6;
+            text-align: left;
+            cursor: pointer;
+            .add-song-icn{
+                width: 35px;
+                height: 36px;
+                margin-right: 10px;
+                display: inline-block;
+                overflow: hidden;
+                vertical-align: middle;
+                background: url('@/assets/images/icon.png') no-repeat 0 9999px;
+                background-position: 0 -495px;
+            }
+        }
+        .song-item{
+            display: flex;
+            padding: 6px 0 6px 35px;
+            border-top: 1px solid #e0e0e0;
+            cursor: pointer;
+            .song-img{
+                width: 40px;
+                height: 40px;
+                min-width: 40px;
+                min-height: 40px;
+                margin-right: 10px;
+                img{
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+            .song-right{
+                width: 100%;
+                .song-name{
+                    width: 100%;
+                    color: #000;
+                    margin-top: 2px;
+                    margin-bottom: 8px;
+                    text-align: left;
+                    word-wrap: break-word;
+                }
+                .song-num{
+                    text-align: left;
+                    word-wrap: break-word;
+                    color: #666;
+                }
+            }
+            &:hover{
+                background: #f2f2f2;
             }
         }
     }
