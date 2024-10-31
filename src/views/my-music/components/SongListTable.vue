@@ -81,9 +81,7 @@
       showCustomButton
       @cancel='playCancel'
     >
-    <template #content>
         <p class="content-text">因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归</p>
-    </template>
     </Dialog>
     <!-- 删除歌曲弹框 -->
     <Dialog 
@@ -95,9 +93,7 @@
       @confirm='deleteConfirm'
       @cancel='deleteCancel'
     >
-    <template #content>
         <p class="content-text">确定删除歌曲？</p>
-    </template>
     </Dialog>
     <!-- 歌单弹框 -->
     <Dialog 
@@ -229,6 +225,7 @@ function deleteCancel() {
 // 收藏
 const songDialog = ref(false);
 function collectMusic(item: songType) {
+    songId.value = item.id;
     songDialog.value = true;
 }
 function songCancel() {
@@ -241,10 +238,17 @@ type SongList = {
     trackCount: number | string,
 }
 function addMusicSongList(item: SongList) {
-    if(item.id === props.playlist.id) {
-        return
-    }
-    
+    songAddorDel({
+        op: 'add',
+        pid: item.id,
+        tracks: songId.value
+    }).then((res: ResponseType) => {
+        if(res.body.code === 502) {
+            console.log('歌单内歌曲重复')
+        }
+        songDialog.value = false;
+    })
+
 }
 </script>
 

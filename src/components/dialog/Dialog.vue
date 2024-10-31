@@ -6,6 +6,7 @@
             <div class="dialog-content">
                 <div class="content">
                     <slot name="content"></slot>
+                    <slot></slot>
                     <div class="content-btn" v-if="showConfirmButton || showCancelButton">
                         <div class="ok-btn btn" @click="confirm">
                             <i>{{ confirmtext }}</i>
