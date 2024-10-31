@@ -124,7 +124,7 @@ const warningInfo = reactive({
     type:0, // 0:警告 ，1：成功
     time: null
 })
-function reviewBtn() {
+async function reviewBtn() {
     // 超出文本大小 || 未输入
     if(replay.length < 0 || replay.text === ''){
         if(replay.text === ''){

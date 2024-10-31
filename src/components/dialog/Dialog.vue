@@ -91,7 +91,7 @@ function cancel() {
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 20001009;
+    z-index: 20001;
     .dialog-mask{
         position: absolute;
         top: 0;

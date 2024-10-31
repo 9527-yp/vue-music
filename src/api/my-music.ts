@@ -103,3 +103,22 @@ export const songAddorDel = ({op, pid, tracks }:SongAddorDel): AxiosPromise => {
         params
     })
 }
+
+/**
+ * @description 新建歌单
+ * @param param.name  歌单名称
+ * @returns 
+ */
+
+export const addSong = ({name }:{name: string}): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+        name
+    };
+
+    return axios.request({
+        url: '/playlist/create',
+        method: 'get',
+        params
+    })
+}
