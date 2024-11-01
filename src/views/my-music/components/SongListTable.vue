@@ -107,7 +107,7 @@ import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
 import usePlaySong from '@/hooks/usePlaySong.ts';
 import type { songType } from '@/hooks/methods/songFormat.ts';
 import type { ResponseType } from '@/types/index';
-import { songAddorDel, addSong } from '@/api/my-music.ts'
+import { songAddorDel } from '@/api/my-music.ts'
 import { computed, ref, reactive, watch } from 'vue';
 
 const props = defineProps({

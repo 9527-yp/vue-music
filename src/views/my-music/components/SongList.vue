@@ -2,7 +2,7 @@
     <div class="n-minelst">
         <h2>
             <div class="add-song-list" v-if="title === '创建的歌单'">
-                <span class="text">新建</span>
+                <span class="text" @click="addSongList">新建</span>
             </div>
             <span class="rtitle">
                 <span class="tri" :class="foundSongListShow ? 'tri1' : 'tri1-hide'" @click="foundSongListChange"></span>
@@ -25,17 +25,42 @@
                     <p class="item-num">{{item.trackCount}}首</p>
                 </div>
                 <span class="oper" v-if="item.name !== '我喜欢的音乐'">
-                    <i class="icn edit-icn" v-if="title === '创建的歌单'"></i>
-                    <i class="icn delete-icn"></i>
+                    <i class="icn edit-icn" v-if="title === '创建的歌单'" @click.stop="editSongList"></i>
+                    <i class="icn delete-icn" @click.stop="deleteSongListBtn(item)"></i>
                 </span>
             </li>
         </ul>
     </div>
+    <teleport to="body">
+        <div class="warning-tip" v-if="warningInfo.visible">
+            <i v-if="warningInfo.type" class="success-icn"></i>
+            <i v-else class="warning-icn"></i>
+            <span class="text">{{warningInfo.text}}</span>
+        </div>
+    </teleport>
+    <!-- 删除歌单弹框 -->
+    <teleport to="body">
+        <Dialog 
+        :visible="deleteSongListDialog"
+        :confirmtext="'确定'"
+        :canceltext="'取消'"
+        showConfirmButton
+        showCancelButton
+        @confirm='deleteConfirm'
+        @cancel='deleteCancel'
+        >
+            <p class="content-text">确定删除歌单？</p>
+        </Dialog>
+    </teleport>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { SongSheetList } from './types/type'
+import { ref, reactive } from 'vue';
+import type { SongSheetList } from './types/type';
+import type { ResponseType } from '@/types/index';
+import useDialogStore from '@/stores/modules/dialog.ts';
+import Dialog from '@/components/dialog/dialog.vue';
+import { deleteSongList } from '@/api/my-music.ts';
 
 const emit = defineEmits(['songListItem'])
 defineProps({
@@ -60,6 +85,9 @@ defineProps({
         default: 0
     }
 })
+
+const dialogStore = useDialogStore();
+
 // 创建的歌单
 const foundSongListShow = ref<boolean>(true);
 function foundSongListChange() {
@@ -68,6 +96,47 @@ function foundSongListChange() {
 
 function songChange(item: SongSheetList) {
     emit('songListItem',item.id)
+}
+
+function addSongList() {
+    dialogStore.setAddSongListShow(true);
+}
+
+const warningInfo = reactive({
+    text: '',
+    visible: false,
+    type:0, // 0:警告 ，1：成功
+    time: null
+})
+function editSongList() {
+    warningInfo.type = 0;
+    warningInfo.text = '功能暂未开发';
+    warningInfo.visible = true;
+    warningInfo.time && clearTimeout( warningInfo.time);
+    warningInfo.time = setTimeout(() => {
+        warningInfo.visible = false;
+    }, 1500);
+}
+
+const deleteSongListDialog = ref(false);
+const songListId = ref(undefined);
+function deleteSongListBtn(item: SongSheetList) {
+    songListId.value = item.id
+    deleteSongListDialog.value = true;
+}
+
+function deleteConfirm() {
+    deleteSongList({id: songListId.value}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            // 刷新歌单数据
+            dialogStore.setIsRefreshSongList(true);
+            deleteSongListDialog.value = false;
+        }
+    })
+}
+
+function deleteCancel() {
+    deleteSongListDialog.value = false;
 }
 </script>
 
@@ -212,6 +281,44 @@ function songChange(item: SongSheetList) {
         .active-item{
             background: #e6e6e6;
         }
+    }
+}
+.warning-tip{
+    width: 280px;
+    background: #fff;
+    color: #333;
+    line-height: 52px;
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    position: absolute;
+    top:50%;
+    left: 50%;
+    z-index: 20002;
+    margin-top: -40px;
+    margin-left: -140px;
+    vertical-align: middle;
+    .warning-icn{
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 3px;
+        background: url('@/assets/images/icon.png') no-repeat;
+        background-position: -24px -406px;
+    }
+    .success-icn{
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 3px;
+        background: url('@/assets/images/icon.png') no-repeat;
+        background-position: -24px -430px;
+    }
+    .text{
+        display: inline-block;
+        vertical-align: middle;
     }
 }
 </style>

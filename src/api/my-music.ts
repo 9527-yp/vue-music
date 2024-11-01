@@ -110,7 +110,7 @@ export const songAddorDel = ({op, pid, tracks }:SongAddorDel): AxiosPromise => {
  * @returns 
  */
 
-export const addSong = ({name }:{name: string}): AxiosPromise => {
+export const addSongList = ({ name }:{name: string}): AxiosPromise => {
     const params = {
         timestamp: new Date().getTime(),
         name
@@ -118,6 +118,25 @@ export const addSong = ({name }:{name: string}): AxiosPromise => {
 
     return axios.request({
         url: '/playlist/create',
+        method: 'get',
+        params
+    })
+}
+
+/**
+ * @description 删除歌单
+ * @param param.id  歌单id
+ * @returns 
+ */
+
+export const deleteSongList = ({ id }:{id: string | number}): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+        id
+    };
+
+    return axios.request({
+        url: '/playlist/delete',
         method: 'get',
         params
     })

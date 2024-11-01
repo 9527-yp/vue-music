@@ -33,7 +33,7 @@
                 </div>
                 <div class="my-music-main">
                     <div class="song-header">
-                        <SongSheetInfo :playlist="songSheetDetail.playlist"/>
+                        <SongSheetInfo :playlist="songSheetDetail.playlist" @jumpToComment="jumpToComment"/>
                     </div>
                     <div class="song-list-box">
                         <h3 class="title">歌曲列表</h3>
@@ -65,8 +65,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive }from 'vue';
+import { ref, computed, reactive, watch }from 'vue';
 import useUserStore from '@/stores/modules/user.ts'
+import useDialogStore from '@/stores/modules/dialog.ts'
 import SongList from './components/SongList.vue'
 import SongSheetInfo from './components/SongSheeInfo.vue'
 import SongListTable from './components/SongListTable.vue'
@@ -79,8 +80,11 @@ import { handleCommentList } from '@/components/comment/handleCommentList.ts'
 import type { SongSheetList, TypeSongSheet, SongSheetDetail} from './types/type.ts'
 
 const userStore = useUserStore();
-const isLogin = computed(() => userStore.getIsLogin)
-const userInfo = computed(() => userStore.getUserInfo)
+const dialogStore = useDialogStore();
+
+const isLogin = computed(() => userStore.getIsLogin);
+const userInfo = computed(() => userStore.getUserInfo);
+const isRefreshSongList = computed(() => dialogStore.getIsRefreshSongList);
 
 // 登录
 function login():void {
@@ -123,7 +127,7 @@ const songSheetList = reactive<TypeSongSheet>({
     createdSongSheet: [],
     collectSongSheet: []
 })
-function getSongListData ()  {
+function getSongListData (isFirst: boolean = true)  {
     getSongList({uid: userInfo.value?.profile?.userId}).then((res: ResponseType) => {
         if(res.code === 200) {
             res.playlist?.forEach?.((item: SongSheetList) => {
@@ -140,8 +144,11 @@ function getSongListData ()  {
             songSheetList.collectSongSheet = res.playlist?.filter?.(
             (item: SongSheetList) => item.subscribed
             );
-            getSongInfo();
-            getSongCommentList();
+            if(isFirst){
+                // 是否首次调用或刷新页面
+                getSongInfo();
+                getSongCommentList();
+            }
         }
     })
 }
@@ -217,6 +224,23 @@ async function publishComment() {
 
 function delSong() {
     getSongInfo()
+}
+
+watch(() => isRefreshSongList.value, (newValue) => {
+    console.log(newValue,'newValue')
+    if(newValue === true){
+        getSongListData(false);
+        dialogStore.setIsRefreshSongList(false);
+    }
+})
+
+// 评论滚动对应位置
+function jumpToComment() {
+    const commentDom = document.querySelector(
+        '.song-sheet-review'
+    ) as HTMLDivElement;
+    const myMusic = document.querySelector('.music-container') as HTMLDivElement;
+    myMusic?.scrollTo(0, Number(commentDom.offsetTop) - 20);
 }
 </script>
 

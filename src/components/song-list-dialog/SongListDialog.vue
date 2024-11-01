@@ -92,6 +92,8 @@ async function addMusicSongList(item: SongList) {
     }else if(res.body.code === 200){
         warningInfo.type = 1;
         warningInfo.text = '收藏成功';
+        // 刷新歌单数据
+        dialogStore.setIsRefreshSongList(true);
     }
     warningInfo.visible = true;
     warningInfo.time && clearTimeout( warningInfo.time);

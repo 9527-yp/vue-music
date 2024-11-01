@@ -3,9 +3,10 @@ import Header from '@/components/header.vue'
 import Menu from '@/components/menu.vue'
 import FootView from '@/views/foot-view/FootView.vue';
 import MyPlay from '@/views/my-play/MyPlay.vue';
-import BackUpper from '@/components/back-upper/BackUpper.vue'
-import LoginDialog from '@/components/login/LoginDialog.vue'
-import SongListDialog from '@/components/song-list-dialog//SongListDialog.vue'
+import BackUpper from '@/components/back-upper/BackUpper.vue';
+import LoginDialog from '@/components/login/LoginDialog.vue';
+import SongListDialog from '@/components/song-list-dialog//SongListDialog.vue';
+import AddSongListDialog from '@/components/song-list-dialog//AddSongListDialog.vue';
 </script>
 
 <template>
@@ -28,6 +29,10 @@ import SongListDialog from '@/components/song-list-dialog//SongListDialog.vue'
   <!-- 歌单弹框 -->
   <teleport to="body">
     <SongListDialog />
+  </teleport>
+  <!-- 新建歌单弹框 -->
+  <teleport to="body">
+    <AddSongListDialog />
   </teleport>
 </template>
 

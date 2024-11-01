@@ -31,7 +31,7 @@
                 <span class="down btns-bag btn-jointly">
                     <i class="down-icn icn btns-bag">下载</i>
                 </span>
-                <span class="review btns-bag btn-jointly">
+                <span class="review btns-bag btn-jointly" @click="jumpToComment">
                     <i class="review-icn icn btns-bag">{{playlist?.commentCount ? '(' + playlist?.commentCount + ')' : '评论'}}</i>
                 </span>
             </div>
@@ -56,6 +56,12 @@ const props = defineProps({
         default: {}
     },
 })
+
+const emit = defineEmits(['jumpToComment']);
+
+function jumpToComment() {
+    emit('jumpToComment')
+}
 </script>
 
 <style lang="scss" scoped>

@@ -32,7 +32,7 @@
 import { ref, computed, watch, reactive }from 'vue';
 import Dialog from '@/components/dialog/dialog.vue';
 import useDialogStore from '@/stores/modules/dialog.ts'
-import { addSong } from '@/api/my-music.ts';
+import { addSongList } from '@/api/my-music.ts';
 import type { ResponseType } from '@/types/index';
 
 const dialogStore = useDialogStore();
@@ -53,10 +53,13 @@ function addSongConfirm() {
     if(regexShow.value || songName.value === ''){
         return;
     }
-    addSong({name: songName.value}).then((res: ResponseType) => {
+    addSongList({name: songName.value}).then((res: ResponseType) => {
         if(res.code === 200) {
             warningInfo.type = 1;
             warningInfo.text = '歌单创建成功';
+            dialogStore.setAddSongListShow(false);
+            // 刷新歌单数据
+            dialogStore.setIsRefreshSongList(true);
             warningInfo.visible = true;
             warningInfo.time && clearTimeout( warningInfo.time);
             warningInfo.time = setTimeout(() => {
