@@ -5,6 +5,7 @@ import FootView from '@/views/foot-view/FootView.vue';
 import MyPlay from '@/views/my-play/MyPlay.vue';
 import BackUpper from '@/components/back-upper/BackUpper.vue'
 import LoginDialog from '@/components/login/LoginDialog.vue'
+import SongListDialog from '@/components/song-list-dialog//SongListDialog.vue'
 </script>
 
 <template>
@@ -23,6 +24,10 @@ import LoginDialog from '@/components/login/LoginDialog.vue'
   <!-- 登录弹框 -->
   <teleport to="body">
     <LoginDialog />
+  </teleport>
+  <!-- 歌单弹框 -->
+  <teleport to="body">
+    <SongListDialog />
   </teleport>
 </template>
 
