@@ -12,7 +12,7 @@
             <div class="music-content">
                 <div class="musicsd">
                     <div>
-                        <h2 class="my-Singer">我的歌手({{options.mySinger.count}})</h2>
+                        <h2 class="my-Singer" @click="mySingBtn">我的歌手({{options.mySinger.count}})</h2>
                         <SongList
                          title="创建的歌单"
                          :visible='options.createdSongSheet.visible'
@@ -32,7 +32,7 @@
                         />
                     </div>
                 </div>
-                <div class="my-music-main">
+                <div v-if="songListInfoShow" class="my-music-main">
                     <div class="song-header">
                         <SongSheetInfo :playlist="songSheetDetail.playlist" @jumpToComment="jumpToComment" @notFeatureTip="notFeatureTip"/>
                     </div>
@@ -77,6 +77,35 @@
                       @changePage="changePage"
                     />
                 </div>
+                <div v-if="!songListInfoShow" class="my-singer-main">
+                    <div class="singer-content">
+                        <div class="singer-header">
+                            <h3>
+                                <span class="singer-title">我的歌手</span>
+                            </h3>
+                        </div>
+                        <div class="singer-list">
+                            <div class="item">
+                                <div class="singer-img">
+                                    <img src="" alt="">
+                                </div>
+                                <div class="item-right">
+                                    <h4 class="singer-name text-hov">赵雷</h4>
+                                    <p class="singer-mv">17个专辑&nbsp;&nbsp;&nbsp;&nbsp;17个MV</p>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="singer-img">
+                                    <img src="" alt="">
+                                </div>
+                                <div class="item-right">
+                                    <h4 class="singer-name text-hov">赵雷</h4>
+                                    <p class="singer-mv">17个专辑&nbsp;&nbsp;&nbsp;&nbsp;17个MV</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -108,6 +137,13 @@ const dialogStore = useDialogStore();
 const isLogin = computed(() => userStore.getIsLogin);
 const userInfo = computed(() => userStore.getUserInfo);
 const isRefreshSongList = computed(() => dialogStore.getIsRefreshSongList);
+
+
+const songListInfoShow = ref(true);
+function mySingBtn() {
+    songSheetId.value = undefined;
+    songListInfoShow.value = false;
+}
 
 // 登录
 function login():void {
@@ -179,6 +215,11 @@ getSongListData()
 
 // 切换歌单查看
 function songListItemChange(value: number) {
+    // 如果当前就是这个歌单就return
+    if(songSheetId.value === value) {
+        return;
+    }
+    songListInfoShow.value = true;
     songSheetId.value = value;
     commentInfo.offset = 1; // 切换歌单重置分页
     getSongInfo();
@@ -387,6 +428,57 @@ function jumpToComment() {
                     color: #666;
                     .num{
                         color: #c20c0c;
+                    }
+                }
+            }
+        }
+        .my-singer-main{
+            height: 100%;
+            float: right;
+            width: 740px;
+            padding-bottom: 50px;
+            position: relative;
+            zoom: 1;
+            .singer-content{
+                padding: 40px;
+                .singer-header{
+                    height: 40px;
+                    border-bottom: 2px solid #c20c0c;
+                    h3{
+                        font-size: 24px;
+                        font-weight: normal;
+                    }
+                    .singer-title{
+                        font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif;
+                    }
+                }
+                .singer-list{
+                    margin-bottom: 50px;
+                    .item{
+                        padding: 10px 0;
+                        border-bottom: 1px solid #ddd;
+                        .singer-img{
+                            float: left;
+                            width: 80px;
+                            height: 80px;
+                            margin-right: -95px;
+                            img{
+                                width: 80px;
+                                height: 80px;
+                            }
+                        }
+                        .item-right{
+                            margin-left: 95px;
+                            .singer-name{
+                                height: 21px;
+                                margin: 10px 0;
+                                line-height: 21px;
+                                font-size: 16px;
+                            }
+                            .singer-mv{
+                                color: #666;
+                            }
+                        }
                     }
                 }
             }
