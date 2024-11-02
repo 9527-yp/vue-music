@@ -51,8 +51,8 @@
                         <div class="btns" v-if="!item?.noCopyrightRcmd">
                             <i class="add-icn" title="添加到播放列表" @click="addMusic(item)"></i>
                             <i class="icn collect-icn" title="收藏" @click="collectMusic(item)"></i>
-                            <i class="icn share-icn" title="分享"></i>
-                            <i class="icn down-icn" title="下载"></i>
+                            <i class="icn share-icn" title="分享" @click="notFeatureTip"></i>
+                            <i class="icn down-icn" title="下载" @click="notFeatureTip"></i>
                             <i class="icn del-icn" v-if="playlist?.userId === userInfo?.userPoint?.userId" title="删除" @click="delSong(item)"></i>
                         </div>
                         <div class="btns" v-else>
@@ -121,7 +121,7 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['delSong'])
+const emit = defineEmits(['delSong', 'notFeatureTip'])
 
 const userStore = useUserStore();
 const playStore = usePlayStore();
@@ -203,6 +203,10 @@ function deleteCancel() {
 function collectMusic(item: songType) {
     dialogStore.setSongId(item.id);
     dialogStore.setSongListShow(true);
+}
+
+function notFeatureTip() {
+    emit('notFeatureTip')
 }
 </script>
 

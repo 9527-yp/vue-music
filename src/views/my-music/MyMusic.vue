@@ -20,6 +20,7 @@
                          :count="options.createdSongSheet.count"
                          :list="songSheetList.createdSongSheet"
                          @songListItem='songListItemChange'
+                         @notFeatureTip="notFeatureTip"
                         />
                         <SongList
                          title="收藏的歌单"
@@ -33,7 +34,7 @@
                 </div>
                 <div class="my-music-main">
                     <div class="song-header">
-                        <SongSheetInfo :playlist="songSheetDetail.playlist" @jumpToComment="jumpToComment"/>
+                        <SongSheetInfo :playlist="songSheetDetail.playlist" @jumpToComment="jumpToComment" @notFeatureTip="notFeatureTip"/>
                     </div>
                     <div class="song-list-box">
                         <h3 class="title">歌曲列表</h3>
@@ -43,10 +44,27 @@
                         </div>
                     </div>
                     <!-- 歌曲列表Table -->
-                    <SongListTable :playlist="songSheetDetail.playlist" :songList="songSheetList.createdSongSheet" @delSong="delSong"/>
+                    <SongListTable
+                      v-if="songSheetDetail.privileges.length > 0"
+                      :playlist="songSheetDetail.playlist"
+                      @delSong="delSong"
+                      @notFeatureTip="notFeatureTip"
+                    />
+                    <div class="not-song-list-box">
+                        <div class="not-title">
+                            <i class="icn"></i>
+                            <h3 class="text">暂无音乐！</h3>
+                        </div>
+                        <div class="desc">
+                            <span class="text">点击</span>
+                            <i class="icon"></i>
+                            <span class="text">即可将你喜欢的音乐收藏到“我的音乐”</span>
+                            <span class="text go">马上去</span>
+                            <router-link to="/" class="text">发现音乐</router-link>
+                        </div>
+                    </div>
                     <!-- 评论 -->
                     <Comment
-                      :playlist="songSheetDetail.playlist"
                       :commentInfo="commentInfo" 
                       @publishComment="publishComment"
                     />
@@ -61,6 +79,11 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="warning-tip" v-if="warningInfo.visible">
+        <i v-if="warningInfo.type" class="success-icn"></i>
+        <i v-else class="warning-icn"></i>
+        <span class="text">{{warningInfo.text}}</span>
     </div>
 </template>
 
@@ -226,6 +249,24 @@ function delSong() {
     getSongInfo()
 }
 
+// 功能暂未开发提示
+const warningInfo = reactive({
+    text: '',
+    visible: false,
+    type:0, // 0:警告 ，1：成功
+    time: null
+})
+
+function notFeatureTip() {
+    warningInfo.type = 0;
+    warningInfo.text = '功能暂未开发';
+    warningInfo.visible = true;
+    warningInfo.time && clearTimeout( warningInfo.time);
+    warningInfo.time = setTimeout(() => {
+        warningInfo.visible = false;
+    }, 1500);
+}
+
 watch(() => isRefreshSongList.value, (newValue) => {
     console.log(newValue,'newValue')
     if(newValue === true){
@@ -372,5 +413,89 @@ function jumpToComment() {
 .musicsd::-webkit-scrollbar {
     width: 8px;
     height: 8px;
+}
+.warning-tip{
+    width: 280px;
+    background: #fff;
+    color: #333;
+    line-height: 52px;
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    position: absolute;
+    top:50%;
+    left: 50%;
+    z-index: 20002;
+    margin-top: -40px;
+    margin-left: -140px;
+    vertical-align: middle;
+    .warning-icn{
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 3px;
+        background: url('@/assets/images/icon.png') no-repeat;
+        background-position: -24px -406px;
+    }
+    .success-icn{
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 3px;
+        background: url('@/assets/images/icon.png') no-repeat;
+        background-position: -24px -430px;
+    }
+    .text{
+        display: inline-block;
+        vertical-align: middle;
+    }
+}
+.not-song-list-box{
+    padding: 95px 0;
+    text-align: center;
+    .not-title{
+        width: 100%;
+        padding-bottom: 16px;
+        margin: 0 auto;
+        font-size: 18px;
+        color: #333;
+        text-align: center;
+        .icn{
+            display: inline-block;
+            width: 64px;
+            height: 50px;
+            margin-right: 17px;
+            vertical-align: middle;
+            background: url('@/assets/images/icon.png') no-repeat 0 9999px;
+            background-position: 0 -347px;
+        }
+        .text{
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
+    .desc{
+        margin-top: 20px;
+        color: #aaa;
+        .text{
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .icon{
+            display: inline-block;
+            width: 16px;
+            height: 14px;
+            margin: 0 9px 0 7px;
+            vertical-align: middle;
+            background: url('@/assets/images/icon.png') no-repeat 0 9999px;
+            background-position: 0 -400px;
+        }
+        .go{
+            margin-right: 5px;
+            margin-left: 10px;
+        }
+    }
 }
 </style>

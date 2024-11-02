@@ -15,23 +15,23 @@
                 <span class="create-time">{{formatDateTime(playlist?.createTime / 1000, 'Y-M-D')}} 创建</span>
             </div>
             <div class="btns">
-                <span class="play btns-bag" title="播放">
+                <span class="btns-bag" :class="playlist?.trackCount ? 'play' : 'disable-play'" title="播放">
                     <i class="i-box btns-bag">
                         <i class="play-icn btns-bag"></i>
                         播放
                     </i>
                 </span>
-                <span class="add btns-bag" title="添加到播放列表"></span>
+                <span v-show="playlist?.trackCount" class="add btns-bag" title="添加到播放列表"></span>
                 <span class="collect btns-bag btn-jointly">
                     <i class="collect-icn icn btns-bag">{{playlist?.subscribedCount ? '(' + playlist?.subscribedCount + ')' : '收藏'}}</i>
                 </span>
-                <span class="share btns-bag btn-jointly">
+                <span class="btns-bag btn-jointly" :class="playlist?.trackCount ? 'share' : 'disable-share'" @click="notFeatureTip">
                     <i class="share-icn icn btns-bag">{{playlist?.shareCount ? '(' + playlist?.shareCount + ')' : '分享'}}</i>
                 </span>
-                <span class="down btns-bag btn-jointly">
+                <span class="btns-bag btn-jointly" :class="playlist?.trackCount ? 'down' : 'disable-down'" @click="notFeatureTip">
                     <i class="down-icn icn btns-bag">下载</i>
                 </span>
-                <span class="review btns-bag btn-jointly" @click="jumpToComment">
+                <span class="btns-bag btn-jointly" :class="playlist?.trackCount ? 'review' : 'disable-review'" @click="jumpToComment">
                     <i class="review-icn icn btns-bag">{{playlist?.commentCount ? '(' + playlist?.commentCount + ')' : '评论'}}</i>
                 </span>
             </div>
@@ -57,10 +57,14 @@ const props = defineProps({
     },
 })
 
-const emit = defineEmits(['jumpToComment']);
+const emit = defineEmits(['jumpToComment', 'notFeatureTip']);
 
 function jumpToComment() {
     emit('jumpToComment')
+}
+
+function notFeatureTip() {
+    emit('notFeatureTip')
 }
 </script>
 
@@ -197,6 +201,31 @@ function jumpToComment() {
                     background-position: -40px -1588px;
                 }
             }
+            .disable-play{
+                width: 67px;
+                margin-right: 8px;
+                color: #bebebe;
+                cursor: default;
+                background-position: right -934px;
+                .i-box{
+                    display: inline-block;
+                    height: 31px;
+                    line-height: 29px;
+                    padding: 0 7px 0 8px;
+                    color: #bebebe;
+                    background-position: 0 -891px;
+                    cursor: default;
+                    .play-icn{
+                        display: inline-block;
+                        vertical-align: top;
+                        width: 20px;
+                        height: 18px;
+                        margin: 6px 2px 2px 0;
+                        background-position: 0 9999px;
+                        overflow: hidden;
+                    }
+                }
+            }
             .btn-jointly{
                 margin-right: 6px;
                 font-family: simsun, \5b8b\4f53;
@@ -255,6 +284,33 @@ function jumpToComment() {
                     .review-icn{
                         background-position: 0 -1508px;
                     }
+                }
+            }
+            .disable-share{
+                color: #bebebe;
+                background-position: right -1192px;
+                cursor: default;
+                .share-icn{
+                    color: #bebebe;
+                    background-position: 0 -1311px;
+                }
+            }
+            .disable-down{
+                color: #bebebe;
+                background-position: right -1192px;
+                cursor: default;
+                .down-icn{
+                    color: #bebebe;
+                    background-position: 0 -3024px;
+                }
+            }
+            .disable-review{
+                color: #bebebe;
+                background-position: right -1192px;
+                cursor: default;
+                .review-icn{
+                    color: #bebebe;
+                    background-position: 0 -1551px;
                 }
             }
         }

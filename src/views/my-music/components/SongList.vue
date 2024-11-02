@@ -31,13 +31,6 @@
             </li>
         </ul>
     </div>
-    <teleport to="body">
-        <div class="warning-tip" v-if="warningInfo.visible">
-            <i v-if="warningInfo.type" class="success-icn"></i>
-            <i v-else class="warning-icn"></i>
-            <span class="text">{{warningInfo.text}}</span>
-        </div>
-    </teleport>
     <!-- 删除歌单弹框 -->
     <teleport to="body">
         <Dialog 
@@ -62,7 +55,7 @@ import useDialogStore from '@/stores/modules/dialog.ts';
 import Dialog from '@/components/dialog/dialog.vue';
 import { deleteSongList } from '@/api/my-music.ts';
 
-const emit = defineEmits(['songListItem'])
+const emit = defineEmits(['songListItem', 'notFeatureTip'])
 defineProps({
     title: {
         type: String,
@@ -102,20 +95,9 @@ function addSongList() {
     dialogStore.setAddSongListShow(true);
 }
 
-const warningInfo = reactive({
-    text: '',
-    visible: false,
-    type:0, // 0:警告 ，1：成功
-    time: null
-})
+
 function editSongList() {
-    warningInfo.type = 0;
-    warningInfo.text = '功能暂未开发';
-    warningInfo.visible = true;
-    warningInfo.time && clearTimeout( warningInfo.time);
-    warningInfo.time = setTimeout(() => {
-        warningInfo.visible = false;
-    }, 1500);
+    emit('notFeatureTip')
 }
 
 const deleteSongListDialog = ref(false);
@@ -281,44 +263,6 @@ function deleteCancel() {
         .active-item{
             background: #e6e6e6;
         }
-    }
-}
-.warning-tip{
-    width: 280px;
-    background: #fff;
-    color: #333;
-    line-height: 52px;
-    text-align: center;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    position: absolute;
-    top:50%;
-    left: 50%;
-    z-index: 20002;
-    margin-top: -40px;
-    margin-left: -140px;
-    vertical-align: middle;
-    .warning-icn{
-        width: 20px;
-        height: 20px;
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 3px;
-        background: url('@/assets/images/icon.png') no-repeat;
-        background-position: -24px -406px;
-    }
-    .success-icn{
-        width: 20px;
-        height: 20px;
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 3px;
-        background: url('@/assets/images/icon.png') no-repeat;
-        background-position: -24px -430px;
-    }
-    .text{
-        display: inline-block;
-        vertical-align: middle;
     }
 }
 </style>

@@ -52,10 +52,6 @@ const userStore = useUserStore();
 const userInfo = computed(() => userStore.getUserInfo)
 const emit = defineEmits(['publishComment'])
 const props = defineProps({
-    playlist: {
-        type: Object,
-        default: {}
-    },
     commentInfo: {
         type: Object,
         default: {}
