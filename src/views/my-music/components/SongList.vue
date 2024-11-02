@@ -88,7 +88,6 @@ function foundSongListChange() {
 }
 
 function songChange(item: SongSheetList) {
-    if(item.id !== )
     emit('songListItem',item.id)
 }
 

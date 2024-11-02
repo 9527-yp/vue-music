@@ -141,3 +141,23 @@ export const deleteSongList = ({ id }:{id: string | number}): AxiosPromise => {
         params
     })
 }
+
+/**
+ * @description 获取我的歌手数据
+ * @param param.offset  偏移数量 , 用于分页 , 如 :( 评论页数 -1)*25, 其中 25 为 limit 的值
+ * @returns 
+ */
+
+export const mySinger = ({ offset, limit }:{offset: string | number, limit: string | number}): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+        offset,
+        limit
+    };
+
+    return axios.request({
+        url: '/artist/sublist',
+        method: 'get',
+        params
+    })
+}

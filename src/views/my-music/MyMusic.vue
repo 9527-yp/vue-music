@@ -32,6 +32,7 @@
                         />
                     </div>
                 </div>
+                <!-- 歌单详情 -->
                 <div v-if="songListInfoShow" class="my-music-main">
                     <div class="song-header">
                         <SongSheetInfo :playlist="songSheetDetail.playlist" @jumpToComment="jumpToComment" @notFeatureTip="notFeatureTip"/>
@@ -47,10 +48,12 @@
                     <SongListTable
                       v-if="songSheetDetail.privileges.length > 0"
                       :playlist="songSheetDetail.playlist"
+                      :privileges="songSheetDetail.privileges"
                       @delSong="delSong"
                       @notFeatureTip="notFeatureTip"
                     />
-                    <div class="not-song-list-box">
+                    <!-- 歌单没有歌曲展示的table内容 -->
+                    <div v-else class="not-song-list-box">
                         <div class="not-title">
                             <i class="icn"></i>
                             <h3 class="text">暂无音乐！</h3>
@@ -77,35 +80,8 @@
                       @changePage="changePage"
                     />
                 </div>
-                <div v-if="!songListInfoShow" class="my-singer-main">
-                    <div class="singer-content">
-                        <div class="singer-header">
-                            <h3>
-                                <span class="singer-title">我的歌手</span>
-                            </h3>
-                        </div>
-                        <div class="singer-list">
-                            <div class="item">
-                                <div class="singer-img">
-                                    <img src="" alt="">
-                                </div>
-                                <div class="item-right">
-                                    <h4 class="singer-name text-hov">赵雷</h4>
-                                    <p class="singer-mv">17个专辑&nbsp;&nbsp;&nbsp;&nbsp;17个MV</p>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="singer-img">
-                                    <img src="" alt="">
-                                </div>
-                                <div class="item-right">
-                                    <h4 class="singer-name text-hov">赵雷</h4>
-                                    <p class="singer-mv">17个专辑&nbsp;&nbsp;&nbsp;&nbsp;17个MV</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- 我的歌手列表 -->
+                <MySinger v-if="!songListInfoShow" :mySingerInfo="mySingerInfo" @changePage="mySingerchangePage" />
             </div>
         </div>
     </div>
@@ -118,18 +94,19 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive, watch }from 'vue';
-import useUserStore from '@/stores/modules/user.ts'
-import useDialogStore from '@/stores/modules/dialog.ts'
-import SongList from './components/SongList.vue'
-import SongSheetInfo from './components/SongSheeInfo.vue'
-import SongListTable from './components/SongListTable.vue'
-import Page from '@/components/page/Page.vue'
-import Comment from '@/components/comment/Comment.vue'
-import { getSongSubcount, getSongList, getSongSheetInfo } from '@/api/my-music.ts'
-import { getSongComment } from '@/api/comment.ts'
+import useUserStore from '@/stores/modules/user.ts';
+import useDialogStore from '@/stores/modules/dialog.ts';
+import SongList from './components/SongList.vue';
+import SongSheetInfo from './components/SongSheeInfo.vue';
+import SongListTable from './components/SongListTable.vue';
+import Page from '@/components/page/Page.vue';
+import Comment from '@/components/comment/Comment.vue';
+import MySinger from './components/MySing.vue'
+import { getSongSubcount, getSongList, getSongSheetInfo, mySinger } from '@/api/my-music.ts';
+import { getSongComment } from '@/api/comment.ts';
 import type { ResponseType } from '@/types/index';
-import { handleCommentList } from '@/components/comment/handleCommentList.ts'
-import type { SongSheetList, TypeSongSheet, SongSheetDetail} from './types/type.ts'
+import { handleCommentList } from '@/components/comment/handleCommentList.ts';
+import type { SongSheetList, TypeSongSheet, SongSheetDetail} from './types/type.ts';
 
 const userStore = useUserStore();
 const dialogStore = useDialogStore();
@@ -143,6 +120,31 @@ const songListInfoShow = ref(true);
 function mySingBtn() {
     songSheetId.value = undefined;
     songListInfoShow.value = false;
+}
+// 获取我的歌手数据
+const mySingerInfo = reactive({
+    offset: 1,
+    limit: 25,
+    totalCount: 0,
+    singerList: [],
+})
+function getMySinger() {
+    mySinger({
+        offset: (mySingerInfo.offset - 1) * mySingerInfo.limit,
+        limit: mySingerInfo.limit
+    }).then((res: ResponseType) => {
+        if(res.code === 200) {
+            mySingerInfo.totalCount = res.count ?? 0
+            mySingerInfo.singerList = res.data ?? []
+        }
+    })
+}
+getMySinger()
+
+// 歌手列表分页切换
+function mySingerchangePage(value: number) {
+    mySingerInfo.offset = value;
+    getMySinger();
 }
 
 // 登录
@@ -428,57 +430,6 @@ function jumpToComment() {
                     color: #666;
                     .num{
                         color: #c20c0c;
-                    }
-                }
-            }
-        }
-        .my-singer-main{
-            height: 100%;
-            float: right;
-            width: 740px;
-            padding-bottom: 50px;
-            position: relative;
-            zoom: 1;
-            .singer-content{
-                padding: 40px;
-                .singer-header{
-                    height: 40px;
-                    border-bottom: 2px solid #c20c0c;
-                    h3{
-                        font-size: 24px;
-                        font-weight: normal;
-                    }
-                    .singer-title{
-                        font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif;
-                    }
-                }
-                .singer-list{
-                    margin-bottom: 50px;
-                    .item{
-                        padding: 10px 0;
-                        border-bottom: 1px solid #ddd;
-                        .singer-img{
-                            float: left;
-                            width: 80px;
-                            height: 80px;
-                            margin-right: -95px;
-                            img{
-                                width: 80px;
-                                height: 80px;
-                            }
-                        }
-                        .item-right{
-                            margin-left: 95px;
-                            .singer-name{
-                                height: 21px;
-                                margin: 10px 0;
-                                line-height: 21px;
-                                font-size: 16px;
-                            }
-                            .singer-mv{
-                                color: #666;
-                            }
-                        }
                     }
                 }
             }

@@ -27,7 +27,7 @@
                   :key="item.id"
                   :class="{
                   'even' : index % 2 === 0,
-                  'list-disabled' : item?.noCopyrightRcmd,
+                  'list-disabled' : isCopyright(item.id) === 0,
                   'no-mySong-disabled' : item?.noCopyrightRcmd && playlist?.userId !== userInfo?.userPoint?.userId
                    }"
                 >
@@ -41,7 +41,7 @@
                         <div class="song-name">
                             <div class="song-name-box">
                                 <span class="text-hov">{{item.name}}</span>
-                            <span class="song-other" v-if="item?.alia.length > 0"> - ({{item?.alia[0]}})</span>
+                                <span class="song-other" v-if="item?.alia.length > 0"> - ({{item?.alia[0]}})</span>
                                 <i v-if="item.mv" class="mv-icn"></i>
                             </div>
                         </div>
@@ -81,7 +81,7 @@
       showCustomButton
       @cancel='playCancel'
     >
-        <p class="content-text">因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归</p>
+        <p class="content-text">{{ playDialogText }}</p>
     </Dialog>
     <!-- 删除歌曲弹框 -->
     <Dialog 
@@ -115,7 +115,7 @@ const props = defineProps({
         type: Object,
         default: {}
     },
-    songList: {
+    privileges: {
         type: Array,
         default: []
     }
@@ -137,6 +137,18 @@ const playSongId = computed(() => playStore.getPlaySongId);
 // 添加到播放列表
 let timer = null;
 function addMusic(item: songType) {
+    let index = isCopyright(item.id)
+
+    if(index === 0) {
+        playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
+        playDialog.value = true;
+        return;
+    }else if(index === 1){
+        playDialogText.value = '该歌曲为付费歌曲，请购买后聆听';
+        playDialog.value = true;
+        return;
+    }
+
     useSongAddPlaylist(item)
     playStore.setAddPlayListTip(true)
     playStore.setAddPlayListTipText('已添加到播放列表')
@@ -150,17 +162,45 @@ function addMusic(item: songType) {
     }, 1500)
 }
 
+// 歌曲是否有版权
+function isCopyright(id?: number): number | undefined {
+    const privilege = props.privileges.find(
+        (item: { id: number }) => item.id === id
+    );
+    if (privilege?.dl === 0) {
+        if(privilege.fee === 0){
+            // 无版权
+            return 0;
+        }else if(privilege.fee === 1){
+            // 付费歌曲
+            return 1;
+        }
+    }else{
+        // 可播放歌曲
+        return 2;
+    }
+}
+
 // 播放
 // 提示弹框
 const playDialog = ref(false);
+const playDialogText = ref('');
 function playCancel(value: boolean) {
     playDialog.value = value;
 }
 function playMusic(item: songType) {
-    if(item?.noCopyrightRcmd){
+    let index = isCopyright(item.id)
+
+    if(index === 0) {
+        playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
+        playDialog.value = true;
+        return;
+    }else if(index === 1){
+        playDialogText.value = '该歌曲为付费歌曲，请购买后聆听';
         playDialog.value = true;
         return;
     }
+    
     usePlaySong(item);
     useSongAddPlaylist(item);
     playStore.setAddPlayListTip(true)
@@ -201,6 +241,18 @@ function deleteCancel() {
 
 // 收藏
 function collectMusic(item: songType) {
+    let index = isCopyright(item.id)
+
+    if(index === 0) {
+        playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
+        playDialog.value = true;
+        return;
+    }else if(index === 1){
+        playDialogText.value = '该歌曲为付费歌曲，请购买后聆听';
+        playDialog.value = true;
+        return;
+    }
+    
     dialogStore.setSongId(item.id);
     dialogStore.setSongListShow(true);
 }
@@ -276,6 +328,9 @@ function notFeatureTip() {
                         cursor: pointer;
                         background: url('@/assets/images/my-music/table.png') no-repeat 0 9999px;
                         background-position: 0 -103px;
+                        &:hover{
+                            background-position: 0 -128px;
+                        }
                     }
                     .play-z-slt{
                         background-position: -20px -128px;
@@ -399,7 +454,22 @@ function notFeatureTip() {
             .tr-index{
                 .index-hd{
                     .play-icn{
+                        opacity: 0.5;
                         cursor: default;
+                        &:hover{
+                            background-position: 0 -103px;
+                        }
+                    }
+                }
+            }
+            .song-name{
+                .song-name-box{
+                    .mv-icn{
+                        background-position: -60px -151px;
+                        cursor: default;
+                        &:hover{
+                            background-position: -60px -151px;
+                        }
                     }
                 }
             }
