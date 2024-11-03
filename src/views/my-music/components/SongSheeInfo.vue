@@ -15,13 +15,13 @@
                 <span class="create-time">{{formatDateTime(playlist?.createTime / 1000, 'Y-M-D')}} 创建</span>
             </div>
             <div class="btns">
-                <span class="btns-bag" :class="playlist?.trackCount ? 'play' : 'disable-play'" title="播放">
+                <span class="btns-bag" :class="playlist?.trackCount ? 'play' : 'disable-play'" title="播放"  @click="PlayListBtn">
                     <i class="i-box btns-bag">
                         <i class="play-icn btns-bag"></i>
                         播放
                     </i>
                 </span>
-                <span v-show="playlist?.trackCount" class="add btns-bag" title="添加到播放列表"></span>
+                <span v-show="playlist?.trackCount" class="add btns-bag" title="添加到播放列表" @click="addPlayListBtn"></span>
                 <span class="collect btns-bag btn-jointly">
                     <i class="collect-icn icn btns-bag">{{playlist?.subscribedCount ? '(' + playlist?.subscribedCount + ')' : '收藏'}}</i>
                 </span>
@@ -49,13 +49,26 @@
 </template>
 
 <script setup lang="ts">
-import { formatDateTime } from '@/utils/utils.ts'
+import { computed } from 'vue';
+import { formatDateTime } from '@/utils/utils.ts';
+import type { songType } from '@/hooks/methods/songFormat.ts';
+import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
+import usePlaySong from '@/hooks/usePlaySong.ts';
+import usePlayStore from '@/stores/modules/play.ts';
+
 const props = defineProps({
     playlist: {
         type: Object,
         default: {}
     },
+    privileges: {
+        type: Array,
+        default: []
+    }
 })
+const playStore = usePlayStore();
+// 播放显示/隐藏
+const lock = computed(() => playStore.getplayLock);
 
 const emit = defineEmits(['jumpToComment', 'notFeatureTip']);
 
@@ -65,6 +78,74 @@ function jumpToComment() {
 
 function notFeatureTip() {
     emit('notFeatureTip')
+}
+
+// 歌曲是否有版权
+function isCopyright(id: number): boolean | undefined {
+  const privilege = props.privileges?.find(
+    (item: { id: number }) => item.id === id
+  );
+
+  if (privilege?.cp === 0) {
+    return true;
+  }
+
+  return false;
+}
+
+// 添加到播放列表
+let timer = null;
+function addPlayListBtn(): boolean | undefined {
+    if (props.playlist?.tracks?.length === 0) {
+        return;
+    }
+
+    // 过滤无版权
+    const songList: SongType[] = props.playlist?.tracks.filter(
+        (item: { id: number }) => !isCopyright(item.id)
+    );
+
+    // 将歌曲添加到播放列表
+    useSongAddPlaylist(songList)
+
+    playStore.setAddPlayListTip(true)
+    playStore.setAddPlayListTipText('已添加到播放列表')
+    if(!lock.value){
+        playStore.setPlayLock(true)
+    }
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => {
+        playStore.setPlayLock(false)
+        playStore.setAddPlayListTip(false)
+    }, 1500)
+}
+
+// 播放列表歌曲
+function PlayListBtn(): boolean | undefined {
+    if (props.playlist?.tracks?.length === 0) {
+        return;
+    }
+
+    // 过滤无版权
+    const songList: SongType[] = props.playlist?.tracks.filter(
+        (item: { id: number }) => !isCopyright(item.id)
+    );
+
+    // 将歌曲添加到播放列表 - 清空当前播放列表
+    useSongAddPlaylist(songList, {clear: true})
+    // 播放第一首歌
+    usePlaySong(songList[0])
+
+    playStore.setAddPlayListTip(true)
+    playStore.setAddPlayListTipText('已开始播放')
+    if(!lock.value){
+        playStore.setPlayLock(true)
+    }
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => {
+        playStore.setPlayLock(false)
+        playStore.setAddPlayListTip(false)
+    }, 1500)
 }
 </script>
 

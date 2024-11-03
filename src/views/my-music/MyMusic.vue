@@ -35,7 +35,12 @@
                 <!-- 歌单详情 -->
                 <div v-if="songListInfoShow" class="my-music-main">
                     <div class="song-header">
-                        <SongSheetInfo :playlist="songSheetDetail.playlist" @jumpToComment="jumpToComment" @notFeatureTip="notFeatureTip"/>
+                        <SongSheetInfo
+                          :playlist="songSheetDetail.playlist"
+                          :privileges="songSheetDetail.privileges"
+                          @jumpToComment="jumpToComment"
+                          @notFeatureTip="notFeatureTip"
+                        />
                     </div>
                     <div class="song-list-box">
                         <h3 class="title">歌曲列表</h3>

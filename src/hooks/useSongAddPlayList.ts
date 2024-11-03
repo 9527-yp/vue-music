@@ -29,7 +29,7 @@ function useSongAddPlaylist(songs: songType[] | songType,
             musicList.value.push(musicItem);
         })
     }
-
+    
     if (options?.clear) {
         playStore.setPlaySongList(musicList.value)
         return;
