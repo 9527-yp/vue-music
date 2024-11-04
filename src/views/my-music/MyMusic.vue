@@ -111,7 +111,7 @@ import { getSongSubcount, getSongList, getSongSheetInfo, mySinger } from '@/api/
 import { getSongComment } from '@/api/comment.ts';
 import type { ResponseType } from '@/types/index';
 import { handleCommentList } from '@/components/comment/handleCommentList.ts';
-import type { SongSheetList, TypeSongSheet, SongSheetDetail} from './types/type.ts';
+import type { TypeSongSheetList, TypeSongSheet, SongSheetDetail} from './types/type.ts';
 
 const userStore = useUserStore();
 const dialogStore = useDialogStore();
@@ -196,7 +196,7 @@ const songSheetList = reactive<TypeSongSheet>({
 function getSongListData (isFirst: boolean = true)  {
     getSongList({uid: userInfo.value?.profile?.userId}).then((res: ResponseType) => {
         if(res.code === 200) {
-            res.playlist?.forEach?.((item: SongSheetList) => {
+            res.playlist?.forEach?.((item: TypeSongSheetList) => {
                 if (item.name?.includes?.('喜欢的音乐')) {
                     item.name = '我喜欢的音乐';
                     songSheetId.value = item.id
@@ -205,10 +205,10 @@ function getSongListData (isFirst: boolean = true)  {
             
             // 创建/收藏的歌单
             songSheetList.createdSongSheet = res.playlist?.filter?.(
-            (item: SongSheetList) => !item.subscribed
+            (item: TypeSongSheetList) => !item.subscribed
             );
             songSheetList.collectSongSheet = res.playlist?.filter?.(
-            (item: SongSheetList) => item.subscribed
+            (item: TypeSongSheetList) => item.subscribed
             );
             if(isFirst){
                 // 是否首次调用或刷新页面

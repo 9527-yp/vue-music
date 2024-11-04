@@ -3,13 +3,13 @@
         <div class="user-box">
             <div class="user-info">
                 <div class="user-cov">
-                    <img src="" alt="">
+                    <img :src="userInfoData?.avatarUrl" alt="">
                 </div>
                 <div class="user-d">
                     <div class="name">
                         <h2 class="name-warp">
-                            <span class="title thide">T信念y</span>
-                            <span class="lev u-lev-icn">8
+                            <span class="title thide">{{ userInfoData.nickname }}</span>
+                            <span class="lev u-lev-icn">{{ level }}
                                 <i class="right u-lev-icn"></i>
                             </span>
                         </h2>
@@ -22,19 +22,19 @@
                     <ul class="info-ul">
                         <li class="item item-fst">
                             <span class="item-cnt">
-                                <strong class="num">0</strong>
+                                <strong class="num">{{ userInfoData.gender }}</strong>
                                 <span class="text">动态</span>
                             </span>
                         </li>
                         <li class="item">
                             <span class="item-cnt">
-                                <strong class="num">0</strong>
+                                <strong class="num">{{ userInfoData.follows }}</strong>
                                 <span class="text">关注</span>
                             </span>
                         </li>
                         <li class="item">
                             <span class="item-cnt">
-                                <strong class="num">0</strong>
+                                <strong class="num">{{ userInfoData.followeds }}</strong>
                                 <span class="text">粉丝</span>
                             </span>
                         </li>
@@ -145,10 +145,50 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import useUserStore from '@/stores/modules/user.ts';
+import { getSongList } from '@/api/my-music.ts';
+import { userInfo } from '@/api/login.ts';
+import type { TypeSongSheetList, TypeSongSheet} from '@/views/my-music/types/type.ts';
+import type { ResponseType } from '@/types/index';
 
 const userStore = useUserStore();
+const route = useRoute();
+
+const userInfoData = ref({});
+const level = ref('');
+function getUserInfo() {
+    userInfo({uid: route?.query?.id}).then((res:ResponseType) => {
+        if(res.code === 200) {
+            userInfoData.value = res?.profile;
+            level.value = res?.level
+        }
+    })
+}
+getUserInfo();
+
+
+// 歌单
+const songSheetList = reactive<TypeSongSheet>({
+    createdSongSheet: [],
+    collectSongSheet: []
+})
+function getSongListData ()  {
+    getSongList({uid: route?.query?.id}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            
+            // 创建/收藏的歌单
+            songSheetList.createdSongSheet = res.playlist?.filter?.(
+            (item: TypeSongSheetList) => !item.subscribed
+            );
+            songSheetList.collectSongSheet = res.playlist?.filter?.(
+            (item: TypeSongSheetList) => item.subscribed
+            );
+        }
+    })
+}
+getSongListData()
 
 onMounted(() => {
     userStore.setMenuIndex(-1);

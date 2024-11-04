@@ -151,7 +151,12 @@ function PlayListBtn(): boolean | undefined {
 }
 
 function goToUserHome() {
-    router.push('/user/home')
+    router.push({
+        path: '/user/home',
+        query: {
+            id: props.playlist?.userId
+        }
+    })
 }
 </script>
 

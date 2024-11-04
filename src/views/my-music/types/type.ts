@@ -1,4 +1,4 @@
-export type SongSheetList = {
+export type TypeSongSheetList = {
     name: string,
     subscribed: boolean,
     id: number,
