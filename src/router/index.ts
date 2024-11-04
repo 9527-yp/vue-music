@@ -16,9 +16,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/my-music',
         name: 'my-music',
         component: () =>
-          import(
-            /* webpackChunkName: "my-music" */ '../views/my-music/MyMusic.vue'
-          )
+        import( /* webpackChunkName: "my-music" */ '../views/my-music/MyMusic.vue')
       },
       {
         path: '/friend',
@@ -35,7 +33,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: '/user/home',
-        name: 'download',
+        name: 'userHome',
         component: () =>
           import(
             /* webpackChunkName: "download" */ '../views/user-home/userHome.vue')

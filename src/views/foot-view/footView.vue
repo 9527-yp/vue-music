@@ -114,6 +114,8 @@
     watch(() => route.path, (path) => {
         if(path === '/my-music' && isLogin.value){
             footShow.value = false
+        }else{
+            footShow.value = true
         }
     },{immediate: true})
 </script>

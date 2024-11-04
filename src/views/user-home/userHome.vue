@@ -72,19 +72,74 @@
             </div>
             <div class="ranking-table-box">
                 <ul class="table-ul">
-                    <li class="item">
+                    <li class="item" :class="index % 2 === 0 ? 'even' : ''" v-for="(item, index) in 10" :key="index">
                         <div class="hd">
                             <i class="play-icn"></i>
-                            <span class="index">1.</span>
+                            <span class="index">{{index + 1}}.</span>
                         </div>
                         <div class="song">
                             <div class="song-info">
-                                <span class="text"></span>
+                                <span class="text">
+                                    <span class="song-name text-hov" title="理想三旬">理想三旬</span>
+                                    <em>-</em>
+                                    <span class="singer text-hov">陈鸿宇</span>
+                                </span>
+                                <div class="play-btns">
+                                    <i class="add-icn" title="添加到播放列表"></i>
+                                    <i class="icn collect-icn" title="收藏"></i>
+                                    <i class="icn share-icn" title="分享"></i>
+                                    <i class="icn down-icn" title="下载"></i>
+                                </div>
                             </div>
+                        </div>
+                        <div class="tops">
+                            <span class="bag"></span>
+                            <span class="play-num">537次</span>
                         </div>
                     </li>
                 </ul>
+                <div class="more">
+                    <span class="text-hov">查看更多></span>
+                </div>
             </div>
+            <div class="ranking-title">
+                <h3 class="title song-list">我创建的歌单（12）</h3>
+            </div>
+            <ul class="m-ovrlst">
+                <li class="item" v-for="(item, index) in 12" :key="index">
+                    <div class="cover">
+                        <img src="" alt="">
+                        <span class="msk" title="T信念y喜欢的音乐"></span>
+                        <div class="bottom">
+                            <i class="icn play-icn"></i>
+                            <i class="icon-headset"></i>
+                            <span class="num">24</span>
+                        </div>
+                    </div>
+                    <p class="title">
+                        <span class="title-text text-hov thide" title="T信念y喜欢的音乐">T信念y喜欢的音乐</span>
+                    </p>
+                </li>
+            </ul>
+            <div class="ranking-title">
+                <h3 class="title song-list">我收藏的歌单（5）</h3>
+            </div>
+            <ul class="m-ovrlst">
+                <li class="item" v-for="(item, index) in 5" :key="index">
+                    <div class="cover">
+                        <img src="" alt="">
+                        <span class="msk" title="T信念y喜欢的音乐"></span>
+                        <div class="bottom">
+                            <i class="icn play-icn"></i>
+                            <i class="icon-headset"></i>
+                            <span class="num">24</span>
+                        </div>
+                    </div>
+                    <p class="title">
+                        <span class="title-text text-hov thide" title="T信念y喜欢的音乐">T信念y喜欢的音乐</span>
+                    </p>
+                </li>
+            </ul>
         </div>
     </div>
 </template>
@@ -306,6 +361,9 @@ onMounted(() => {
                 font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif;
                 float: left;
             }
+            .song-list{
+                color: #333;
+            }
             .listen-music-total{
                 float: left;
                 display: inline;
@@ -413,6 +471,7 @@ onMounted(() => {
                     height: 38px;
                     line-height: 38px;
                     overflow: hidden;
+                    cursor: pointer;
                     .hd{
                         float: left;
                         width: 72px;
@@ -455,7 +514,113 @@ onMounted(() => {
                             float: left;
                             width: 100%;
                             .text{
-                                
+                                position: relative;
+                                display: inline-block;
+                                max-width: 99%;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                .song-name{
+                                    color: #333;
+                                    font-weight: 700;
+                                }
+                                em{
+                                    margin: 0 5px;
+                                    font-style: normal;
+                                    text-align: left;
+                                    font-size: inherit;
+                                }
+                                .singer{
+                                    color: #aeaeae;
+                                }
+                            }
+                            .play-btns{
+                                position: absolute;
+                                z-index: 1;
+                                right: 0;
+                                top: 11px;
+                                display: none;
+                                width: 92px;
+                                height: 20px;
+                                overflow: hidden;
+                                .add-icn{
+                                    margin-top: 2px;
+                                    float: left;
+                                    overflow: hidden;
+                                    vertical-align: middle;
+                                    width: 13px;
+                                    height: 13px;
+                                    background: url('@/assets/images/icon.png') no-repeat;
+                                    background-position: 0 -700px;
+                                    cursor: pointer;
+                                    &:hover{
+                                        background-position: -22px -700px;
+                                    }
+                                }
+                                .icn{
+                                    float: left;
+                                    width: 18px;
+                                    height: 16px;
+                                    margin: 2px 0 0 4px;
+                                    overflow: hidden;
+                                    text-indent: -999px;
+                                    background: url('@/assets/images/my-music/table.png') no-repeat;
+                                    cursor: pointer;
+                                }
+                                .collect-icn{
+                                    background-position: 0 -174px;
+                                    &:hover{
+                                        background-position: -20px -174px;
+                                    }
+                                }
+                                .share-icn{
+                                    background-position: 0 -195px;
+                                    &:hover{
+                                        background-position: -20px -195px;
+                                    }
+                                }
+                                .down-icn{
+                                    background-position: -81px -174px;
+                                    &:hover{
+                                        background-position: -104px -174px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .tops{
+                        float: right;
+                        position: relative;
+                        z-index: 1;
+                        zoom: 1;
+                        width: 319px;
+                        height: 38px;
+                        line-height: 38px;
+                        .bag{
+                            position: absolute;
+                            z-index: 1;
+                            width: 100%;
+                            height: 38px;
+                            background-color: #4eb4f5;
+                            opacity: 0.1;
+                        }
+                        .play-num{
+                            position: absolute;
+                            left: 10px;
+                            z-index: 1;
+                            height: 38px;
+                            line-height: 38px;
+                            color: #666;
+                            font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif;
+                        }
+                    }
+                    &:hover{
+                        background: #eeeeee;
+                        .song{
+                            .song-info{
+                                .play-btns{
+                                    display:block;
+                                }
                             }
                         }
                     }
@@ -467,6 +632,94 @@ onMounted(() => {
                         visibility: hidden;
                     }
                 }
+                .even{
+                    background-color: #f7f7f7;
+                }
+            }
+            .more{
+                color: #666;
+                height: 32px;
+                line-height: 32px;
+                text-align: right;
+            }
+        }
+        .m-ovrlst{
+            margin: 20px 0 0 -50px;
+            .item{
+                float: left;
+                width: 140px;
+                padding: 0 0 30px 50px;
+                line-height: 1.4;
+                height: 165px;
+                overflow: hidden;
+                .cover{
+                    width: 140px;
+                    height: 140px;
+                    position: relative;
+                    img{
+                        width: 140px;
+                        height: 140px;
+                        display: block;
+                    }
+                    .msk{
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: url('@/assets/images/home/name-D5CGUEo8.png') no-repeat 0 9999px;
+                        background-position: 0 0;
+                    }
+                    .bottom{
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 27px;
+                        background: url('@/assets/images/home/name-D5CGUEo8.png') no-repeat 0 9999px;
+                        background-position: 0 -537px;
+                        color: #ccc;
+                        .play-icn{
+                            position: absolute;
+                            right: 10px;
+                            bottom: 5px;
+                            width: 16px;
+                            height: 17px;
+                            background: url('@/assets/images/home/name-Db6Jvh02.png') no-repeat 0 9999px;
+                            background-position: 0 0;
+                        }
+                        .icon-headset{
+                            float: left;
+                            width: 14px;
+                            height: 11px;
+                            background: url('@/assets/images/home/name-Db6Jvh02.png') no-repeat 0 9999px;
+                            background-position: 0 -24px;
+                            margin: 9px 5px 9px 10px;
+                        }
+                        .num{
+                            float: left;
+                            margin: 7px 0 0 0;
+                        }
+                    }
+                }
+                .title{
+                    margin: 8px 0 3px;
+                    font-size: 14px;
+                    width: 100%;
+                    .title-text{
+                        display: inline-block;
+                        max-width: 100%;
+                        vertical-align: middle;
+                        color: #000;
+                    }
+                }
+            }
+            &:after{
+                clear: both;
+                content: '.';
+                display: block;
+                height: 0;
+                visibility: hidden;
             }
         }
     }
