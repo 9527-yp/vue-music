@@ -79,7 +79,7 @@
                         </div>
                         <div class="song">
                             <div class="song-info">
-
+                                <span class="text"></span>
                             </div>
                         </div>
                     </li>
@@ -454,6 +454,9 @@ onMounted(() => {
                         .song-info{
                             float: left;
                             width: 100%;
+                            .text{
+                                
+                            }
                         }
                     }
                     &:after{
