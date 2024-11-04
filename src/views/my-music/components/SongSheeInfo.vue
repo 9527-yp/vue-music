@@ -10,7 +10,7 @@
                 <h2>{{playlist?.name}}</h2>
             </div>
             <div class="user-info">
-                <img class="user-img" :src="playlist?.creator?.avatarUrl" alt="">
+                <img class="user-img" :src="playlist?.creator?.avatarUrl" @click="goToUserHome">
                 <span class="user-name thide text-hov">{{playlist?.creator?.nickname}}</span>
                 <span class="create-time">{{formatDateTime(playlist?.createTime / 1000, 'Y-M-D')}} 创建</span>
             </div>
@@ -55,6 +55,7 @@ import type { songType } from '@/hooks/methods/songFormat.ts';
 import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
 import usePlaySong from '@/hooks/usePlaySong.ts';
 import usePlayStore from '@/stores/modules/play.ts';
+import { useRouter } from 'vue-router';
 
 const props = defineProps({
     playlist: {
@@ -67,6 +68,7 @@ const props = defineProps({
     }
 })
 const playStore = usePlayStore();
+const router = useRouter();
 // 播放显示/隐藏
 const lock = computed(() => playStore.getplayLock);
 
@@ -146,6 +148,10 @@ function PlayListBtn(): boolean | undefined {
         playStore.setPlayLock(false)
         playStore.setAddPlayListTip(false)
     }, 1500)
+}
+
+function goToUserHome() {
+    router.push('/user/home')
 }
 </script>
 
