@@ -24,14 +24,14 @@
 import { onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import useUserStore from '@/stores/modules/user.ts';
-import findCityZipCode from './city.ts'
+import findCityZipCode from './city.ts';
 import { getSongList } from '@/api/my-music.ts';
 import { userInfo } from '@/api/login.ts';
-import { getRecords } from '@/api/user-home.ts'
+import { getRecords } from '@/api/user-home.ts';
 import type { ResponseType } from '@/types/index';
-import UserInfo from './user-info/UserInfo.vue'
-import RankingTable from './ranking-table/RankingTable.vue'
-import UserSongList from './user-song-list/UserSongList.vue'
+import UserInfo from './user-info/UserInfo.vue';
+import RankingTable from './ranking-table/RankingTable.vue';
+import UserSongList from './user-song-list/UserSongList.vue';
 
 const userStore = useUserStore();
 const route = useRoute();

@@ -25,6 +25,10 @@ export const getRecords = ({uid, type}: RecordsItem): AxiosPromise => {
     })
 }
 
+/**
+ * @description 获取歌曲详情
+ * @param ids 歌曲id，多个用，隔开
+ */
 export const getSongDetail = ({ids}: {ids: string | number}): AxiosPromise => {
     const params = {
         timestamp: new Date().getTime(),

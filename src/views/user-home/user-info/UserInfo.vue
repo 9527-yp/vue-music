@@ -19,7 +19,7 @@
             </div>
             <ul class="info-ul">
                 <li class="item item-fst">
-                    <span class="item-cnt">
+                    <span class="item-cnt" @click="goUserSocial">
                         <strong class="num">{{ userInfoData.eventCount }}</strong>
                         <span class="text">动态</span>
                     </span>
@@ -55,8 +55,11 @@
 
 <script setup lang="ts">
 import { getAgeFragment } from '@/utils/utils.ts';
+import { useRouter, useRoute } from 'vue-router'
 
-defineProps({
+const router = useRouter();
+const route = useRoute();
+const props = defineProps({
     userInfoData: {
         type: Object,
         default: {}
@@ -72,8 +75,22 @@ defineProps({
     cityName: {
         type: String,
         default: ''
+    },
+    isTwoTo: {
+        type: Boolean,
+        default: false
     }
 })
+
+function goUserSocial(): undefined {
+    if(props.isTwoTo){
+        return;
+    }
+    router.push({
+        path: '/user/Social',
+        query: {id: route.query.id}
+    })
+}
 </script>
 
 <style lang="scss" scoped>

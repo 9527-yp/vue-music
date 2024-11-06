@@ -32,6 +32,7 @@ const routes: Array<RouteRecordRaw> = [
             /* webpackChunkName: "download" */ '../views/download/Download.vue')
       },
       {
+        /** 个人主页 */
         path: '/user/home',
         name: 'userHome',
         component: () =>
@@ -39,11 +40,20 @@ const routes: Array<RouteRecordRaw> = [
             /* webpackChunkName: "download" */ '../views/user-home/userHome.vue')
       },
       {
+        /** 听歌记录查看更多 */
         path: '/song/rank',
         name: 'songRank',
         component: () =>
           import(
             /* webpackChunkName: "download" */ '../views/song-rank/songRank.vue')
+      },
+      {
+        /** 动态 */
+        path: '/user/Social',
+        name: 'userSocial',
+        component: () =>
+          import(
+            /* webpackChunkName: "download" */ '../views/user-social/userSocial.vue')
       },
     ]
   }
