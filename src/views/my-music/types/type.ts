@@ -11,8 +11,8 @@ export type TypeSongSheetList = {
     }
 }
 export type TypeSongSheet = {
-    createdSongSheet: SongSheetList[],
-    collectSongSheet: SongSheetList[],
+    createdSongSheet: TypeSongSheetList[],
+    collectSongSheet: TypeSongSheetList[],
 }
 
 export type SongSheetDetail = {

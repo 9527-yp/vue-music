@@ -38,6 +38,13 @@ const routes: Array<RouteRecordRaw> = [
           import(
             /* webpackChunkName: "download" */ '../views/user-home/userHome.vue')
       },
+      {
+        path: '/song/rank',
+        name: 'songRank',
+        component: () =>
+          import(
+            /* webpackChunkName: "download" */ '../views/song-rank/songRank.vue')
+      },
     ]
   }
 ]

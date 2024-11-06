@@ -202,3 +202,24 @@ function getTimestamp(value : number = 0) : number {
         
     return timestamp;  
 }
+
+
+export function getAgeFragment(timestamp: string | number): undefined | string {
+
+    // 创建一个时间对象
+    const date = new Date(timestamp);
+    // 获取年份
+    const year = date.getFullYear();
+
+    if (year < 1980) {  
+        return "70后";  
+    }else if (year >= 1980 && year < 1990) {  
+        return "80后";  
+    } else if (year >= 1990 && year < 1995) {  
+        return "90后";  
+    } else if (year >= 1995 && year < 2000) {  
+        return "95后";  
+    } else if (year >= 2000) {  
+        return "00后";
+    }
+}

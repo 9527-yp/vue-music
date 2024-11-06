@@ -90,11 +90,6 @@
             </div>
         </div>
     </div>
-    <div class="warning-tip" v-if="warningInfo.visible">
-        <i v-if="warningInfo.type" class="success-icn"></i>
-        <i v-else class="warning-icn"></i>
-        <span class="text">{{warningInfo.text}}</span>
-    </div>
 </template>
 
 <script setup lang="ts">
@@ -111,7 +106,6 @@ import { getSongSubcount, getSongList, getSongSheetInfo, mySinger } from '@/api/
 import { getSongComment } from '@/api/comment.ts';
 import type { ResponseType } from '@/types/index';
 import { handleCommentList } from '@/components/comment/handleCommentList.ts';
-import type { TypeSongSheetList, TypeSongSheet, SongSheetDetail} from './types/type.ts';
 
 const userStore = useUserStore();
 const dialogStore = useDialogStore();
@@ -119,6 +113,7 @@ const dialogStore = useDialogStore();
 const isLogin = computed(() => userStore.getIsLogin);
 const userInfo = computed(() => userStore.getUserInfo);
 const isRefreshSongList = computed(() => dialogStore.getIsRefreshSongList);
+const messageInfo = computed(() => dialogStore.getMessage);
 
 
 const songListInfoShow = ref(true);
@@ -187,11 +182,29 @@ function getSongCount() {
 }
 getSongCount()
 
+type TypeSongSheetList = {
+    name: string,
+    subscribed: boolean,
+    id: number,
+    coverImgUrl: string,
+    trackCount: number,
+    creator: {
+        nickname: string,
+        userId: number,
+        avatarUrl: string
+    }
+}
+
+type TypeSongSheet = {
+    createdSongSheet: TypeSongSheetList[],
+    collectSongSheet: TypeSongSheetList[],
+}
+
 // 歌单ID
 const songSheetId = ref(undefined)
 const songSheetList = reactive<TypeSongSheet>({
     createdSongSheet: [],
-    collectSongSheet: []
+    collectSongSheet: [],
 })
 function getSongListData (isFirst: boolean = true)  {
     getSongList({uid: userInfo.value?.profile?.userId}).then((res: ResponseType) => {
@@ -233,7 +246,24 @@ function songListItemChange(value: number) {
     getSongCommentList();
 }
 
-const songSheetDetail = reactive<SongSheetDetail>({
+type TypeSongSheetDetail = {
+    playlist: {
+        coverImgUrl?: string,
+        name?: string,
+        id?: number,
+        playCount?: number,
+        trackCount?: number,
+        subscribed?: boolean,
+        tracks?: {
+            id: number;
+        }[];
+    },
+    privileges: {
+        id: number;
+    }[];
+}
+
+const songSheetDetail = reactive<TypeSongSheetDetail>({
     playlist: {},
     privileges: []
 })
@@ -299,24 +329,26 @@ function delSong() {
 
 // 功能暂未开发提示
 const warningInfo = reactive({
-    text: '',
-    visible: false,
-    type:0, // 0:警告 ，1：成功
     time: null
 })
 
 function notFeatureTip() {
-    warningInfo.type = 0;
-    warningInfo.text = '功能暂未开发';
-    warningInfo.visible = true;
+    dialogStore.setMessage({
+        type: 0,
+        text: '功能暂未开发',
+        visible: true,
+    })
     warningInfo.time && clearTimeout( warningInfo.time);
     warningInfo.time = setTimeout(() => {
-        warningInfo.visible = false;
+        dialogStore.setMessage({
+            type: 0,
+            text: '功能暂未开发',
+            visible: false,
+        })
     }, 1500);
 }
 
 watch(() => isRefreshSongList.value, (newValue) => {
-    console.log(newValue,'newValue')
     if(newValue === true){
         getSongListData(false);
         dialogStore.setIsRefreshSongList(false);
@@ -461,44 +493,6 @@ function jumpToComment() {
 .musicsd::-webkit-scrollbar {
     width: 8px;
     height: 8px;
-}
-.warning-tip{
-    width: 280px;
-    background: #fff;
-    color: #333;
-    line-height: 52px;
-    text-align: center;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    position: absolute;
-    top:50%;
-    left: 50%;
-    z-index: 20002;
-    margin-top: -40px;
-    margin-left: -140px;
-    vertical-align: middle;
-    .warning-icn{
-        width: 20px;
-        height: 20px;
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 3px;
-        background: url('@/assets/images/icon.png') no-repeat;
-        background-position: -24px -406px;
-    }
-    .success-icn{
-        width: 20px;
-        height: 20px;
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 3px;
-        background: url('@/assets/images/icon.png') no-repeat;
-        background-position: -24px -430px;
-    }
-    .text{
-        display: inline-block;
-        vertical-align: middle;
-    }
 }
 .not-song-list-box{
     padding: 95px 0;

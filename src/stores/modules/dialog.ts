@@ -1,5 +1,10 @@
 import { defineStore } from "pinia";
 
+type MessageInfo = {
+  visible: boolean,
+  text: string,
+  type: number | string
+}
 // defineStore方法执行会返回一个函数，函数的作用就是让组件可以获取到仓库数据
 const dialogStore = defineStore("dialog", {
     
@@ -9,7 +14,12 @@ const dialogStore = defineStore("dialog", {
         songId: undefined, // 歌曲ID
         songListShow: false, // 歌单弹框
         addSongListShow: false, // 新建歌单弹框
-        isRefreshSongList: false // 是否刷新歌单列表数据
+        isRefreshSongList: false, // 是否刷新歌单列表数据
+        messageInfo: {
+          visible: false, // 提示弹框
+          type: 0, // 0:警告 ，1：成功
+          text: '', // 提示内容
+        }
       };
     },
     
@@ -28,7 +38,10 @@ const dialogStore = defineStore("dialog", {
       },
       setIsRefreshSongList(value: boolean) {
         this.isRefreshSongList = value;
-      }
+      },
+      setMessage(info: MessageInfo) {
+        this.messageInfo = info;
+      },
     },
     // 计算属性，和vuex是使用一样，getters里面不是方法，是计算返回的结果值
     getters: {
@@ -36,6 +49,7 @@ const dialogStore = defineStore("dialog", {
         getAddSongListShow: state => state.addSongListShow,
         getSongId: state => state.songId,
         getIsRefreshSongList: state => state.isRefreshSongList,
+        getMessage: state => state.messageInfo,
     }
   });
   

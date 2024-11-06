@@ -36,18 +36,25 @@
         </div>
       </div>
     </div>
+    <div class="warning-tip" v-if="messageInfo.visible">
+        <i v-if="messageInfo.type" class="success-icn"></i>
+        <i v-else class="warning-icn"></i>
+        <span class="text">{{messageInfo.text}}</span>
+    </div>
 </template>
 
 <script setup lang="ts">
-import User from '@/views/user/User.vue'
-import useUserStore from '@/stores/modules/user.ts'
-import { getMsgCode } from '@/api/user.ts'
+import User from '@/views/user/User.vue';
+import useUserStore from '@/stores/modules/user.ts';
+import useDialogStore from '@/stores/modules/dialog.ts';
+import { getMsgCode } from '@/api/user.ts';
 import type { ResponseType } from '@/types/index';
 import { ref, computed, watch } from 'vue';
 import { useRouter, useRoute } from "vue-router";
 
 // 用户信息数据
 const userStore = useUserStore();
+const dialogStore = useDialogStore();
 
 // 路由跳转
 const router = useRouter()
@@ -55,6 +62,7 @@ const route = useRoute()
 
 const isLogin = computed<boolean>(() => userStore.getIsLogin);
 const menuIndex = computed<number>(() => userStore.getMenuIndex);
+const messageInfo = computed(() => dialogStore.getMessage);
 
 // header 菜单列表
 type MenuType = {
@@ -328,4 +336,43 @@ watch(() => route.path,
       }
     }
   }
+.warning-tip{
+  width: 280px;
+  background: #fff;
+  color: #333;
+  line-height: 52px;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  position: fixed;
+  top:50%;
+  left: 50%;
+  z-index: 20002;
+  margin-left: -140px;
+  margin-top: -300px;
+  // transform: translate(-50%, -50%);
+  vertical-align: middle;
+  .warning-icn{
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 3px;
+      background: url('@/assets/images/icon.png') no-repeat;
+      background-position: -24px -406px;
+  }
+  .success-icn{
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 3px;
+      background: url('@/assets/images/icon.png') no-repeat;
+      background-position: -24px -430px;
+  }
+  .text{
+      display: inline-block;
+      vertical-align: middle;
+  }
+}
 </style>

@@ -163,8 +163,12 @@ function addMusic(item: songType) {
 }
 
 // 歌曲是否有版权
+type privilegeItem = {
+    dl?: number,
+    fee?: number
+}
 function isCopyright(id?: number): number | undefined {
-    const privilege = props.privileges.find(
+    const privilege: privilegeItem = props.privileges.find(
         (item: { id: number }) => item.id === id
     );
     if (privilege?.dl === 0) {
