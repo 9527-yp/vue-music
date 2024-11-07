@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { formatDateTime } from '@/utils/utils.ts';
+import { formatDateTime } from '@/utils/utils';
 import type { songType } from '@/hooks/methods/songFormat.ts';
 import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
 import usePlaySong from '@/hooks/usePlaySong.ts';
@@ -84,7 +84,7 @@ function notFeatureTip() {
 
 // 歌曲是否有版权
 function isCopyright(id: number): boolean | undefined {
-  const privilege = props.privileges?.find(
+  const privilege: {cp?: number} = props.privileges?.find(
     (item: { id: number }) => item.id === id
   );
 
