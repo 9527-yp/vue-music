@@ -55,6 +55,22 @@ const routes: Array<RouteRecordRaw> = [
           import(
             /* webpackChunkName: "download" */ '../views/user-social/userSocial.vue')
       },
+      {
+        /** 关注 */
+        path: '/user/follows',
+        name: 'userFollows',
+        component: () =>
+          import(
+            /* webpackChunkName: "download" */ '../views/user-follows/userFollows.vue')
+      },
+      {
+        /** 粉丝 */
+        path: '/user/fans',
+        name: 'userFans',
+        component: () =>
+          import(
+            /* webpackChunkName: "download" */ '../views/user-fans/userFans.vue')
+      },
     ]
   }
 ]

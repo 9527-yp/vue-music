@@ -8,10 +8,12 @@
               :cityName="cityName"
             />
             <!-- 听歌排行 -->
-            <RankingTable
-              :recordInfo="recordInfo"
-              @tagschange="tagschange"
-            />
+            <template v-show="songTableShow">
+                <RankingTable
+                  :recordInfo="recordInfo"
+                  @tagschange="tagschange"
+                />
+            </template>
             <!-- 创建的歌单 -->
             <UserSongList title="我创建的歌单" :list="songSheetList.createdSongSheet" />
             <!-- 收藏的歌单 -->
@@ -107,6 +109,7 @@ function getSongListData ()  {
 getSongListData()
 
 // 听歌排行
+const songTableShow = ref<boolean>(true); //  是否有权限访问
 function records() {
     recordInfo.loading = true;
     getRecords({
@@ -114,13 +117,16 @@ function records() {
         type: recordInfo.type
     }).then((res: ResponseType) => {
         if(res.code === 200) {
+            songTableShow.value = true;
             recordInfo.loading = false;
             if(recordInfo.type === 0){
                 recordInfo.list = res?.allData.slice(0, 10)
             }else{
                 recordInfo.list = res?.weekData.slice(0, 10)
             }
-            
+        }else{
+            songTableShow.value = false;
+            recordInfo.loading = false;
         }
     })
 }

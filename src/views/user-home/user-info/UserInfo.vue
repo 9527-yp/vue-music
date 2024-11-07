@@ -5,20 +5,43 @@
         </div>
         <div class="user-d">
             <div class="name">
-                <h2 class="name-warp">
-                    <span class="title thide">{{ userInfoData.nickname }}</span>
-                    <span class="lev u-lev-icn">{{ level }}
-                        <i class="right u-lev-icn"></i>
-                    </span>
-                </h2>
-                <div class="edit">
+                <div class="user-header-left">
+                    <h2 class="name-warp">
+                        <span class="title thide">{{ userInfoData.nickname }}</span>
+                        <span class="lev u-lev-icn">{{ level }}
+                            <i class="right u-lev-icn"></i>
+                        </span>
+                        <i class="gender-icn" :class="userInfoData?.gender === 1 ? 'boy' : 'girl'"></i>
+                    </h2>
+                    <div class="contact-head" v-show="userInfoData?.userId !== userInfo?.profile?.userId">
+                        <div class="btn send-letter" v-show="userInfoData.followed">
+                            <i class="icn">发私信</i>
+                        </div>
+                        <div class="btn Followed" v-show="userInfoData.followed && userInfoData.mutual === false">
+                            <i class="icn has">已关注</i>
+                            <i class="icn clear">取消关注</i>
+                        </div>
+                        <div class="btn another-Followed" v-show="userInfoData.followed && userInfoData.mutual">
+                            <i class="icn has">相互关注</i>
+                            <i class="icn clear">取消关注</i>
+                        </div>
+                        <div class="btn follow" v-show="!userInfoData.followed">关注</div>
+                    </div>
+                </div>
+                <div class="edit" v-show="userInfoData?.userId === userInfo?.profile?.userId">
                     <div class="edit-box edit-btn edit-bag">
                         <i class="edit-btn edit-bag">编辑个人资料</i>
                     </div>
                 </div>
             </div>
             <ul class="info-ul">
-                <li class="item item-fst">
+                <li class="item" :class="{'item-fst' : index === 0}" v-for="(item, index) in tagList" :key="item.title">
+                    <span class="item-cnt" @click="goUserSocial(item.path)">
+                        <strong class="num">{{ item.num }}</strong>
+                        <span class="text">{{item.title}}</span>
+                    </span>
+                </li>
+                <!-- <li class="item item-fst">
                     <span class="item-cnt" @click="goUserSocial">
                         <strong class="num">{{ userInfoData.eventCount }}</strong>
                         <span class="text">动态</span>
@@ -35,7 +58,7 @@
                         <strong class="num">{{ userInfoData.followeds }}</strong>
                         <span class="text">粉丝</span>
                     </span>
-                </li>
+                </li> -->
             </ul>
             <div class="info">
                 <span>所在地：{{provinceName}}-{{cityName}}</span>
@@ -55,10 +78,13 @@
 
 <script setup lang="ts">
 import { getAgeFragment } from '@/utils/utils.ts';
-import { useRouter, useRoute } from 'vue-router'
+import useUserStore from '@/stores/modules/user.ts';
+import { useRouter, useRoute } from 'vue-router';
+import { computed, ref, nextTick, watch } from 'vue';
 
 const router = useRouter();
 const route = useRoute();
+const userStore = useUserStore();
 const props = defineProps({
     userInfoData: {
         type: Object,
@@ -81,13 +107,36 @@ const props = defineProps({
         default: false
     }
 })
+const tagList = ref([])
+watch(() => props.userInfoData, () => {
+    tagList.value = [
+        {
+            title: '动态',
+            num: props?.userInfoData?.eventCount,
+            path: '/user/Social'
+        },
+        {
+            title: '关注',
+            num: props?.userInfoData?.follows,
+            path: '/user/follows'
+        },
+        {
+            title: '粉丝',
+            num: props?.userInfoData?.followeds,
+            path: '/user/fans'
+        },
+    ]
+})
 
-function goUserSocial(): undefined {
-    if(props.isTwoTo){
+// 登录信息
+const userInfo = computed(() => userStore.getUserInfo)
+
+function goUserSocial(path: string): undefined {
+    if(route.path === path){
         return;
     }
     router.push({
-        path: '/user/Social',
+        path: path,
         query: {id: route.query.id}
     })
 }
@@ -121,6 +170,10 @@ function goUserSocial(): undefined {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            .user-header-left{
+                display: flex;
+                align-items: center
+            }
             .name-warp{
                 padding-bottom: 3px;
                 display: flex;
@@ -155,12 +208,99 @@ function goUserSocial(): undefined {
                     height: 19px;
                     background-position: -191px -190px;
                 }
+                .gender-icn{
+                    margin: 9px 0 0 8px;
+                    width: 20px;
+                    height: 20px;
+                    background: url('@/assets/images/icon.png') no-repeat;
+                }
+                .boy{
+                    background-position: -41px -57px;
+                }
+                .girl{
+                    background-position: -41px -27px;
+                }
                 &:after{
                     clear: both;
                     content: '.';
                     display: block;
                     height: 0;
                     visibility: hidden;
+                }
+            }
+            .contact-head{
+                display: flex;
+                align-items: center;
+                height: 35px;
+                .btn{
+                    margin: 0px 0 0 15px;
+                    width: 75px;
+                    height: 31px;
+                    cursor: pointer;
+                    background: url('@/assets/images/my-music/button.png');
+                    .icn{
+                        display: inline-block;
+                        height: 29px;
+                        line-height: 29px;
+                        padding-left: 30px;
+                    }
+                }
+                .send-letter{
+                    background-position: 0 -810px;
+                    &:hover{
+                        background-position: 0 -845px;
+                    }
+                }
+                .Followed{
+                    background-position: 0 -919px;
+                    .has{
+                        display: inline-block;
+                    }
+                    .clear{
+                        display: none
+                    }
+                    &:hover{
+                        background-position: 0 -760px;
+                        text-align: center;
+                        .has{
+                            display: none;
+                        }
+                        .clear{
+                            padding-left: 0px;
+                            display: inline-block;
+                        }
+                    }
+                }
+                .another-Followed{
+                    width: 81px;
+                    background-position: 0 -955px;
+                    .has{
+                        display: inline-block;
+                    }
+                    .clear{
+                        display: none
+                    }
+                    &:hover{
+                        background-position: -68px -990px;
+                        text-align: center;
+                        .has{
+                            display: none;
+                        }
+                        .clear{
+                            padding-left: 0px;
+                            display: inline-block;
+                        }
+                    }
+                }
+                .follow{
+                    width: 40px;
+                    background-position: 0 -720px;
+                    color: #fff;
+                    padding-left: 30px;
+                    line-height: 30px;
+                    &:hover{
+                        background-position: -80px -720px;
+                    }
                 }
             }
             .edit{

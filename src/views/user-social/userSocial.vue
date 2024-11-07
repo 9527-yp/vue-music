@@ -14,7 +14,7 @@
             <div class="social">
                 <div class="social-left">
                     <div class="m-timeline">
-                        <ul class="timeline-ul">
+                        <ul class="timeline-ul" v-if="dynamicList.length > 0">
                             <li class="item" v-for="(item, index) in dynamicList" :key="index">
                                 <div class="u-cover">
                                     <img class="u-img" :src="item?.user?.avatarUrl" alt="">
@@ -22,10 +22,10 @@
                                 <div class="item-r">
                                     <div class="item-header">
                                         <span class="u-name text-hov">{{item?.user?.nickname}}</span>
-                                        <span class="title">分享单曲</span>
+                                        <span class="title">{{item.typeStr}}</span>
                                     </div>
                                     <div class="time">
-                                        <span class="text-hov">昨天 18:01</span>
+                                        <span class="text-hov">{{formatDate(item.showTime)}}</span>
                                     </div>
                                     <div class="text"></div>
                                     <div class="item-content">
@@ -60,8 +60,8 @@
                                             <span class="">(1)</span>
                                         </span>
                                     </div>
-                                    <div class="arrow">
-                                        <ul class="mng-ul">
+                                    <div class="arrow" @click="ControlsShow = !ControlsShow">
+                                        <ul class="mng-ul" v-show="ControlsShow">
                                             <li class="mng-item">
                                                 <i class="del-icn"></i>
                                                 删除
@@ -71,49 +71,37 @@
                                 </div>
                             </li>
                         </ul>
+                        <div class="n-nmusic">
+                            <h3>
+                                <i class="n-music-icn"></i>
+                                暂时还没有动态
+                            </h3>
+                        </div>
                     </div>
                 </div>
                 <div class="social-right">
                     <div class="soide">
                         <h4 class="my-follow">我的关注</h4>
                         <ul class="follow-ul">
-                            <li class="item">
-                                <span title="音乐人赵磊">
-                                    <img class="user-img" src="" alt="">
+                            <li class="item" v-for="item in followList" :key="item.userId">
+                                <span :title="item.nickname" @click="toUserHome(item?.userId)">
+                                    <img class="user-img" :src="item.avatarUrl" alt="">
                                 </span>
                                 <p>
-                                    <span class="name thide text-hov">音乐人赵磊</span>
-                                    <img class="name-icn" src="@/assets/images/social/name-icn.png" alt="">
-                                </p>
-                            </li>
-                            <li class="item">
-                                <span title="音乐人赵磊">
-                                    <img class="user-img" src="" alt="">
-                                </span>
-                                <p>
-                                    <span class="name thide text-hov">音乐人赵磊</span>
-                                    <img class="name-icn" src="@/assets/images/social/name-icn.png" alt="">
+                                    <span class="name thide text-hov" @click="toUserHome(item?.userId)">{{item.nickname}}</span>
+                                    <!-- <img class="name-icn" src="@/assets/images/social/name-icn.png" alt=""> -->
                                 </p>
                             </li>
                         </ul>
                         <h4 class="my-follow">我的粉丝</h4>
                         <ul class="follow-ul">
-                            <li class="item">
-                                <span title="音乐人赵磊">
-                                    <img class="user-img" src="" alt="">
+                            <li class="item" v-for="item in vermicelliList" :key="item.userId">
+                                <span :title="item.nickname" @click="toUserHome(item?.userId)">
+                                    <img class="user-img" :src="item.avatarUrl" alt="">
                                 </span>
                                 <p>
-                                    <span class="name thide text-hov">音乐人赵磊</span>
-                                    <img class="name-icn" src="@/assets/images/social/name-icn.png" alt="">
-                                </p>
-                            </li>
-                            <li class="item">
-                                <span title="音乐人赵磊">
-                                    <img class="user-img" src="" alt="">
-                                </span>
-                                <p>
-                                    <span class="name thide text-hov">音乐人赵磊</span>
-                                    <img class="name-icn" src="@/assets/images/social/name-icn.png" alt="">
+                                    <span class="name thide text-hov" @click="toUserHome(item?.userId)">{{item.nickname}}</span>
+                                    <!-- <img class="name-icn" src="@/assets/images/social/name-icn.png" alt=""> -->
                                 </p>
                             </li>
                         </ul>
@@ -128,18 +116,20 @@
 import { ref, reactive } from 'vue';
 import UserInfo from '@/views/user-home/user-info/UserInfo.vue';
 import { userInfo } from '@/api/login.ts';
-import { getDynamic } from '@/api/user-social.ts';
+import { getDynamic, getFolloweds, getFollows } from '@/api/user-social.ts';
 import findCityZipCode from '@/views/user-home/city.ts';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import type { ResponseType } from '@/types/index';
+import { formatDate } from '@/utils/utils.ts';
 
 const route = useRoute();
+const router = useRouter();
 
-
+const ControlsShow = ref<boolean>(false);
 const userInfoData = ref({});
-const level = ref(0); // 等级
-const provinceName = ref(''); // 省
-const cityName = ref(''); // 市
+const level = ref<number>(0); // 等级
+const provinceName = ref<string>(''); // 省
+const cityName = ref<string>(''); // 市
 function getUserInfo() {
     userInfo({uid: route?.query?.id}).then((res:ResponseType) => {
         if(res.code === 200) {
@@ -157,6 +147,8 @@ getUserInfo();
 type DynamicItem = {
     type: string | number,
 }
+
+// 动态
 const dynamicList = ref<DynamicItem[]>([]);
 function Dynamic() {
     getDynamic({
@@ -167,20 +159,76 @@ function Dynamic() {
         if(res.code === 200) {
             dynamicList.value = res?.events ?? []
             dynamicList.value.forEach(item => {
-                item.type = statusJudgment(item?.type)
+                item.typeStr = statusJudgment(item?.type)
             })
         }
     })
 }
 Dynamic();
 
+
+// 关注
+const followList = ref([]);
+function follows() {
+    getFollows({
+        uid: route?.query?.id,
+        limit: 30,
+        lasttime: 0
+    }).then((res: ResponseType) => {
+        if(res.code === 200) {
+            followList.value = res.follow ?? []
+        }
+    })
+}
+follows();
+
+// 粉丝
+const vermicelliList = ref([]);
+function vermicelli() {
+    getFolloweds({
+        uid: route?.query?.id,
+        limit: 30,
+        lasttime: 0
+    }).then((res: ResponseType) => {
+        if(res.code === 200) {
+           vermicelliList.value = res.followeds ?? []
+        }
+    })
+}
+vermicelli();
+
 function statusJudgment(type: number | string) {
     let text = '';
+
     if(type === 18){
-        text = '分享单曲'
+        text = '分享单曲';
+    }else if(type === 19){
+        text = '分享专辑';
+    }else if(type === 17 || type === 28){
+        text = '分享电台节目';
+    }else if(type === 22){
+        text = '转发';
+    }else if(type === 39){
+        text = '发布视频';
+    }else if(type === 35 || type === 13){
+        text = '分享歌单';
+    }else if(type === 24){
+        text = '分享专栏文章';
+    }else if(type === 21 || type === 41){
+        text = '分享视频';
     }
 
     return text
+}
+
+// 跳转关注、粉丝主页
+function toUserHome(id: string | number) {
+    if(id) {
+        router.push({
+            path: '/user/home',
+            query: {id}
+        })
+    }
 }
 
 </script>
@@ -189,7 +237,7 @@ function statusJudgment(type: number | string) {
 <style lang="scss" scoped>
 .user-home{
     width: 980px;
-    // min-height: 700px;
+    min-height: 700px;
     margin: 0 auto;
     background-color: #fff;
     border: 1px solid #d3d3d3;
@@ -227,6 +275,7 @@ function statusJudgment(type: number | string) {
         display: inline-block;
         vertical-align: middle;
         .m-timeline{
+            width: 624px;
             position: relative;
             zoom: 1;
             text-shadow: none;
@@ -397,6 +446,27 @@ function statusJudgment(type: number | string) {
                             }
                         }
                     }
+                }
+            }
+            .n-nmusic{
+                padding: 105px 0 105px 0;
+                text-align: center;
+                h3{
+                    font-weight: normal;
+                    margin-top: -2px;
+                    padding-bottom: 38px;
+                    font-size: 18px;
+                    font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif;
+                }
+                .n-music-icn{
+                    margin-right: 17px;
+                    width: 64px;
+                    height: 50px;
+                    background: url('@/assets/images/icon.png') no-repeat;
+                    background-position: 0 -347px;
+                    display: inline-block;
+                    overflow: hidden;
+                    vertical-align: middle;
                 }
             }
         }

@@ -1,23 +1,25 @@
 <template>
-    <div class="ranking-title">
-        <h3 class="title song-list">{{title}}（{{list.length}}）</h3>
-    </div>
-    <ul class="m-ovrlst">
-        <li class="item" v-for="(item, index) in list" :key="index">
-            <div class="cover">
-                <img :src="item.coverImgUrl" alt="">
-                <span class="msk" :title="item.name"></span>
-                <div class="bottom">
-                    <i class="icn play-icn" @click="PlayListBtn(item)"></i>
-                    <i class="icon-headset"></i>
-                    <span class="num">{{getBigNumberTransform(item.playCount)}}</span>
+    <div v-if="list.length > 0">
+        <div class="ranking-title">
+            <h3 class="title song-list">{{title}}（{{list.length}}）</h3>
+        </div>
+        <ul class="m-ovrlst">
+            <li class="item" v-for="(item, index) in list" :key="index">
+                <div class="cover">
+                    <img :src="item.coverImgUrl" alt="">
+                    <span class="msk" :title="item.name"></span>
+                    <div class="bottom">
+                        <i class="icn play-icn" @click="PlayListBtn(item)"></i>
+                        <i class="icon-headset"></i>
+                        <span class="num">{{getBigNumberTransform(item.playCount)}}</span>
+                    </div>
                 </div>
-            </div>
-            <p class="title">
-                <span class="title-text text-hov thide" :title="item.name">{{item.name}}</span>
-            </p>
-        </li>
-    </ul>
+                <p class="title">
+                    <span class="title-text text-hov thide" :title="item.name">{{item.name}}</span>
+                </p>
+            </li>
+        </ul>
+    </div>
 </template>
 
 <script setup lang="ts">
