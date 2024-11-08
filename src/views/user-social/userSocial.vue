@@ -9,7 +9,7 @@
               :isTwoTo="true"
             />
             <div class="ranking-title">
-                <h3 class="title song-list">我的动态（{{dynamicList.length}}）</h3>
+                <h3 class="title">我的动态（{{dynamicList.length}}）</h3>
             </div>
             <div class="social">
                 <div class="social-left">
