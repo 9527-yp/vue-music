@@ -1,4 +1,4 @@
-import { replaceEmojiWithImage } from '@/utils/replaceEmojiWithImage.ts'
+import { replaceEmojiWithImage } from '@/utils/replaceEmojiWithImage.ts';
 import type { ResponseType } from '@/types/index';
 
 type List = {
