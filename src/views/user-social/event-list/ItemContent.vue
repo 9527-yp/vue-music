@@ -18,8 +18,8 @@
             </h4>
         </div>
     </div>
-    <!-- 分享节目 -->
-    <div class="item-content" v-if="item.type === 17 || item.type === 28">
+    <!-- 分享电台节目 -->
+    <div class="item-content" v-if="item.type === 17">
         <div class="cover cover-play">
             <span>
                 <img class="img" :src="`${item?.jsonData?.program?.coverUrl}?param=40y40&quality=100`" alt="">
@@ -31,7 +31,27 @@
                 <span class="text-hov tit-name">{{item.jsonData?.program?.mainSong?.name}}</span>
             </h3>
             <h4 class="singer thide">
+                <span class="progra-tag">情感 <i class="progra-icn"></i></span>
                 <span class="text-hov">{{item.jsonData?.program?.radio?.name}}</span>
+            </h4>
+        </div>
+    </div>
+    <!-- 分享电台节目 -->
+    <div class="item-content" v-if="item.type === 28">
+        <div class="cover cover-play">
+            <span>
+                <img class="img" :src="`${item?.jsonData?.djRadio?.picUrl}?param=40y40&quality=100`" alt="">
+            </span>
+            <!-- <i class="play-icn"></i> -->
+        </div>
+        <div class="scnt">
+            <h3 class="tit thide">
+                <span class="progra-tag">二次元 <i class="progra-icn"></i></span>
+                <span class="text-hov tit-name">{{item.jsonData?.djRadio?.name}}</span>
+            </h3>
+            <h4 class="singer thide">
+                by
+                <span class="text-hov">{{item.jsonData?.djRadio?.dj?.nickname}}</span>
             </h4>
         </div>
     </div>
@@ -45,11 +65,44 @@
         </div>
         <div class="scnt">
             <h3 class="tit thide">
+                <span class="progra-tag">专辑 <i class="progra-icn"></i></span>
                 <span class="text-hov tit-name">{{item.jsonData?.album?.name}}</span>
             </h3>
             <h4 class="singer thide">
                 <span class="text-hov">{{item?.jsonData?.album?.artist?.name}}</span>
             </h4>
+        </div>
+    </div>
+    <!-- 分享歌单 -->
+    <div class="item-content" v-if="item.type === 13">
+        <div class="cover cover-play">
+            <span>
+                <img class="img" :src="`${item?.jsonData?.playlist?.coverImgUrl}?param=40y40&quality=100`" alt="">
+            </span>
+            <!-- <i class="play-icn"></i> -->
+        </div>
+        <div class="scnt">
+            <h3 class="tit thide">
+                <span class="progra-tag">歌单 <i class="progra-icn"></i></span>
+                <span class="text-hov tit-name">{{item.jsonData?.playlist?.name}}</span>
+            </h3>
+            <h4 class="singer thide">
+                by
+                <span class="text-hov">{{item?.jsonData?.playlist?.creator?.nickname}}</span>
+            </h4>
+        </div>
+    </div>
+    <!-- 分享网页 -->
+    <div class="item-content" v-if="item.type === 56">
+        <div class="cover cover-play">
+            <span>
+                <img class="img" :src="`${item?.jsonData?.resource?.coverImgUrl}`" alt="">
+            </span>
+        </div>
+        <div class="scnt web">
+            <h3 class="tit thide">
+                <span class="text-hov tit-name">{{item.jsonData?.resource?.title}}</span>
+            </h3>
         </div>
     </div>
     <!-- 转发 -->
@@ -155,12 +208,59 @@ defineProps({
                     color: #000;
                 }
             }
+            .progra-tag{
+                margin-right: 6px;
+                color: #e03f40;
+                padding: 0 2px 0 3px;
+                line-height: 16px;
+                position: relative;
+                display: inline-block;
+                height: 16px;
+                font-size: 12px;
+                background: url('@/assets/images/social/sprite.png') no-repeat;
+                background-position: -110px 0;
+            }
+            .progra-icn{
+                position: absolute;
+                top: 0;
+                right: 0px;
+                width: 3px;
+                height: 16px;
+                font-size: 12px;
+                background: url('@/assets/images/social/sprite.png') no-repeat;
+                background-position: right 0;
+            }
         }
         .singer{
             font-weight: normal;
             color: #666;
             font-size: 100%;
+            .progra-tag{
+                margin-right: 6px;
+                color: #e03f40;
+                padding: 0 2px 0 3px;
+                line-height: 16px;
+                position: relative;
+                display: inline-block;
+                height: 16px;
+                font-size: 12px;
+                background: url('@/assets/images/social/sprite.png') no-repeat;
+                background-position: -110px 0;
+            }
+            .progra-icn{
+                position: absolute;
+                top: 0;
+                right: 0px;
+                width: 3px;
+                height: 16px;
+                font-size: 12px;
+                background: url('@/assets/images/social/sprite.png') no-repeat;
+                background-position: right 0;
+            }
         }
+    }
+    .web{
+        line-height: 40px;
     }
     .retrans-tit{
         color: #666;

@@ -8,6 +8,9 @@
                 <div class="item-r">
                     <div class="item-header">
                         <span class="u-name text-hov">{{item?.user?.nickname}}</span>
+                        <span class="u-vip-icn" v-if="item?.user?.avatarDetail">
+                            <img :src="item?.user?.avatarDetail?.identityIconUrl" alt="">
+                        </span>
                         <span class="title">{{item.typeStr}}</span>
                     </div>
                     <div class="time">
@@ -115,6 +118,18 @@ defineProps({
                 position: relative;
                 .u-name{
                     color: #0c73c2;
+                }
+                .u-vip-icn{
+                    position: relative;
+                    display: inline-block;
+                    width: 15px;
+                    height: 15px;
+                    margin: 2px 0 0 2px;
+                    vertical-align: top;
+                    img{
+                        width: 100%;
+                        height: 100%;
+                    }
                 }
                 .title{
                     margin-left: 5px;

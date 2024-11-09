@@ -25,7 +25,7 @@
                                 </span>
                                 <p>
                                     <span class="name thide text-hov" @click="toUserHome(item?.userId)">{{item.nickname}}</span>
-                                    <!-- <img class="name-icn" src="@/assets/images/social/name-icn.png" alt=""> -->
+                                    <img class="name-icn" v-if="item?.avatarDetail" :src="item?.avatarDetail?.identityIconUrl" alt="">
                                 </p>
                             </li>
                         </ul>
@@ -37,7 +37,7 @@
                                 </span>
                                 <p>
                                     <span class="name thide text-hov" @click="toUserHome(item?.userId)">{{item.nickname}}</span>
-                                    <!-- <img class="name-icn" src="@/assets/images/social/name-icn.png" alt=""> -->
+                                    <img class="name-icn" v-if="item?.avatarDetail" :src="item?.avatarDetail?.identityIconUrl" alt="">
                                 </p>
                             </li>
                         </ul>
@@ -104,6 +104,7 @@ const dynamicList = ref<DynamicItem[]>([]);
 function Dynamic() {
     getDynamic({
         // uid: 1684269650,
+        // uid: 356767794,
         uid: route?.query?.id,
         limit: 30,
         lasttime: -1
@@ -118,6 +119,7 @@ function Dynamic() {
                 item.controls = false
                 item.jsonData.msg = replaceEmojiWithImage(item.jsonData.msg)
             })
+            // 过滤一些未确认的类型，后期发现再添加，避免页面渲染错误
             dynamicList.value = Arr.filter(item => item.itemStatus)
             dynamicList.value.forEach(item => {
                 if(item.type === 22) {
@@ -181,13 +183,15 @@ function statusJudgment(type: number | string): string {
         text = '分享专栏文章';
     }else if(type === 21 || type === 41){
         text = '分享视频';
+    }else if(type === 56){
+        text = '分享网页';
     }
 
     return text
 }
 
 function itemEffective(type: number): boolean {
-    let arr: number[] = [17,18,19,28,22,39,13,24,21,41,35]
+    let arr: number[] = [17,18,19,28,22,39,13,24,21,41,35,56]
     let index = arr.includes(type)
     return index
 }

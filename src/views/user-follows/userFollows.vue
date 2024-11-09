@@ -9,38 +9,41 @@
               :isTwoTo="true"
             />
             <div class="ranking-title">
-                <h3 class="title">关注（{{followList.length}}）</h3>
+                <h3 class="title">关注（{{userInfoData.follows}}）</h3>
             </div>
             <div class="follows-box">
-                <ul class="follows-ul">
-                    <li class="item" :class="{'old': index % 2 !== 0}" v-for="(item, index) in followList" :key="index">
+                <ul class="follows-ul" v-if="isAuthority">
+                    <li class="item" :class="{'old': index % 2 !== 0, 'last-item': index === followList.length-1 || followList.length-2}" v-for="(item, index) in followList" :key="index">
                         <div class="user-cover" :title="item.nickname">
                             <img class="img" :src="item.avatarUrl" alt="">
                         </div>
                         <div class="info">
                             <p>
                                 <span class="name thide" :title="item.nickname">{{item.nickname}}</span>
+                                <span class="u-vip-icn" v-if="item?.avatarDetail">
+                                    <img :src="item?.avatarDetail?.identityIconUrl" alt="">
+                                </span>
                                 <i class="gender-icn" :class="item?.gender === 1 ? 'boy' : 'girl'"></i>
                             </p>
                             <p>
-                                <span class="text text-hov">
+                                <span class="text text-hov" @click="toSocial(item.userId)">
                                     动态
                                     <i class="num">{{item.eventCount}}</i>
                                 </span>
                                 <span class="line">|</span>
-                                <span class="text text-hov">
+                                <span class="text text-hov" @click="toFollows(item.userId)">
                                     关注
                                     <i class="num">{{item.follows}}</i>
                                 </span>
                                 <span class="line">|</span>
-                                <span class="text text-hov">
+                                <span class="text text-hov" @click="toFans(item.userId)">
                                     粉丝
                                     <i class="num">{{item.followeds}}</i>
                                 </span>
                             </p>
                             <p class="thide dec">{{item.signature}}</p>
                         </div>
-                        <div class="oper">
+                        <div class="oper" v-if="userInfos.profile.userId !== item.userId">
                             <div class="send-btn" v-show="item.followed">
                                 <i>发私信</i>
                             </div>
@@ -56,22 +59,29 @@
                         </div>
                     </li>
                 </ul>
+                <div v-else class="no-authority">用户关闭了权限</div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, watch } from 'vue';
 import { userInfo } from '@/api/login.ts';
 import type { ResponseType } from '@/types/index';
 import findCityZipCode from '@/views/user-home/city.ts';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import UserInfo from '@/views/user-home/user-info/UserInfo.vue';
 import { getFollows } from '@/api/user-social.ts';
+import useUserStore from '@/stores/modules/user.ts';
 
 const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
 
+const userInfos = computed(() => userStore.getUserInfo)
+
+const isAuthority = ref<boolean>(true);
 const userInfoData = ref({});
 const level = ref<number>(0); // 等级
 const provinceName = ref<string>(''); // 省
@@ -99,11 +109,46 @@ function follows() {
         lasttime: 0
     }).then((res: ResponseType) => {
         if(res.code === 200) {
+            isAuthority.value = true;
             followList.value = res.follow ?? []
+        }else if(res.code === 400) {
+            isAuthority.value = false;
         }
     })
 }
 follows();
+
+watch(() => route?.query?.id, () => {
+    getUserInfo();
+    follows();
+})
+
+function toSocial(id: number|string) {
+    router.push({
+        path: '/user/Social',
+        query: {
+            id
+        }
+    })
+}
+
+function toFollows(id: number|string) {
+    router.push({
+        path: '/user/follows',
+        query: {
+            id
+        }
+    })
+}
+
+function toFans(id: number|string) {
+    router.push({
+        path: '/user/fans',
+        query: {
+            id
+        }
+    })
+}
 
 </script>
 <style lang="scss" scoped>
@@ -140,7 +185,6 @@ follows();
     .follows-ul{
         border-left: 1px solid #d5d5d5;
         .item{
-            border-bottom: 1px solid #d5d5d5;
             float: left;
             width: 409px;
             height: 80px;
@@ -170,6 +214,18 @@ follows();
                     color: #0c73c2;
                     font-size: 14px;
                     cursor: pointer;
+                }
+                .u-vip-icn{
+                    position: relative;
+                    display: inline-block;
+                    width: 15px;
+                    height: 15px;
+                    margin: 2px 2px 0 2px;
+                    vertical-align: top;
+                    img{
+                        width: 100%;
+                        height: 100%;
+                    }
                 }
                 .gender-icn{
                     display: inline-block;
@@ -261,6 +317,20 @@ follows();
         .old{
             width: 408px;
         }
+        .last-item{
+            border-bottom: 1px solid #d5d5d5;
+        }
+        &:after{
+            clear: both;
+            content: '.';
+            display: block;
+            height: 0;
+            visibility: hidden;
+        }
+    }
+    .no-authority{
+        margin: 20px 0;
+        text-align: center;
     }
 }
 </style>
