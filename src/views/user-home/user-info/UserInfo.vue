@@ -5,33 +5,39 @@
         </div>
         <div class="user-d">
             <div class="name">
-                <div class="user-header-left">
-                    <h2 class="name-warp">
-                        <span class="title thide">{{ userInfoData.nickname }}</span>
-                        <span class="lev u-lev-icn">{{ level }}
-                            <i class="right u-lev-icn"></i>
-                        </span>
-                        <i class="gender-icn" :class="userInfoData?.gender === 1 ? 'boy' : 'girl'"></i>
-                    </h2>
-                    <div class="contact-head" v-show="userInfoData?.userId !== userInfo?.profile?.userId">
-                        <div class="btn send-letter" v-show="userInfoData.followed">
-                            <i class="icn">发私信</i>
+                <div class="user-header">
+                    <div class="user-header-left">
+                        <h2 class="name-warp">
+                            <span class="title thide">{{ userInfoData.nickname }}</span>
+                            <span class="lev u-lev-icn">{{ level }}
+                                <i class="right u-lev-icn"></i>
+                            </span>
+                            <i class="gender-icn" :class="userInfoData?.gender === 1 ? 'boy' : 'girl'"></i>
+                        </h2>
+                        <div class="contact-head" v-show="userInfoData?.userId !== userInfo?.profile?.userId">
+                            <div class="btn send-letter" @click="notFeatureTip">
+                                <i class="icn">发私信</i>
+                            </div>
+                            <div class="btn Followed" v-show="userInfoData.followed && userInfoData.mutual === false" @click="notFeatureTip">
+                                <i class="icn has">已关注</i>
+                                <i class="icn clear">取消关注</i>
+                            </div>
+                            <div class="btn another-Followed" v-show="userInfoData.followed && userInfoData.mutual" @click="notFeatureTip">
+                                <i class="icn has">相互关注</i>
+                                <i class="icn clear">取消关注</i>
+                            </div>
+                            <div class="btn follow" v-show="!userInfoData.followed" @click="follow(userInfoData?.userId)">关注</div>
                         </div>
-                        <div class="btn Followed" v-show="userInfoData.followed && userInfoData.mutual === false">
-                            <i class="icn has">已关注</i>
-                            <i class="icn clear">取消关注</i>
+                    </div>
+                    <div class="edit" v-show="userInfoData?.userId === userInfo?.profile?.userId">
+                        <div class="edit-box edit-btn edit-bag">
+                            <i class="edit-btn edit-bag">编辑个人资料</i>
                         </div>
-                        <div class="btn another-Followed" v-show="userInfoData.followed && userInfoData.mutual">
-                            <i class="icn has">相互关注</i>
-                            <i class="icn clear">取消关注</i>
-                        </div>
-                        <div class="btn follow" v-show="!userInfoData.followed">关注</div>
                     </div>
                 </div>
-                <div class="edit" v-show="userInfoData?.userId === userInfo?.profile?.userId">
-                    <div class="edit-box edit-btn edit-bag">
-                        <i class="edit-btn edit-bag">编辑个人资料</i>
-                    </div>
+                <div class="authentication" v-if="userInfoData?.allAuthTypes">
+                    <i class="auth-icn"></i>
+                    <span v-for="(item, index) in userInfoData?.allAuthTypes" :key="index">{{item.desc}}</span>
                 </div>
             </div>
             <ul class="info-ul">
@@ -41,25 +47,10 @@
                         <span class="text">{{item.title}}</span>
                     </span>
                 </li>
-                <!-- <li class="item item-fst">
-                    <span class="item-cnt" @click="goUserSocial">
-                        <strong class="num">{{ userInfoData.eventCount }}</strong>
-                        <span class="text">动态</span>
-                    </span>
-                </li>
-                <li class="item">
-                    <span class="item-cnt">
-                        <strong class="num">{{ userInfoData.follows }}</strong>
-                        <span class="text">关注</span>
-                    </span>
-                </li>
-                <li class="item">
-                    <span class="item-cnt">
-                        <strong class="num">{{ userInfoData.followeds }}</strong>
-                        <span class="text">粉丝</span>
-                    </span>
-                </li> -->
             </ul>
+            <div class="info" v-show="userInfoData?.signature">
+                个人介绍：{{userInfoData?.signature}}
+            </div>
             <div class="info">
                 <span>所在地：{{provinceName}}-{{cityName}}</span>
                 <span class="sep"> 年龄：{{getAgeFragment(userInfoData.birthday)}}</span>
@@ -79,12 +70,16 @@
 <script setup lang="ts">
 import { getAgeFragment } from '@/utils/utils.ts';
 import useUserStore from '@/stores/modules/user.ts';
+import useDialogStore from '@/stores/modules/dialog.ts';
 import { useRouter, useRoute } from 'vue-router';
-import { computed, ref, nextTick, watch } from 'vue';
+import { computed, ref, nextTick, watch, reactive } from 'vue';
 
 const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
+const dialogStore = useDialogStore();
+
+const emit = defineEmits(['follow']);
 const props = defineProps({
     userInfoData: {
         type: Object,
@@ -101,10 +96,6 @@ const props = defineProps({
     cityName: {
         type: String,
         default: ''
-    },
-    isTwoTo: {
-        type: Boolean,
-        default: false
     }
 })
 const tagList = ref([])
@@ -140,6 +131,31 @@ function goUserSocial(path: string): undefined {
         query: {id: route.query.id}
     })
 }
+
+function follow(id: number|string) {
+    emit('follow',id)
+}
+
+// 功能暂未开发提示
+const warningInfo = reactive({
+    time: null
+})
+
+function notFeatureTip() {
+    dialogStore.setMessage({
+        type: 0,
+        text: '功能暂未开发',
+        visible: true,
+    })
+    warningInfo.time && clearTimeout( warningInfo.time);
+    warningInfo.time = setTimeout(() => {
+        dialogStore.setMessage({
+            type: 0,
+            text: '功能暂未开发',
+            visible: false,
+        })
+    }, 1500);
+}
 </script>
 
 <style lang="scss" scoped>
@@ -167,9 +183,11 @@ function goUserSocial(path: string): undefined {
             padding-bottom: 12px;
             margin-bottom: 10px;
             border-bottom: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            .user-header{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
             .user-header-left{
                 display: flex;
                 align-items: center
@@ -331,6 +349,27 @@ function goUserSocial(path: string): undefined {
                     pointer-events: none;
                     background: url('@/assets/images/login/button-bag.png') no-repeat;
                     background-position: 0 -59px;
+                }
+            }
+            .authentication{
+                margin-top: 8px;
+                line-height: 20px;
+                color: #666;
+                font-size: 14px;
+                .auth-icn{
+                    margin-right: 6px;
+                    float: left;
+                    width: 68px;
+                    height: 20px;
+                    background: url('@/assets/images/icon2.png') no-repeat;
+                    background-position: 0 -480px;
+                }
+                &:after{
+                    clear: both;
+                    content: '.';
+                    display: block;
+                    height: 0;
+                    visibility: hidden;
                 }
             }
         }

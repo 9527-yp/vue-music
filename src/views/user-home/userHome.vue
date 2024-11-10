@@ -6,6 +6,7 @@
               :level="level"
               :provinceName="provinceName"
               :cityName="cityName"
+              @follow="follow"
             />
             <!-- 听歌排行 -->
             <template v-show="songTableShow">
@@ -30,6 +31,7 @@ import findCityZipCode from './city.ts';
 import { getSongList } from '@/api/my-music.ts';
 import { userInfo } from '@/api/login.ts';
 import { getRecords } from '@/api/user-home.ts';
+import { addFollow } from '@/api/user-social.ts';
 import type { ResponseType } from '@/types/index';
 import UserInfo from './user-info/UserInfo.vue';
 import RankingTable from './ranking-table/RankingTable.vue';
@@ -135,6 +137,14 @@ records()
 function tagschange(value: number) {
     recordInfo.type = value;
     records();
+}
+
+function follow(id: number|string) {
+    addFollow({id,t: 1}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            getUserInfo();
+        }
+    })
 }
 onMounted(() => {
     userStore.setMenuIndex(-1);

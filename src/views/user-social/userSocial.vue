@@ -6,7 +6,7 @@
               :level="level"
               :provinceName="provinceName"
               :cityName="cityName"
-              :isTwoTo="true"
+              @follow="follow"
             />
             <div class="ranking-title">
                 <h3 class="title">我的动态（{{dynamicList.length}}）</h3>
@@ -52,7 +52,7 @@
 import { ref, reactive, computed } from 'vue';
 import UserInfo from '@/views/user-home/user-info/UserInfo.vue';
 import { userInfo } from '@/api/login.ts';
-import { getDynamic, getFolloweds, getFollows } from '@/api/user-social.ts';
+import { getDynamic, getFolloweds, getFollows, addFollow } from '@/api/user-social.ts';
 import findCityZipCode from '@/views/user-home/city.ts';
 import { useRoute, useRouter } from 'vue-router';
 import type { ResponseType } from '@/types/index';
@@ -86,6 +86,14 @@ function getUserInfo() {
     })
 }
 getUserInfo();
+
+function follow(id: number|string) {
+    addFollow({id,t: 1}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            getUserInfo();
+        }
+    })
+}
 
 type DynamicItem = {
     type: string | number,

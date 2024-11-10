@@ -72,3 +72,22 @@ export const getFolloweds = ({uid, limit, offset}: DynamicItem): AxiosPromise =>
         params
     })
 }
+
+/**
+ * @description 关注、取消关注
+ * @param id 用户id
+ * @param t 1为关注,其他为取消关注
+ */
+export const addFollow = ({id, t}: {id: number|string, t: number}): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+        id,
+        t
+    };
+
+    return axios.request({
+        url: '/follow',
+        method: 'get',
+        params
+    })
+}

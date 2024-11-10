@@ -6,59 +6,77 @@
               :level="level"
               :provinceName="provinceName"
               :cityName="cityName"
-              :isTwoTo="true"
+              @follow="follow"
             />
             <div class="ranking-title">
                 <h3 class="title">粉丝（{{userInfoData.followeds}}）</h3>
             </div>
             <div class="follows-box">
-                <ul class="follows-ul" v-if="isAuthority">
-                    <li class="item" :class="{'old': index % 2 !== 0, 'last-item': index === followedsList.length-1 || followedsList.length-2}" v-for="(item, index) in followedsList" :key="index">
-                        <div class="user-cover" :title="item.nickname">
-                            <img class="img" :src="item.avatarUrl" alt="">
-                        </div>
-                        <div class="info">
-                            <p>
-                                <span class="name thide" :title="item.nickname">{{item.nickname}}</span>
-                                <span class="u-vip-icn" v-if="item?.avatarDetail">
-                                    <img :src="item?.avatarDetail?.identityIconUrl" alt="">
-                                </span>
-                                <i class="gender-icn" :class="item?.gender === 1 ? 'boy' : 'girl'"></i>
-                            </p>
-                            <p>
-                                <span class="text text-hov" @click="toSocial(item.userId)">
-                                    动态
-                                    <i class="num">{{item.eventCount}}</i>
-                                </span>
-                                <span class="line">|</span>
-                                <span class="text text-hov" @click="toFollows(item.userId)">
-                                    关注
-                                    <i class="num">{{item.follows}}</i>
-                                </span>
-                                <span class="line">|</span>
-                                <span class="text text-hov" @click="toFans(item.userId)">
-                                    粉丝
-                                    <i class="num">{{item.followeds}}</i>
-                                </span>
-                            </p>
-                            <p class="thide dec">{{item.signature}}</p>
-                        </div>
-                        <div class="oper" v-if="userInfos.profile.userId !== item.userId">
-                            <div class="send-btn" v-show="item.followed">
-                                <i>发私信</i>
+                <template v-if="isAuthority">
+                    <ul class="follows-ul">
+                        <li class="item"
+                        :class="{
+                            'old': index % 2 !== 0,
+                            'last-item': index === followedsInfo.list.length-1 || index === followedsInfo.list.length-2,
+                            'bg':  index % 4 === 2 || index % 4 === 3,
+                        }"
+                        v-for="(item, index) in followedsInfo.list"
+                        :key="index"
+                        >
+                            <div class="user-cover" :title="item.nickname">
+                                <img class="img" :src="item.avatarUrl" alt="">
                             </div>
-                            <p v-show="item.followed && !item.mutual">
-                                <i class="icn follow-icn"></i>
-                                已关注
-                            </p>
-                            <p v-show="item.mutual">
-                                <i class="icn another-icn"></i>
-                                相互关注
-                            </p>
-                            <div class="add-follow" v-show="!item.followed">关注</div>
-                        </div>
-                    </li>
-                </ul>
+                            <div class="info">
+                                <p>
+                                    <span class="name thide text-hov" :title="item.nickname" @click="toUserHome(item.id)">{{item.nickname}}</span>
+                                    <span class="u-vip-icn" v-if="item?.avatarDetail">
+                                        <img :src="item?.avatarDetail?.identityIconUrl" alt="">
+                                    </span>
+                                    <i class="gender-icn" :class="item?.gender === 1 ? 'boy' : 'girl'"></i>
+                                </p>
+                                <p>
+                                    <span class="text text-hov" @click="toSocial(item.userId)">
+                                        动态
+                                        <i class="num">{{item.eventCount}}</i>
+                                    </span>
+                                    <span class="line">|</span>
+                                    <span class="text text-hov" @click="toFollows(item.userId)">
+                                        关注
+                                        <i class="num">{{item.follows}}</i>
+                                    </span>
+                                    <span class="line">|</span>
+                                    <span class="text text-hov" @click="toFans(item.userId)">
+                                        粉丝
+                                        <i class="num">{{item.followeds}}</i>
+                                    </span>
+                                </p>
+                                <p class="thide dec">{{item.signature}}</p>
+                            </div>
+                            <div class="oper" v-if="userInfos.profile.userId !== item.userId">
+                                <div class="send-btn" v-show="item.followed">
+                                    <i>发私信</i>
+                                </div>
+                                <p v-show="item.followed && !item.mutual">
+                                    <i class="icn follow-icn"></i>
+                                    已关注
+                                </p>
+                                <p v-show="item.mutual">
+                                    <i class="icn another-icn"></i>
+                                    相互关注
+                                </p>
+                                <div class="add-follow" v-show="!item.followed" @click="follow(item.userId)">关注</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <!-- 底部分页 -->
+                    <Page
+                        v-if="followedsInfo.totalCount > followedsInfo.limit"
+                        :total="followedsInfo.totalCount"
+                        :pageSize="followedsInfo.limit"
+                        :page="followedsInfo.offset"
+                        @changePage="changePage"
+                    />
+                </template>
                 <div v-else class="no-authority">用户关闭了权限</div>
             </div>
         </div>
@@ -72,8 +90,9 @@ import type { ResponseType } from '@/types/index';
 import findCityZipCode from '@/views/user-home/city.ts';
 import { useRoute, useRouter } from 'vue-router';
 import UserInfo from '@/views/user-home/user-info/UserInfo.vue';
-import { getFolloweds } from '@/api/user-social.ts';
+import { getFolloweds, addFollow } from '@/api/user-social.ts';
 import useUserStore from '@/stores/modules/user.ts';
+import Page from '@/components/page/Page.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -102,16 +121,23 @@ getUserInfo();
 
 // 粉丝数据
 const followedsList = ref([]);
+const followedsInfo = reactive({
+    list: [],
+    limit: 20,
+    offset: 1,
+    totalCount: 0
+})
 function follows() {
     getFolloweds({
         uid: route?.query?.id,
         // uid: 1684269650,
-        limit: 30,
-        lasttime: 0
+        limit: followedsInfo.limit,
+        offset: (followedsInfo.offset - 1) * followedsInfo.limit,
     }).then((res: ResponseType) => {
         if(res.code === 200) {
             isAuthority.value = true;
-            followedsList.value = res.followeds ?? []
+            followedsInfo.list = res.followeds ?? [];
+            followedsInfo.totalCount = res.size ?? 0;
         }else if(res.code === 400) {
             isAuthority.value = false;
         }
@@ -119,10 +145,25 @@ function follows() {
 }
 follows();
 
+function changePage(value: number) {
+    followedsInfo.offset = value;
+    follows();
+}
+
 watch(() => route?.query?.id, () => {
+    followedsInfo.offset = 1;
     getUserInfo();
     follows();
 })
+
+function toUserHome(id: number|string) {
+    router.push({
+        path: '/user/home',
+        query: {
+            id
+        }
+    })
+}
 
 function toSocial(id: number|string) {
     router.push({
@@ -147,6 +188,15 @@ function toFans(id: number|string) {
         path: '/user/fans',
         query: {
             id
+        }
+    })
+}
+
+// 关注
+function follow(id: number|string) {
+    addFollow({id,t: 1}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            follows();
         }
     })
 }
@@ -320,6 +370,9 @@ function toFans(id: number|string) {
         }
         .last-item{
             border-bottom: 1px solid #d5d5d5;
+        }
+        .bg{
+            background: #fafafa;
         }
         &:after{
             clear: both;
