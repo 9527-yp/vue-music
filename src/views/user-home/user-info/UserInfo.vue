@@ -30,7 +30,7 @@
                         </div>
                     </div>
                     <div class="edit" v-show="userInfoData?.userId === userInfo?.profile?.userId">
-                        <div class="edit-box edit-btn edit-bag">
+                        <div class="edit-box edit-btn edit-bag" @click="notFeatureTip">
                             <i class="edit-btn edit-bag">编辑个人资料</i>
                         </div>
                     </div>
