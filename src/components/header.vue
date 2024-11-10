@@ -36,11 +36,14 @@
         </div>
       </div>
     </div>
-    <div class="warning-tip" v-if="messageInfo.visible">
+    <teleport to="body">
+      <div class="warning-tip" v-if="messageInfo.visible">
         <i v-if="messageInfo.type" class="success-icn"></i>
         <i v-else class="warning-icn"></i>
         <span class="text">{{messageInfo.text}}</span>
-    </div>
+      </div>
+    </teleport>
+    
 </template>
 
 <script setup lang="ts">
@@ -348,9 +351,9 @@ watch(() => route.path,
   top:50%;
   left: 50%;
   z-index: 20002;
-  margin-left: -140px;
-  margin-top: -300px;
-  // transform: translate(-50%, -50%);
+  // margin-left: -140px;
+  // margin-top: -300px;
+  transform: translate(-50%, -50%);
   vertical-align: middle;
   .warning-icn{
       width: 20px;
