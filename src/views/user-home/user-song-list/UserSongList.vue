@@ -7,7 +7,7 @@
             <li class="item" v-for="(item, index) in list" :key="index">
                 <div class="cover">
                     <img :src="item.coverImgUrl" alt="">
-                    <span class="msk" :title="item.name"></span>
+                    <span class="msk" :title="item.name" @click="toPlayList(item.id)"></span>
                     <div class="bottom">
                         <i class="icn play-icn" @click="PlayListBtn(item)"></i>
                         <i class="icon-headset"></i>
@@ -15,7 +15,7 @@
                     </div>
                 </div>
                 <p class="title">
-                    <span class="title-text text-hov thide" :title="item.name">{{item.name}}</span>
+                    <span class="title-text text-hov thide" :title="item.name" @click="toPlayList(item.id)">{{item.name}}</span>
                 </p>
             </li>
         </ul>
@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import { computed, ref, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 import { getBigNumberTransform } from '@/utils/utils.ts';
 import type { ResponseType } from '@/types/index';
 import type { songType } from '@/hooks/methods/songFormat.ts';
@@ -45,6 +46,7 @@ defineProps({
 })
 
 const playStore = usePlayStore();
+const router = useRouter();
 
 // 播放显示/隐藏
 const lock = computed(() => playStore.getplayLock);
@@ -117,7 +119,7 @@ async function PlayListBtn(item: TypeSongSheetList) {
     }
 
     // 过滤无版权
-    const songList: SongType[] = songSheetDetail.playlist?.tracks.filter(
+    const songList: songType[] = songSheetDetail.playlist?.tracks.filter(
         (item: { id: number }) => !isCopyright(item.id)
     );
 
@@ -138,16 +140,15 @@ async function PlayListBtn(item: TypeSongSheetList) {
     }, 1500)
 }
 
-
-// 歌单详情
-// function getSongInfo() {
-//     getSongSheetInfo({id: songSheetId.value}).then((res: ResponseType) => {
-//         if(res.code === 200) {
-//             songSheetDetail.playlist = res?.playlist ?? {};
-//             songSheetDetail.privileges = res?.privileges ?? [];
-//         }
-//     })
-// }
+// 跳转歌单
+function toPlayList(id: number|string) {
+    router.push({
+        path: '/playList',
+        query: {
+            id
+        }
+    })
+}
 </script>
 
 

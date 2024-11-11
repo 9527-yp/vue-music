@@ -37,7 +37,10 @@
                 </div>
                 <div class="authentication" v-if="userInfoData?.allAuthTypes">
                     <i class="auth-icn"></i>
-                    <span v-for="(item, index) in userInfoData?.allAuthTypes" :key="index">{{item.desc}}</span>
+                    <span v-for="(item, index) in userInfoData?.allAuthTypes" :key="index">
+                        <span>{{item.desc}}</span>
+                        <span class="yyrtag" v-for="(key, i) in item.tags" :key="i">{{key}}</span>
+                    </span>
                 </div>
             </div>
             <ul class="info-ul">
@@ -356,13 +359,28 @@ function notFeatureTip() {
                 line-height: 20px;
                 color: #666;
                 font-size: 14px;
+                vertical-align: middle;
                 .auth-icn{
                     margin-right: 6px;
                     float: left;
                     width: 68px;
                     height: 20px;
+                    vertical-align: middle;
                     background: url('@/assets/images/icon2.png') no-repeat;
                     background-position: 0 -480px;
+                }
+                .yyrtag{
+                    display: inline-block;
+                    height: 16px;
+                    margin-left: 5px;
+                    padding: 0 2px;
+                    vertical-align: middle;
+                    color: rgba(0, 0, 0, 0.4);
+                    font-size: 12px;
+                    line-height: 16px;
+                    text-align: center;
+                    border: solid 1px rgba(0, 0, 0, 0.3);
+                    border-radius: 2px;
                 }
                 &:after{
                     clear: both;

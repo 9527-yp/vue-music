@@ -103,7 +103,7 @@ function addPlayListBtn(): boolean | undefined {
     }
 
     // 过滤无版权
-    const songList: SongType[] = props.playlist?.tracks.filter(
+    const songList: songType[] = props.playlist?.tracks.filter(
         (item: { id: number }) => !isCopyright(item.id)
     );
 
@@ -129,7 +129,7 @@ function PlayListBtn(): boolean | undefined {
     }
 
     // 过滤无版权
-    const songList: SongType[] = props.playlist?.tracks.filter(
+    const songList: songType[] = props.playlist?.tracks.filter(
         (item: { id: number }) => !isCopyright(item.id)
     );
 
@@ -162,7 +162,7 @@ function goToUserHome() {
 
 <style lang="scss" scoped>
 .song-shere-info{
-    padding: 40px;
+    // padding: 40px;
     display: flex;
     .user-cover{
         position: relative;
@@ -199,7 +199,7 @@ function goToUserHome() {
                 background-position: 0 -243px;
             }
             h2{
-                width: 370px;
+                width: 80%;
                 display: inline-block;
                 vertical-align: top;
                 font-size: 20px;

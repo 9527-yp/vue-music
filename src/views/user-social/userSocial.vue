@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import UserInfo from '@/views/user-home/user-info/UserInfo.vue';
 import { userInfo } from '@/api/login.ts';
 import { getDynamic, getFolloweds, getFollows, addFollow } from '@/api/user-social.ts';
@@ -213,6 +213,11 @@ function toUserHome(id: string | number) {
         })
     }
 }
+
+onMounted(() => {
+    userStore.setMenuIndex(0);
+    // userStore.setSubMenuIndex(-1);
+});
 
 </script>
 

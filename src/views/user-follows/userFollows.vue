@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue';
+import { ref, reactive, computed, watch, onMounted } from 'vue';
 import { userInfo } from '@/api/login.ts';
 import type { ResponseType } from '@/types/index';
 import findCityZipCode from '@/views/user-home/city.ts';
@@ -198,6 +198,11 @@ function follow(id: number|string) {
         }
     })
 }
+
+onMounted(() => {
+    userStore.setMenuIndex(0);
+    // userStore.setSubMenuIndex(-1);
+});
 
 </script>
 <style lang="scss" scoped>
