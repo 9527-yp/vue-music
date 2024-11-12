@@ -22,7 +22,8 @@
                         <img :src="item?.coverImgUrl" alt="">
                     </div>
                     <p class="item-name">{{item.name}}</p>
-                    <p class="item-num">{{item.trackCount}}首</p>
+                    <p class="item-num" v-if="title === '创建的歌单'">{{item.trackCount}}首</p>
+                    <p class="item-num" v-else>{{item.trackCount}}首 by {{item?.creator?.nickname}}</p>
                 </div>
                 <span class="oper" v-if="item.name !== '我喜欢的音乐'">
                     <i class="icn edit-icn" v-if="title === '创建的歌单'" @click.stop="editSongList"></i>

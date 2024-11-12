@@ -11,7 +11,12 @@
             </div>
             <div class="user-info">
                 <img class="user-img" :src="playlist?.creator?.avatarUrl" @click="goToUserHome">
-                <span class="user-name thide text-hov">{{playlist?.creator?.nickname}}</span>
+                <span class="user-name thide text-hov" @click="goToUserHome">
+                    {{playlist?.creator?.nickname}}
+                </span>
+                <span class="u-icn-new-wrap" v-if="playlist?.creator?.avatarDetail">
+                    <img :src="playlist?.creator?.avatarDetail?.identityIconUrl" alt="">
+                </span>
                 <span class="create-time">{{formatDateTime(playlist?.createTime / 1000, 'Y-M-D')}} 创建</span>
             </div>
             <div class="btns">
@@ -226,11 +231,23 @@ function goToUserHome() {
             }
             .user-name{
                 max-width: 210px;
-                margin-right: 15px;
                 cursor: pointer;
                 color: #0c73c2;
             }
+            .u-icn-new-wrap{
+                position: relative;
+                display: inline-block;
+                width: 15px;
+                height: 15px;
+                margin: 2px 0 0 2px;
+                vertical-align: top;
+                img{
+                    width: 15px;
+                    height: 15px;
+                }
+            }
             .create-time{
+                margin-left: 15px;
                 color: #999;
             }
         }

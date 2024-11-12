@@ -60,6 +60,26 @@ function getUserInfo() {
     userInfo({uid: route?.query?.id}).then((res:ResponseType) => {
         if(res.code === 200) {
             userInfoData.value = res?.profile;
+            let newAuthTypeOther = [
+                {
+                    type: 200,
+                    desc: [],
+                    tags: null
+                }
+            ];
+            let newAuthType = [];
+            if(userInfoData.value?.allAuthTypes){
+                userInfoData.value?.allAuthTypes.forEach((item) => {
+                if(String(item.type).includes('2')){
+                    newAuthTypeOther[0].desc.push(item.desc)
+                }else{
+                    newAuthType.unshift(item)
+                }
+            })
+            userInfoData.value.allAuthTypes = [...newAuthType, ...newAuthTypeOther];
+            }
+            
+            console.log(userInfoData.value.allAuthTypes, 'userInfoData.value.allAuthTypes')
             level.value = res?.level
             recordInfo.listenSongs = res?.listenSongs
             if(res?.profile?.province){

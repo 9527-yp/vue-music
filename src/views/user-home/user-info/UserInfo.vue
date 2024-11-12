@@ -35,9 +35,17 @@
                         </div>
                     </div>
                 </div>
-                <div class="authentication" v-if="userInfoData?.allAuthTypes">
-                    <i class="auth-icn"></i>
-                    <span v-for="(item, index) in userInfoData?.allAuthTypes" :key="index">{{item.desc}}</span>
+                <div v-if="userInfoData?.allAuthTypes">
+                    <div class="authentication" v-for="(item, index) in userInfoData?.allAuthTypes" :key="index">
+                        <i v-if="item.type === 10" class="auth-icn icn"></i>
+                        <i v-if="item.type === 4" class="auth4-icn icn"></i>
+                        <i v-if="item.type === 200 && item.desc.length > 0" class="auth200-icn icn"></i>
+                        <span v-if="item.type === 200">{{item.desc.join('、')}}</span>
+                        <span v-else>
+                            {{item.desc}}
+                            <span class="yyrtag" v-for="i in item.tags" :key="i">{{i}}</span>
+                        </span>
+                    </div>
                 </div>
             </div>
             <ul class="info-ul">
@@ -356,13 +364,34 @@ function notFeatureTip() {
                 line-height: 20px;
                 color: #666;
                 font-size: 14px;
-                .auth-icn{
+                .icn{
                     margin-right: 6px;
                     float: left;
                     width: 68px;
                     height: 20px;
                     background: url('@/assets/images/icon2.png') no-repeat;
+                }
+                .auth-icn{
                     background-position: 0 -480px;
+                }
+                .auth4-icn{
+                    background-position: -150px -480px;
+                }
+                .auth200-icn{
+                    background-position: -75px -480px;
+                }
+                .yyrtag{
+                    display: inline-block;
+                    height: 16px;
+                    margin-left: 5px;
+                    padding: 0 2px;
+                    vertical-align: middle;
+                    color: rgba(0, 0, 0, 0.4);
+                    font-size: 12px;
+                    line-height: 16px;
+                    text-align: center;
+                    border: solid 1px rgba(0, 0, 0, 0.3);
+                    border-radius: 2px;
                 }
                 &:after{
                     clear: both;

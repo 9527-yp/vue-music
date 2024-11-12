@@ -73,6 +73,9 @@ export function timeStampToDuration(timestamp: number) {
  * @param format 日期格式 YYYY-MM-DD
  */
 export function formatDateTime(timestamp : number, format: string): string {
+    if(!timestamp){
+        return '';
+    }
     // 创建一个 Date 对象
     const date = new Date(timestamp * 1000);
   
