@@ -9,6 +9,7 @@
                       :privileges="songSheetDetail.privileges"
                       @jumpToComment="jumpToComment"
                       @notFeatureTip="notFeatureTip"
+                      @collectPlayList="collect"
                     />
                     <div class="song-list-box">
                         <h3 class="title">歌曲列表</h3>
@@ -48,14 +49,16 @@
         </div>
         <div class="playList-container">
             <div class="container">
-                <h3 class="header" v-if="songSheetDetail?.playlist?.subscribers.length > 0">
-                    <span>喜欢这个歌单的人</span>
-                </h3>
-                <ul class="like-song-list" v-if="songSheetDetail?.playlist?.subscribers.length > 0">
-                    <li class="like-item" v-for="item in songSheetDetail?.playlist?.subscribers" :key="item.userId">
-                        <img :src="item.avatarUrl" :title="item.nickname" @click="toUserHome(item.userId)" alt="">
-                    </li>
-                </ul>
+                <div v-if="songSheetDetail?.playlist?.subscribers && songSheetDetail?.playlist?.subscribers.length > 0">
+                    <h3 class="header">
+                        <span>喜欢这个歌单的人</span>
+                    </h3>
+                    <ul class="like-song-list">
+                        <li class="like-item" v-for="item in songSheetDetail?.playlist?.subscribers" :key="item.userId">
+                            <img :src="item.avatarUrl" :title="item.nickname" @click="toUserHome(item.userId)" alt="">
+                        </li>
+                    </ul>
+                </div>
                 <h3 class="header">
                     <span>相关推荐</span>
                 </h3>
@@ -112,7 +115,7 @@ import useDialogStore from '@/stores/modules/dialog.ts';
 import type { ResponseType } from '@/types/index';
 import { getSongSheetInfo } from '@/api/my-music.ts';
 import { getSongComment } from '@/api/comment.ts';
-import { getPlayList } from '@/api/song-list.ts';
+import { getPlayList, collectPlayList } from '@/api/song-list.ts';
 import Dialog from '@/components/dialog/dialog.vue';
 import Page from '@/components/page/Page.vue';
 import SongSheetInfo from '@/views/my-music/components/SongSheeInfo.vue';
@@ -132,6 +135,7 @@ type TypeSongSheetDetail = {
         playCount?: number,
         trackCount?: number,
         subscribed?: boolean,
+        subscribedCount: number,
         tracks?: {
             id: number;
         }[];
@@ -281,6 +285,32 @@ function notFeatureTip() {
 // 滚动到评论位置
 function jumpToComment() {
 
+}
+
+// 收藏歌单
+function collect() {
+    collectPlayList({
+        t: 1,
+        id:songSheetDetail.playlist.id
+    }).then((res: ResponseType) => {
+        if(res.code === 200) {
+            songSheetDetail.playlist.subscribed = true
+            songSheetDetail.playlist.subscribedCount = songSheetDetail.playlist.subscribedCount + 1
+            dialogStore.setMessage({
+                type: 1,
+                text: '收藏成功',
+                visible: true,
+            })
+            warningInfo.time && clearTimeout( warningInfo.time);
+            warningInfo.time = setTimeout(() => {
+                dialogStore.setMessage({
+                    type: 0,
+                    text: '',
+                    visible: false,
+                })
+            }, 1500);
+        }
+    })
 }
 
 function delSong() {

@@ -27,7 +27,12 @@
                     </i>
                 </span>
                 <span v-show="playlist?.trackCount" class="add btns-bag" title="添加到播放列表" @click="addPlayListBtn"></span>
-                <span class="collect btns-bag btn-jointly">
+                <!-- 自己的歌单不可收藏、取消收藏 -->
+                <span class="disable-collect btns-bag btn-jointly" v-if="playlist?.creator?.userId === userInfo?.profile?.userId">
+                    <i class="collect-icn icn btns-bag">{{playlist?.subscribedCount ? '(' + playlist?.subscribedCount + ')' : '收藏'}}</i>
+                </span>
+                <!-- 别人的歌单可以收藏、取消收藏 -->
+                <span class="btns-bag btn-jointly" :class="playlist?.trackCount && !playlist?.subscribed ? 'collect' : 'disable-collect'" v-else @click="collectSongList">
                     <i class="collect-icn icn btns-bag">{{playlist?.subscribedCount ? '(' + playlist?.subscribedCount + ')' : '收藏'}}</i>
                 </span>
                 <span class="btns-bag btn-jointly" :class="playlist?.trackCount ? 'share' : 'disable-share'" @click="notFeatureTip">
@@ -59,6 +64,7 @@ import { formatDateTime } from '@/utils/utils';
 import type { songType } from '@/hooks/methods/songFormat.ts';
 import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
 import usePlaySong from '@/hooks/usePlaySong.ts';
+import useUserStore from '@/stores/modules/user.ts';
 import usePlayStore from '@/stores/modules/play.ts';
 import { useRouter } from 'vue-router';
 
@@ -73,17 +79,26 @@ const props = defineProps({
     }
 })
 const playStore = usePlayStore();
+const userStore = useUserStore();
 const router = useRouter();
+
+const userInfo = computed(() => userStore.getUserInfo);
 // 播放显示/隐藏
 const lock = computed(() => playStore.getplayLock);
 
-const emit = defineEmits(['jumpToComment', 'notFeatureTip']);
+const emit = defineEmits(['jumpToComment', 'notFeatureTip', 'collectPlayList']);
 
 function jumpToComment() {
+    if(!props.playlist?.trackCount) {
+        return false;
+    }
     emit('jumpToComment')
 }
 
 function notFeatureTip() {
+    if(!props.playlist?.trackCount) {
+        return false;
+    }
     emit('notFeatureTip')
 }
 
@@ -153,6 +168,14 @@ function PlayListBtn(): boolean | undefined {
         playStore.setPlayLock(false)
         playStore.setAddPlayListTip(false)
     }, 1500)
+}
+
+// 收藏歌单
+function collectSongList(): Boolean {
+    if(props.playlist?.subscribed || !props.playlist?.trackCount) {
+        return false;
+    }
+    emit('collectPlayList')
 }
 
 function goToUserHome() {
@@ -352,11 +375,9 @@ function goToUserHome() {
                 }
             }
             .collect{
-                background-position: right -1192px;
+                background-position: right -1020px;
                 .collect-icn{
-                    color: #bebebe;
-                    background-position: 0 -1149px;
-                    cursor: default;
+                    background-position: 0 -977px;
                 }
             }
             .share{
@@ -393,6 +414,15 @@ function goToUserHome() {
                     .review-icn{
                         background-position: 0 -1508px;
                     }
+                }
+            }
+            .disable-collect{
+                color: #bebebe;
+                background-position: right -1192px;
+                cursor: default;
+                .collect-icn{
+                    color: #bebebe;
+                    background-position: 0 -1149px;
                 }
             }
             .disable-share{

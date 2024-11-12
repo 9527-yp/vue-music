@@ -30,3 +30,22 @@ export const getPlayList = ({order, cat, limit, offset}: playListItem): AxiosPro
         params
     })
 }
+
+/**
+ * @description 收藏/取消收藏歌单
+ * @param t : 类型,1:收藏,2:取消收藏 id : 歌单 id
+ * @param id : 歌单 id
+ */
+export const collectPlayList = ({t, id}: {t: number|string, id: number|string}): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+        t,
+        id
+    };
+
+    return axios.request({
+        url: '/playlist/subscribe',
+        method: 'get',
+        params
+    })
+}
