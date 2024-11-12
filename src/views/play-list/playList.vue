@@ -48,7 +48,50 @@
         </div>
         <div class="playList-container">
             <div class="container">
-
+                <h3 class="header" v-if="songSheetDetail?.playlist?.subscribers.length > 0">
+                    <span>喜欢这个歌单的人</span>
+                </h3>
+                <ul class="like-song-list" v-if="songSheetDetail?.playlist?.subscribers.length > 0">
+                    <li class="like-item" v-for="item in songSheetDetail?.playlist?.subscribers" :key="item.userId">
+                        <img :src="item.avatarUrl" :title="item.nickname" @click="toUserHome(item.userId)" alt="">
+                    </li>
+                </ul>
+                <h3 class="header">
+                    <span>相关推荐</span>
+                </h3>
+                <ul class="recommend-ul">
+                    <li class="item" v-for="item in playSheet" :key="item.id">
+                        <div class="song-img" :title="item.name" @click="toPlayList(item.id)">
+                            <img :src="item.coverImgUrl" alt="">
+                        </div>
+                        <div class="info">
+                            <p class="thide">
+                                <span class="song-name text-hov" @click="toPlayList(item.id)">{{item.name}}</span>
+                            </p>
+                            <p>
+                                <span class="by">by</span>
+                                <span class="nm thide text-hov" :title="item.subscribers[0].nickname" @click="toUserHome(item.userId)">{{item.subscribers[0].nickname}}</span>
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+                <div class="m-multi">
+                    <h3 class="header">
+                        <span>网易云音乐多端下载</span>
+                    </h3>
+                    <ul class="down-ul">
+                        <li class="item">
+                            <span class="ios"></span>
+                        </li>
+                        <li class="item">
+                            <span class="pc"></span>
+                        </li>
+                        <li class="item">
+                            <span class="aos"></span>
+                        </li>
+                    </ul>
+                    <p>同步歌单，随时畅听好音乐</p>
+                </div>
             </div>
         </div>
         <!-- 删除歌曲弹框 -->
@@ -63,12 +106,13 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { reactive, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import useDialogStore from '@/stores/modules/dialog.ts';
 import type { ResponseType } from '@/types/index';
 import { getSongSheetInfo } from '@/api/my-music.ts';
 import { getSongComment } from '@/api/comment.ts';
+import { getPlayList } from '@/api/song-list.ts';
 import Dialog from '@/components/dialog/dialog.vue';
 import Page from '@/components/page/Page.vue';
 import SongSheetInfo from '@/views/my-music/components/SongSheeInfo.vue';
@@ -77,6 +121,7 @@ import Comment from '@/components/comment/Comment.vue';
 import { handleCommentList } from '@/components/comment/handleCommentList.ts';
 
 const route = useRoute();
+const router = useRouter();
 const dialogStore = useDialogStore();
 
 type TypeSongSheetDetail = {
@@ -95,6 +140,30 @@ type TypeSongSheetDetail = {
         id: number;
     }[];
 }
+
+function toUserHome(id: number) {
+    router.push({
+        path: '/user/home',
+        query: {
+            id
+        }
+    })
+}
+
+function toPlayList(id: number) {
+    router.push({
+        path: '/playList',
+        query: {
+            id
+        }
+    })
+}
+
+watch(() => route.query.id, () => {
+    getSongInfo();
+    getRecommend();
+    getSongCommentList();
+})
 
 const songSheetDetail = reactive<TypeSongSheetDetail>({
     playlist: {},
@@ -116,6 +185,22 @@ function getSongInfo() {
     })
 }
 getSongInfo();
+
+const playListInfo = reactive({
+    order: 'hot',
+    cat: '全部',
+    limit: 5,
+    offset: 0
+});
+const playSheet = ref([]);
+function getRecommend() {
+    getPlayList(playListInfo).then((res: ResponseType) => {
+        if(res.code === 200) {
+            playSheet.value = res.playlists ?? []
+        }
+    })
+}
+getRecommend();
 
 // 评论数据
 const commentInfo = reactive({
@@ -277,6 +362,135 @@ function delSong() {
         width: 270px;
         .container{
             padding: 20px 40px 40px 30px;
+            .header{
+                position: relative;
+                height: 23px;
+                margin-bottom: 20px;
+                border-bottom: 1px solid #ccc;
+                color: #333;
+                font-size: 100%;
+            }
+            .like-song-list{
+                margin-left: -13px;
+                padding-bottom: 25px;
+                .like-item{
+                    display: inline;
+                    padding: 0 0 13px 13px;
+                    float: left;
+                    width: 40px;
+                    height: 40px;
+                    cursor: pointer;
+                    img{
+                        width: 40px;
+                        height: 40px;
+                    }
+                }
+                &:after{
+                    clear: both;
+                    content: '.';
+                    display: block;
+                    height: 0;
+                    visibility: hidden;
+                }
+            }
+            .recommend-ul{
+                margin-bottom: 25px;
+                .item{
+                    float: left;
+                    width: 200px;
+                    height: 50px;
+                    margin-bottom: 15px;
+                    line-height: 24px;
+                    .song-img{
+                        margin-right: -60px;
+                        float: left;
+                        width: 50px;
+                        height: 50px;
+                        cursor: pointer;
+                        img{
+                            width: 50px;
+                            height: 50px;
+                        }
+                    }
+                    .info{
+                        margin-left: 60px;
+                        line-height: 24px;
+                        p{
+                            width: 140px;
+                        }
+                        .song-name{
+                            color: #000;
+                            font-size: 14px;
+                            cursor: pointer;
+                        }
+                        .by{
+                            float: left;
+                            color: #999;
+                        }
+                        .nm{
+                            float: left;
+                            max-width: 106px;
+                            margin: 0 2px 0 4px;
+                            color: #666;
+                            cursor: pointer;
+                        }
+                    }
+                }
+                &:after{
+                    clear: both;
+                    content: '.';
+                    display: block;
+                    height: 0;
+                    visibility: hidden;
+                }
+            }
+            .m-multi{
+                margin: 20px 0;
+                padding-bottom: 20px;
+                .down-ul{
+                    height: 65px;
+                    margin-bottom: 10px;
+                    background: url('@/assets/images/sprite.png') no-repeat;
+                    background-position: 0 -392px;
+                    .item{
+                        float: left;
+                        .ios{
+                            display: block;
+                            width: 42px;
+                            height: 48px;
+                            cursor: pointer;
+                            &:hover{
+                                background: url('@/assets/images/sprite.png') no-repeat;
+                                background-position: 0 -472px;
+                            }
+                        }
+                        .pc{
+                            display: block;
+                            width: 60px;
+                            margin: 0 26px 0 30px;
+                            height: 48px;
+                            cursor: pointer;
+                            &:hover{
+                                background: url('@/assets/images/sprite.png') no-repeat;
+                                background-position: -72px -472px;
+                            }
+                        }
+                        .aos{
+                            display: block;
+                            width: 42px;
+                            height: 48px;
+                            cursor: pointer;
+                            &:hover{
+                                background: url('@/assets/images/sprite.png') no-repeat;
+                                background-position: -158px -472px;
+                            }
+                        }
+                    }
+                }
+                p{
+                    color: #999;
+                }
+            }
         }
     }
     &:after{
