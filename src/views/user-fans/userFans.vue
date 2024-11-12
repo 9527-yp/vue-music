@@ -28,7 +28,7 @@
                             </div>
                             <div class="info">
                                 <p>
-                                    <span class="name thide text-hov" :title="item.nickname" @click="toUserHome(item.id)">{{item.nickname}}</span>
+                                    <span class="name thide text-hov" :title="item.nickname" @click="toUserHome(item.userId)">{{item.nickname}}</span>
                                     <span class="u-vip-icn" v-if="item?.avatarDetail">
                                         <img :src="item?.avatarDetail?.identityIconUrl" alt="">
                                     </span>
@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue';
+import { ref, reactive, computed, watch, onMounted } from 'vue';
 import { userInfo } from '@/api/login.ts';
 import type { ResponseType } from '@/types/index';
 import findCityZipCode from '@/views/user-home/city.ts';
@@ -201,6 +201,11 @@ function follow(id: number|string) {
     })
 }
 
+onMounted(() => {
+    userStore.setMenuIndex(0);
+    // userStore.setSubMenuIndex(-1);
+});
+
 </script>
 <style lang="scss" scoped>
 .user-home{
@@ -281,8 +286,8 @@ function follow(id: number|string) {
                 .gender-icn{
                     display: inline-block;
                     vertical-align: middle;
-                    margin: 1px 0 0 2px;
-                    margin-top: -2px;
+                    margin: 1px 0 0 4px;
+                    // margin-top: -2px;
                     width: 14px;
                     height: 15px;
                     overflow: hidden;

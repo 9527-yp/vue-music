@@ -51,26 +51,11 @@
                     </div>
                     <!-- 歌曲列表Table -->
                     <SongListTable
-                      v-if="songSheetDetail.privileges.length > 0"
                       :playlist="songSheetDetail.playlist"
                       :privileges="songSheetDetail.privileges"
                       @delSong="delSong"
                       @notFeatureTip="notFeatureTip"
                     />
-                    <!-- 歌单没有歌曲展示的table内容 -->
-                    <div v-else class="not-song-list-box">
-                        <div class="not-title">
-                            <i class="icn"></i>
-                            <h3 class="text">暂无音乐！</h3>
-                        </div>
-                        <div class="desc">
-                            <span class="text">点击</span>
-                            <i class="icon"></i>
-                            <span class="text">即可将你喜欢的音乐收藏到“我的音乐”</span>
-                            <span class="text go">马上去</span>
-                            <router-link to="/" class="text">发现音乐</router-link>
-                        </div>
-                    </div>
                     <!-- 评论 -->
                     <Comment
                       :commentInfo="commentInfo" 
@@ -443,6 +428,9 @@ function jumpToComment() {
             padding-bottom: 50px;
             position: relative;
             zoom: 1;
+            .song-header{
+                padding: 40px;
+            }
             .song-list-box{
                 width: 100%;
                 height: 35px;
@@ -494,50 +482,5 @@ function jumpToComment() {
     width: 8px;
     height: 8px;
 }
-.not-song-list-box{
-    padding: 95px 0;
-    text-align: center;
-    .not-title{
-        width: 100%;
-        padding-bottom: 16px;
-        margin: 0 auto;
-        font-size: 18px;
-        color: #333;
-        text-align: center;
-        .icn{
-            display: inline-block;
-            width: 64px;
-            height: 50px;
-            margin-right: 17px;
-            vertical-align: middle;
-            background: url('@/assets/images/icon.png') no-repeat 0 9999px;
-            background-position: 0 -347px;
-        }
-        .text{
-            display: inline-block;
-            vertical-align: middle;
-        }
-    }
-    .desc{
-        margin-top: 20px;
-        color: #aaa;
-        .text{
-            display: inline-block;
-            vertical-align: middle;
-        }
-        .icon{
-            display: inline-block;
-            width: 16px;
-            height: 14px;
-            margin: 0 9px 0 7px;
-            vertical-align: middle;
-            background: url('@/assets/images/icon.png') no-repeat 0 9999px;
-            background-position: 0 -400px;
-        }
-        .go{
-            margin-right: 5px;
-            margin-left: 10px;
-        }
-    }
-}
+
 </style>

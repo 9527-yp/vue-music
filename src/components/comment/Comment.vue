@@ -122,6 +122,11 @@ function publish() {
         }
     }
 }
+.playList-comment{
+    .review-box{
+        margin: 20px 0 0;
+    }
+}
 .corr{
     position: absolute;
     top: 11px;

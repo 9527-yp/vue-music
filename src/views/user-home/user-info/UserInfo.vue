@@ -369,6 +369,7 @@ function notFeatureTip() {
                     float: left;
                     width: 68px;
                     height: 20px;
+                    vertical-align: middle;
                     background: url('@/assets/images/icon2.png') no-repeat;
                 }
                 .auth-icn{

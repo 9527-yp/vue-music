@@ -1,6 +1,6 @@
 <template>
     <div class="music-table">
-        <table class="song-list-table">
+        <table v-if="privileges.length > 0" class="song-list-table">
             <thead>
                 <tr>
                     <th class="first th-1">
@@ -74,6 +74,24 @@
                 </tr>
             </tbody>
         </table>
+        <!-- 歌单没有歌曲展示的table内容 -->
+        <div v-else class="not-song-list-box">
+            <div class="not-title">
+                <i class="icn"></i>
+                <h3 class="text">暂无音乐！</h3>
+            </div>
+            <div class="desc">
+                <span class="text">点击</span>
+                <i class="icon"></i>
+                <span class="text">即可将你喜欢的音乐收藏到“我的音乐”</span>
+                <span class="text go">马上去</span>
+                <router-link to="/" class="text">发现音乐</router-link>
+            </div>
+        </div>
+        <div class="playlist-see-more">
+            <div class="text">查看更多内容，请下载客户端</div>
+            <div class="button" @click="notFeatureTip">立即下载</div>
+        </div>
     </div>
     <!-- 播放权限弹框 -->
     <Dialog 
@@ -494,5 +512,81 @@ function notFeatureTip() {
     padding: 0 20px;
     line-height: 22px;
     font-size: 14px;
+}
+.playlist-see-more{
+    width: 100%;
+    height: 66px;
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 30px;
+    margin-bottom: -10px;
+    .text{
+        font-size: 13px;
+        color: #333333;
+    }
+    .button{
+        width: 120px;
+        height: 30px;
+        background-image: linear-gradient(90deg, #ff5a4c 0%, #ff1d12 100%);
+        border-radius: 18px;
+        line-height: 30px;
+        font-size: 12px;
+        color: #ffffff;
+        text-align: center;
+        cursor: pointer;
+    }
+}
+.playList-table{
+    .playlist-see-more{
+        display: flex !important;
+    }
+}
+.not-song-list-box{
+    padding: 95px 0;
+    text-align: center;
+    .not-title{
+        width: 100%;
+        padding-bottom: 16px;
+        margin: 0 auto;
+        font-size: 18px;
+        color: #333;
+        text-align: center;
+        .icn{
+            display: inline-block;
+            width: 64px;
+            height: 50px;
+            margin-right: 17px;
+            vertical-align: middle;
+            background: url('@/assets/images/icon.png') no-repeat 0 9999px;
+            background-position: 0 -347px;
+        }
+        .text{
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
+    .desc{
+        margin-top: 20px;
+        color: #aaa;
+        .text{
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .icon{
+            display: inline-block;
+            width: 16px;
+            height: 14px;
+            margin: 0 9px 0 7px;
+            vertical-align: middle;
+            background: url('@/assets/images/icon.png') no-repeat 0 9999px;
+            background-position: 0 -400px;
+        }
+        .go{
+            margin-right: 5px;
+            margin-left: 10px;
+        }
+    }
 }
 </style>
