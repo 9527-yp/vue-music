@@ -2,7 +2,15 @@
     <div class="song">
         <div class="music-box">
             <div class="song-info">
-                <SongInfo :songDetailData="songDetailData" :list="lyric.list" :id="id" />
+                <SongInfo 
+                    :songDetailData="songDetailData" 
+                    :list="lyric.list" 
+                    :id="id" 
+                    @playMusic="playMusic"
+                    @addMusic="addMusic"
+                    @collectMusic="collectMusic"
+                    @notFeatureTip="notFeatureTip"
+                />
                 <!--
                     歌曲被翻译有transUser, 没有lyricUser
                     歌曲没被翻译有lyricUser, 没有transUser
@@ -108,18 +116,32 @@
                 <span>用户wiki任务中心</span>
             </a>
         </div>
+        <!-- 播放权限弹框 -->
+        <Dialog 
+            :visible="playDialog"
+            showCustomButton
+            @cancel='playCancel'
+        >
+            <p class="content-text">{{ playDialogText }}</p>
+        </Dialog>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { getLyric, getDetail, getComment, getSimiPlayList, getSimiSong } from '@/api/song.ts';
 import { useRoute, useRouter } from 'vue-router';
 import type { ResponseType } from '@/types/index';
+import type { songType } from '@/hooks/methods/songFormat.ts';
+import Dialog from '@/components/dialog/dialog.vue';
 import SongInfo from './song-info/SongInfo.vue';
 import Comment from '@/components/comment/Comment.vue';
 import Page from '@/components/page/Page.vue';
 import { handleCommentList } from '@/components/comment/handleCommentList.ts';
+import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
+import usePlaySong from '@/hooks/usePlaySong.ts';
+import usePlayStore from '@/stores/modules/play.ts';
+import useDialogStore from '@/stores/modules/dialog.ts';
 
 type Lyric = {
   lyricUser: {
@@ -138,6 +160,11 @@ type Lyric = {
 
 const route = useRoute();
 const router = useRouter();
+const playStore = usePlayStore();
+const dialogStore = useDialogStore();
+
+// 播放显示/隐藏
+const lock = computed(() => playStore.getplayLock);
 
 const id = route.query.id
 
@@ -290,6 +317,123 @@ function formatLyricTime(time: string): number {
 
   return Number(second + '.' + ms);
 }
+
+// 播放列表歌曲
+let timer = null;
+const playDialog = ref(false);
+const playDialogText = ref('');
+function playMusic(item: songType) {
+    let index = isCopyright()
+
+    if(index === 0) {
+        playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
+        playDialog.value = true;
+        return;
+    }else if(index === 1){
+        playDialogText.value = '该歌曲为付费歌曲，请购买后聆听';
+        playDialog.value = true;
+        return;
+    }
+    
+    usePlaySong(songDetailData.value?.songs[0]);
+    useSongAddPlaylist(songDetailData.value?.songs[0]);
+    playStore.setAddPlayListTip(true)
+    playStore.setAddPlayListTipText('已开始播放')
+    if(!lock.value){
+        playStore.setPlayLock(true)
+    }
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => {
+        playStore.setPlayLock(false)
+        playStore.setAddPlayListTip(false)
+    }, 1500)
+}
+
+// 添加到播放列表
+function addMusic() {
+    let index = isCopyright()
+
+    if(index === 0) {
+        playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
+        playDialog.value = true;
+        return;
+    }else if(index === 1){
+        playDialogText.value = '该歌曲为付费歌曲，请购买后聆听';
+        playDialog.value = true;
+        return;
+    }
+
+    useSongAddPlaylist(songDetailData.value?.songs[0])
+    playStore.setAddPlayListTip(true)
+    playStore.setAddPlayListTipText('已添加到播放列表')
+    if(!lock.value){
+        playStore.setPlayLock(true)
+    }
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => {
+        playStore.setPlayLock(false)
+        playStore.setAddPlayListTip(false)
+    }, 1500)
+}
+
+// 收藏
+function collectMusic() {
+    let index = isCopyright()
+
+    if(index === 0) {
+        playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
+        playDialog.value = true;
+        return;
+    }else if(index === 1){
+        playDialogText.value = '该歌曲为付费歌曲，请购买后聆听';
+        playDialog.value = true;
+        return;
+    }
+    
+    dialogStore.setSongId(songDetailData.value?.songs[0]?.id);
+    dialogStore.setSongListShow(true);
+}
+
+// 功能暂未开发提示
+const warningInfo = reactive({
+    time: null
+})
+function notFeatureTip() {
+    dialogStore.setMessage({
+        type: 0,
+        text: '功能暂未开发',
+        visible: true,
+    })
+    warningInfo.time && clearTimeout( warningInfo.time);
+    warningInfo.time = setTimeout(() => {
+        dialogStore.setMessage({
+            type: 0,
+            text: '功能暂未开发',
+            visible: false,
+        })
+    }, 1500);
+}
+
+function playCancel(value: boolean) {
+    playDialog.value = value;
+}
+
+function isCopyright(): number | undefined {
+    
+    if (songDetailData?.privilege?.[0]?.dl === 0) {
+        if(songDetailData?.privilege?.[0]?.fee === 0){
+            // 无版权
+            return 0;
+        }else if(songDetailData?.privilege?.[0]?.fee === 1){
+            // 付费歌曲
+            return 1;
+        }
+    }else{
+        // 可播放歌曲
+        return 2;
+    }
+}
+
 </script>
 
 <style lang="scss" scoped>

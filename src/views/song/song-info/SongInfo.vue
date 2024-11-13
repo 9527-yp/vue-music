@@ -35,20 +35,20 @@
                     <span class="text">{{songDetailData.songs?.[0]?.al?.name}}</span>
                 </p>
                 <div class="m-btns">
-                    <span class="btns-bag play" title="播放">
+                    <span class="btns-bag play" title="播放" @click="playMusic">
                         <i class="i-box btns-bag">
                             <i class="play-icn btns-bag"></i>
                             播放
                         </i>
                     </span>
-                    <span class="add btns-bag" title="添加到播放列表"></span>
-                    <span class="btns-bag btn-jointly collect">
+                    <span class="add btns-bag" title="添加到播放列表" @click="addMusic"></span>
+                    <span class="btns-bag btn-jointly collect" @click="collectMusic">
                         <i class="collect-icn icn btns-bag">收藏</i>
                     </span>
-                    <span class="btns-bag btn-jointly share">
+                    <span class="btns-bag btn-jointly share" @click="notFeatureTip">
                         <i class="share-icn icn btns-bag">分享</i>
                     </span>
-                    <span class="btns-bag btn-jointly down">
+                    <span class="btns-bag btn-jointly down" @click="notFeatureTip">
                         <i class="down-icn icn btns-bag">下载</i>
                     </span>
                     <span class="btns-bag btn-jointly review">
@@ -75,22 +75,42 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-    const props = defineProps({
-        songDetailData: {
-            type: Object,
-            default: {}
-        },
-        list: {
-            type: Array,
-            default: []
-        },
-        id: {
-            type: String,
-            default: 0
-        }
-    })
 
-    const toggleShow = ref(false);
+const props = defineProps({
+    songDetailData: {
+        type: Object,
+        default: {}
+    },
+    list: {
+        type: Array,
+        default: []
+    },
+    id: {
+        type: String,
+        default: 0
+    }
+})
+
+const emit = defineEmits(['playMusic', 'addMusic', 'collectMusic', 'notFeatureTip'])
+
+const toggleShow = ref(false);
+
+function playMusic() {
+    emit('playMusic')
+}
+
+function addMusic() {
+    emit('addMusic')
+}
+
+function collectMusic() {
+    emit('collectMusic')
+}
+
+function notFeatureTip() {
+    emit('notFeatureTip')
+}
+
 </script>
 
 <style lang="scss" scoped>
