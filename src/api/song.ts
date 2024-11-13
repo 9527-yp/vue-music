@@ -59,3 +59,38 @@ export const getComment = ({id, limit, offset}: MusicItem): AxiosPromise => {
         params
     })
 }
+
+
+/**
+ * @description 获取相似歌单
+ * @param id 歌曲id
+ */
+export const getSimiPlayList = ({id}: {id: number|string}): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+        id,
+    };
+
+    return axios.request({
+        url: '/simi/playlist',
+        method: 'get',
+        params
+    })
+}
+
+/**
+ * @description 获取相似音乐
+ * @param id 歌曲id
+ */
+export const getSimiSong = ({id}: {id: number|string}): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+        id,
+    };
+
+    return axios.request({
+        url: '/simi/song',
+        method: 'get',
+        params
+    })
+}

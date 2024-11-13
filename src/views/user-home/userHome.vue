@@ -127,7 +127,7 @@ const songSheetList = reactive<TypeSongSheet>({
 function getSongListData ()  {
     getSongList({uid: route?.query?.id}).then((res: ResponseType) => {
         if(res.code === 200) {
-            if(route?.query?.id === myInfo.value?.profile?.userId){
+            if(route?.query?.id == myInfo.value?.profile?.userId){
                 // 创建/收藏的歌单
                 songSheetList.createdSongSheet = res.playlist?.filter?.(
                     (item: TypeSongSheetList) => !item.subscribed
