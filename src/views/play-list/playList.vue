@@ -109,9 +109,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import useDialogStore from '@/stores/modules/dialog.ts';
+import useUserStore from '@/stores/modules/user.ts';
 import type { ResponseType } from '@/types/index';
 import { getSongSheetInfo } from '@/api/my-music.ts';
 import { getSongComment } from '@/api/comment.ts';
@@ -126,6 +127,7 @@ import { handleCommentList } from '@/components/comment/handleCommentList.ts';
 const route = useRoute();
 const router = useRouter();
 const dialogStore = useDialogStore();
+const userStore = useUserStore();
 
 type TypeSongSheetDetail = {
     playlist: {
@@ -135,7 +137,7 @@ type TypeSongSheetDetail = {
         playCount?: number,
         trackCount?: number,
         subscribed?: boolean,
-        subscribedCount: number,
+        subscribedCount?: number,
         tracks?: {
             id: number;
         }[];
@@ -316,6 +318,11 @@ function collect() {
 function delSong() {
     getSongInfo()
 }
+
+onMounted(() => {
+    userStore.setMenuIndex(0);
+    userStore.setSubMenuIndex(-1);
+});
 
 </script>
 

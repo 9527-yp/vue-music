@@ -40,7 +40,7 @@
                     <td>
                         <div class="song-name">
                             <div class="song-name-box">
-                                <span class="text-hov">{{item.name}}</span>
+                                <span class="text-hov" @click="toSong(item.id)">{{item.name}}</span>
                                 <span class="song-other" v-if="item?.alia.length > 0"> - ({{item?.alia[0]}})</span>
                                 <i v-if="item.mv" class="mv-icn"></i>
                             </div>
@@ -127,6 +127,7 @@ import type { songType } from '@/hooks/methods/songFormat.ts';
 import type { ResponseType } from '@/types/index';
 import { songAddorDel } from '@/api/my-music.ts'
 import { computed, ref, reactive, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 const props = defineProps({
     playlist: {
@@ -144,6 +145,7 @@ const emit = defineEmits(['delSong', 'notFeatureTip'])
 const userStore = useUserStore();
 const playStore = usePlayStore();
 const dialogStore = useDialogStore();
+const router = useRouter();
 
 const userInfo = computed(() => userStore.getUserInfo);
 
@@ -281,6 +283,15 @@ function collectMusic(item: songType) {
 
 function notFeatureTip() {
     emit('notFeatureTip')
+}
+
+function toSong(id: number|string) {
+    router.push({
+        path: '/song',
+        query: {
+            id
+        }
+    })
 }
 </script>
 

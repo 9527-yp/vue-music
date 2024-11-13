@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import useUserStore from '@/stores/modules/user.ts';
 import findCityZipCode from './city.ts';
@@ -40,6 +40,8 @@ import UserSongList from './user-song-list/UserSongList.vue';
 const userStore = useUserStore();
 const route = useRoute();
 
+const myInfo = computed(() => userStore.getUserInfo)
+
 type RecordItem = {
     loading: boolean,
     listenSongs: number,
@@ -52,7 +54,15 @@ const recordInfo = reactive<RecordItem>({
     type:0,
     list: []
 })
-const userInfoData = ref({});
+
+type UserInfo = {
+    allAuthTypes?: {
+        type: number,
+        desc: string,
+        tags: string[] | null
+    }[]
+}
+const userInfoData = ref<UserInfo>({});
 const level = ref(0); // 等级
 const provinceName = ref(''); // 省
 const cityName = ref(''); // 市
@@ -70,16 +80,15 @@ function getUserInfo() {
             let newAuthType = [];
             if(userInfoData.value?.allAuthTypes){
                 userInfoData.value?.allAuthTypes.forEach((item) => {
-                if(String(item.type).includes('2')){
+                if(item.type >= 200 && item.type < 300){
                     newAuthTypeOther[0].desc.push(item.desc)
-                }else{
+                }else if(item.type < 100){
                     newAuthType.unshift(item)
                 }
             })
             userInfoData.value.allAuthTypes = [...newAuthType, ...newAuthTypeOther];
             }
             
-            console.log(userInfoData.value.allAuthTypes, 'userInfoData.value.allAuthTypes')
             level.value = res?.level
             recordInfo.listenSongs = res?.listenSongs
             if(res?.profile?.province){
@@ -118,13 +127,20 @@ const songSheetList = reactive<TypeSongSheet>({
 function getSongListData ()  {
     getSongList({uid: route?.query?.id}).then((res: ResponseType) => {
         if(res.code === 200) {
-            // 创建/收藏的歌单
-            songSheetList.createdSongSheet = res.playlist?.filter?.(
-            (item: TypeSongSheetList) => !item.subscribed
-            );
-            songSheetList.collectSongSheet = res.playlist?.filter?.(
-            (item: TypeSongSheetList) => item.subscribed
-            );
+            if(route?.query?.id === myInfo.value?.profile?.userId){
+                // 创建/收藏的歌单
+                songSheetList.createdSongSheet = res.playlist?.filter?.(
+                    (item: TypeSongSheetList) => !item.subscribed
+                );
+                songSheetList.collectSongSheet = res.playlist?.filter?.(
+                    (item: TypeSongSheetList) => item.subscribed
+                );
+            }else{
+                // 其他的用户不用筛选收藏的歌单
+                songSheetList.createdSongSheet = res.playlist
+                songSheetList.collectSongSheet = []
+            }
+            
         }
     })
 }

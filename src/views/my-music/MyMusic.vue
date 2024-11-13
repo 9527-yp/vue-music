@@ -286,7 +286,6 @@ function getSongCommentList() {
     }
     getSongComment(params).then((res: ResponseType) => {
         const result = handleCommentList(res)
-        console.log(result, 'resultresultresult')
         commentInfo.hotCommentList = result?.hotComments ?? []
         
         commentInfo.newCommentList = result?.comments ?? []
