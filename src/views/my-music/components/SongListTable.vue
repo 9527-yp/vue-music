@@ -62,7 +62,7 @@
                     <td>
                         <div class="text">
                             <template v-for="(key, i) in item.ar" :key="i">
-                                <span class="text-hov" :title="key.name">{{key.name}}</span><i v-if="i !== item.ar.length-1">/</i>
+                                <span class="text-hov" :title="key.name" @click="toSinger(item.id)">{{key.name}}</span><i v-if="i !== item.ar.length-1">/</i>
                             </template>
                         </div>
                     </td>
@@ -288,6 +288,15 @@ function notFeatureTip() {
 function toSong(id: number|string) {
     router.push({
         path: '/song',
+        query: {
+            id
+        }
+    })
+}
+
+function toSinger(id: number) {
+    router.push({
+        path: '/singer',
         query: {
             id
         }
