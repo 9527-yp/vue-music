@@ -51,7 +51,7 @@
                     <span class="btns-bag btn-jointly down" @click="notFeatureTip">
                         <i class="down-icn icn btns-bag">下载</i>
                     </span>
-                    <span class="btns-bag btn-jointly review">
+                    <span class="btns-bag btn-jointly review" @click="jumpToComment">
                         <i class="review-icn icn btns-bag">评论</i>
                     </span>
                 </div>
@@ -91,7 +91,7 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['playMusic', 'addMusic', 'collectMusic', 'notFeatureTip'])
+const emit = defineEmits(['playMusic', 'addMusic', 'collectMusic', 'notFeatureTip', 'jumpToComment'])
 
 const toggleShow = ref(false);
 
@@ -109,6 +109,10 @@ function collectMusic() {
 
 function notFeatureTip() {
     emit('notFeatureTip')
+}
+
+function jumpToComment() {
+    emit('jumpToComment')
 }
 
 </script>

@@ -10,6 +10,7 @@
                     @addMusic="addMusic"
                     @collectMusic="collectMusic"
                     @notFeatureTip="notFeatureTip"
+                    @jumpToComment="jumpToComment"
                 />
                 <!--
                     歌曲被翻译有transUser, 没有lyricUser
@@ -32,6 +33,7 @@
                 </div>
                 <!-- 评论 -->
                 <Comment
+                    class="playList-comment"
                     :commentInfo="musicCommentInfo" 
                     @publishComment="publishComment"
                 />
@@ -45,77 +47,7 @@
                 />
             </div>
         </div>
-        <div class="music-side">
-            <h3 class="header">
-                <span>包含这首歌的歌单</span>
-            </h3>
-            <ul class="recommend-ul">
-                <li class="item" v-for="item in playListData" :key="item.id">
-                    <div class="song-img" :title="item.name" @click="toPlayList(item.id)">
-                        <img :src="item.coverImgUrl" alt="">
-                    </div>
-                    <div class="info">
-                        <p class="thide">
-                            <span class="song-name text-hov" @click="toPlayList(item.id)">{{item.name}}</span>
-                        </p>
-                        <p>
-                            <span class="by">by</span>
-                            <span class="nm thide text-hov" :title="item.creator.nickname" @click="toUserHome(item.userId)">{{item.creator.nickname}}</span>
-                        </p>
-                    </div>
-                </li>
-            </ul>
-            <h3 class="header">
-                <span>相似的歌曲</span>
-            </h3>
-            <ul class="m-sglist">
-                <li class="sglist-item" v-for="item in songList" :key="item.id">
-                    <div class="item-left">
-                        <div class="thide">
-                            <span class="text-tit text-hov" :title="item.name">{{item.name}}</span>
-                        </div>
-                        <div class="thide">
-                            <template v-for="(key, i) in item?.artists" :key="i">
-                                <span class="text-hov" :title="key.name">{{key.name}}</span><i v-show="i !== item?.artists.length-1">/</i>
-                            </template>
-                            
-                        </div>
-                    </div>
-                    <div class="item-right">
-                        <i class="play-icn icn"></i>
-                        <i class="add-icn icn"></i>
-                    </div>
-                </li>
-            </ul>
-            <div class="m-multi">
-                <h3 class="header">
-                    <span>网易云音乐多端下载</span>
-                </h3>
-                <ul class="down-ul">
-                    <li class="item">
-                        <span class="ios"></span>
-                    </li>
-                    <li class="item">
-                        <span class="pc"></span>
-                    </li>
-                    <li class="item">
-                        <span class="aos"></span>
-                    </li>
-                </ul>
-                <p>同步歌单，随时畅听好音乐</p>
-            </div>
-            <h3 class="header">
-                <span>用户wiki</span>
-            </h3>
-            <a class="wiki-edit text-hov" href="">
-                <img class="img" src="@/assets/images/my-music/icn.png" alt="">
-                <span>补充或修改歌曲资料</span>
-            </a>
-            <a class="wiki-edit text-hov" href="">
-                <img class="img" src="@/assets/images/my-music/icn.png" alt="">
-                <span>用户wiki任务中心</span>
-            </a>
-        </div>
+        <SongSide @playSimiMusic="playSimiMusic" @addSimiMusic="addSimiMusic" />
         <!-- 播放权限弹框 -->
         <Dialog 
             :visible="playDialog"
@@ -128,14 +60,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
-import { getLyric, getDetail, getComment, getSimiPlayList, getSimiSong } from '@/api/song.ts';
+import { ref, reactive, computed, watch } from 'vue';
+import { getLyric, getDetail, getComment } from '@/api/song.ts';
 import { useRoute, useRouter } from 'vue-router';
 import type { ResponseType } from '@/types/index';
 import type { songType } from '@/hooks/methods/songFormat.ts';
 import Dialog from '@/components/dialog/dialog.vue';
 import SongInfo from './song-info/SongInfo.vue';
 import Comment from '@/components/comment/Comment.vue';
+import SongSide from './song-side/SongSide.vue'
 import Page from '@/components/page/Page.vue';
 import { handleCommentList } from '@/components/comment/handleCommentList.ts';
 import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
@@ -163,13 +96,29 @@ const router = useRouter();
 const playStore = usePlayStore();
 const dialogStore = useDialogStore();
 
+// 监听歌曲id变化
+watch(() => route.query.id, () => {
+    musicCommentInfo.id = Number(route.query.id)
+    getDetailInfo();
+    getCommentList();
+    getLyricData();
+})
 // 播放显示/隐藏
 const lock = computed(() => playStore.getplayLock);
 
 const id = route.query.id
 
 // 获取歌曲详情
-const songDetailData = ref({})
+type songDetailItem = {
+    songs?: {
+        id: number
+    }[],
+    privilege?: {
+        dl: number,
+        fee: number
+    }[]
+}
+const songDetailData = ref<songDetailItem>({})
 function getDetailInfo() {
     getDetail({ids: route.query.id}).then((res: ResponseType) => {
         if(res.code === 200) {
@@ -219,27 +168,6 @@ function changePage(value: number) {
     musicCommentInfo.offset = value;
     getCommentList();
 }
-
-// 获取相似歌单及相似音乐
-const playListData = ref([]);
-function getSimiPlayListData() {
-    getSimiPlayList({id: route.query.id}).then((res: ResponseType) => {
-        if(res.code === 200) {
-            playListData.value = res.playlists;
-        }
-    })
-}
-getSimiPlayListData()
-
-const songList = ref([])
-function getSimiSongData() {
-    getSimiSong({id: route.query.id}).then((res: ResponseType) => {
-        if(res.code === 200) {
-            songList.value = res.songs;
-        }
-    })
-}
-getSimiSongData();
 
 // 获取歌词
 const lyric = reactive<Lyric>({
@@ -323,8 +251,48 @@ let timer = null;
 const playDialog = ref(false);
 const playDialogText = ref('');
 function playMusic(item: songType) {
-    let index = isCopyright()
+    let index = isCopyright(songDetailData.value?.privilege?.[0])
 
+    commonalityFun(index, songDetailData.value?.songs[0], 'play' )
+}
+
+// 播放相似歌曲
+async function playSimiMusic(id: number): Promise<undefined> {
+    let res = await getDetail({ids: id})
+    if(res.code !== 200){
+        return;
+    }
+
+    let index = isCopyright(res?.privilege?.[0])
+
+    commonalityFun(index, res?.songs[0], 'play' )
+}
+
+// 添加到播放列表
+function addMusic() {
+    let index = isCopyright(songDetailData.value?.privilege?.[0])
+    commonalityFun(index, songDetailData.value?.songs[0], 'add' )
+}
+
+// 添加相似歌曲到播放列表
+async function addSimiMusic(id: number) {
+    let res = await getDetail({ids: id})
+    if(res.code !== 200){
+        return;
+    }
+
+    let index = isCopyright(res?.privilege?.[0])
+
+    commonalityFun(index, res?.songs[0], 'add' )
+}
+
+// 公共方法
+/**
+ * index 歌曲权限
+ * songItem 歌曲详情数据
+ * type 播放或添加到播放列表
+ */
+function commonalityFun(index: number, songItem: {id: number}, type: string) {
     if(index === 0) {
         playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
         playDialog.value = true;
@@ -335,37 +303,12 @@ function playMusic(item: songType) {
         return;
     }
     
-    usePlaySong(songDetailData.value?.songs[0]);
-    useSongAddPlaylist(songDetailData.value?.songs[0]);
-    playStore.setAddPlayListTip(true)
-    playStore.setAddPlayListTipText('已开始播放')
-    if(!lock.value){
-        playStore.setPlayLock(true)
+    if(type === 'play'){
+        usePlaySong(songItem);
     }
-    timer && clearTimeout(timer)
-    timer = setTimeout(() => {
-        playStore.setPlayLock(false)
-        playStore.setAddPlayListTip(false)
-    }, 1500)
-}
-
-// 添加到播放列表
-function addMusic() {
-    let index = isCopyright()
-
-    if(index === 0) {
-        playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
-        playDialog.value = true;
-        return;
-    }else if(index === 1){
-        playDialogText.value = '该歌曲为付费歌曲，请购买后聆听';
-        playDialog.value = true;
-        return;
-    }
-
-    useSongAddPlaylist(songDetailData.value?.songs[0])
+    useSongAddPlaylist(songItem);
     playStore.setAddPlayListTip(true)
-    playStore.setAddPlayListTipText('已添加到播放列表')
+    playStore.setAddPlayListTipText(type === 'play' ? '已开始播放' : '已添加到播放列表')
     if(!lock.value){
         playStore.setPlayLock(true)
     }
@@ -378,7 +321,7 @@ function addMusic() {
 
 // 收藏
 function collectMusic() {
-    let index = isCopyright()
+    let index = isCopyright(songDetailData.value?.privilege?.[0])
 
     if(index === 0) {
         playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
@@ -414,17 +357,30 @@ function notFeatureTip() {
     }, 1500);
 }
 
+// 滚动到评论位置
+function jumpToComment() {
+    const commentDom = document.querySelector(
+        '.song-sheet-review'
+    ) as HTMLDivElement;
+    window.scrollTo(0, Number(commentDom.offsetTop) - 50);
+}
+
 function playCancel(value: boolean) {
     playDialog.value = value;
 }
 
-function isCopyright(): number | undefined {
+// 歌曲是否有版权
+type privilegeItem = {
+    dl?: number,
+    fee?: number
+}
+function isCopyright(privilege: privilegeItem): number | undefined {
     
-    if (songDetailData?.privilege?.[0]?.dl === 0) {
-        if(songDetailData?.privilege?.[0]?.fee === 0){
+    if (privilege?.[0]?.dl === 0) {
+        if(privilege?.[0]?.fee === 0){
             // 无版权
             return 0;
-        }else if(songDetailData?.privilege?.[0]?.fee === 1){
+        }else if(privilege?.[0]?.fee === 1){
             // 付费歌曲
             return 1;
         }
@@ -471,188 +427,7 @@ function isCopyright(): number | undefined {
             }
         }
     }
-    .music-side{
-        position: relative;
-        float: right;
-        width: 270px;
-        padding: 20px 40px 40px 30px;
-        box-sizing: border-box;
-        .header{
-            position: relative;
-            height: 23px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ccc;
-            color: #333;
-            font-size: 100%;
-        }
-        .recommend-ul{
-            margin-bottom: 25px;
-            .item{
-                float: left;
-                width: 200px;
-                height: 50px;
-                margin-bottom: 15px;
-                line-height: 24px;
-                .song-img{
-                    margin-right: -60px;
-                    float: left;
-                    width: 50px;
-                    height: 50px;
-                    cursor: pointer;
-                    img{
-                        width: 50px;
-                        height: 50px;
-                    }
-                }
-                .info{
-                    margin-left: 60px;
-                    line-height: 24px;
-                    p{
-                        width: 140px;
-                    }
-                    .song-name{
-                        color: #000;
-                        font-size: 14px;
-                        cursor: pointer;
-                    }
-                    .by{
-                        float: left;
-                        color: #999;
-                    }
-                    .nm{
-                        float: left;
-                        max-width: 106px;
-                        margin: 0 2px 0 4px;
-                        color: #666;
-                        cursor: pointer;
-                    }
-                }
-            }
-            &:after{
-                clear: both;
-                content: '.';
-                display: block;
-                height: 0;
-                visibility: hidden;
-            }
-        }
-        .m-sglist{
-            margin-bottom: 25px;
-            .sglist-item{
-                margin-top: 10px;
-                .item-left{
-                    float: left;
-                    width: 156px;
-                    line-height: 16px;
-                    color: #999;
-                    .text-tit{
-                        color: #333;
-                    }
-                }
-                .item-right{
-                    float: right;
-                    position: relative;
-                    top: 10px;
-                    line-height: 32px;
-                    .icn{
-                        float: left;
-                        width: 10px;
-                        height: 11px;
-                        opacity: 0.9;
-                        cursor: pointer;
-                        background: url('@/assets/images/icon2.png') no-repeat;
-                    }
-                    .play-icn{
-                        margin-right: 16px;
-                        background-position: -69px -455px;
-                        &:hover{
-                            opacity: 1;
-                        }
-                    }
-                    .add-icn{
-                        background-position: -87px -454px;
-                        &:hover{
-                            opacity: 1;
-                        }
-                    }
-                    &:after {
-                        clear: both;
-                        content: '.';
-                        display: block;
-                        height: 0;
-                        visibility: hidden;
-                    }
-                }
-                &:after {
-                    clear: both;
-                    content: '.';
-                    display: block;
-                    height: 0;
-                    visibility: hidden;
-                }
-            }
-        }
-        .m-multi{
-            margin: 20px 0;
-            padding-bottom: 20px;
-            .down-ul{
-                height: 65px;
-                margin-bottom: 10px;
-                background: url('@/assets/images/sprite.png') no-repeat;
-                background-position: 0 -392px;
-                .item{
-                    float: left;
-                    .ios{
-                        display: block;
-                        width: 42px;
-                        height: 48px;
-                        cursor: pointer;
-                        &:hover{
-                            background: url('@/assets/images/sprite.png') no-repeat;
-                            background-position: 0 -472px;
-                        }
-                    }
-                    .pc{
-                        display: block;
-                        width: 60px;
-                        margin: 0 26px 0 30px;
-                        height: 48px;
-                        cursor: pointer;
-                        &:hover{
-                            background: url('@/assets/images/sprite.png') no-repeat;
-                            background-position: -72px -472px;
-                        }
-                    }
-                    .aos{
-                        display: block;
-                        width: 42px;
-                        height: 48px;
-                        cursor: pointer;
-                        &:hover{
-                            background: url('@/assets/images/sprite.png') no-repeat;
-                            background-position: -158px -472px;
-                        }
-                    }
-                }
-            }
-            p{
-                color: #999;
-            }
-        }
-        .wiki-edit{
-            margin-bottom: 5px;
-            display: block;
-            margin-left: -4px;
-            line-height: 12px;
-            color: #333;
-            .img{
-                vertical-align: middle;
-            }
-            span{
-                vertical-align: middle;
-            }
-        }
-    }
+    
     &:after{
         clear: both;
         content: '.';

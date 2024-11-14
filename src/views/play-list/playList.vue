@@ -1,4 +1,5 @@
 <template>
+<div class="playList-box">
     <div class="my-playList">
         <div class="my-song">
             <div class="m-song-info">
@@ -32,7 +33,7 @@
                     />
                     <!-- 评论 -->
                     <Comment
-                    class="playList-comment"
+                      class="playList-comment"
                       :commentInfo="commentInfo" 
                       @publishComment="publishComment"
                     />
@@ -106,6 +107,7 @@
             <p class="content-text">由于版权保护，无法生成外链。</p>
         </Dialog>
     </div>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -240,6 +242,7 @@ getSongCommentList();
 // 分页点击获取当前页评论
 function changePage(value: number) {
     commentInfo.offset = value;
+    jumpToComment();
     getSongCommentList();
 }
 
@@ -286,7 +289,11 @@ function notFeatureTip() {
 
 // 滚动到评论位置
 function jumpToComment() {
-
+    const commentDom = document.querySelector(
+        '.song-sheet-review'
+    ) as HTMLDivElement;
+    const myMusic = document.querySelector('.my-song') as HTMLDivElement;
+    window.scrollTo(0, Number(commentDom.offsetTop) - 20);
 }
 
 // 收藏歌单
@@ -327,6 +334,12 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.playList-box{
+    // overflow-x: hidden;
+    // overflow-y: scroll;
+    // position: relative;
+    // height: calc(100vh - 75px);
+}
 .my-playList{
     width: 980px;
     min-height: 700px;
