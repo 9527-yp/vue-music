@@ -79,23 +79,7 @@
                         </div>
                     </li>
                 </ul>
-                <div class="m-multi">
-                    <h3 class="header">
-                        <span>网易云音乐多端下载</span>
-                    </h3>
-                    <ul class="down-ul">
-                        <li class="item">
-                            <span class="ios"></span>
-                        </li>
-                        <li class="item">
-                            <span class="pc"></span>
-                        </li>
-                        <li class="item">
-                            <span class="aos"></span>
-                        </li>
-                    </ul>
-                    <p>同步歌单，随时畅听好音乐</p>
-                </div>
+                <SideMulti />
             </div>
         </div>
         <!-- 删除歌曲弹框 -->
@@ -123,6 +107,7 @@ import Dialog from '@/components/dialog/dialog.vue';
 import Page from '@/components/page/Page.vue';
 import SongSheetInfo from '@/views/my-music/components/SongSheeInfo.vue';
 import SongListTable from '@/views/my-music/components/SongListTable.vue';
+import SideMulti from '@/components/side-info/Side-Multi.vue';
 import Comment from '@/components/comment/Comment.vue';
 import { handleCommentList } from '@/components/comment/handleCommentList.ts';
 
@@ -492,53 +477,6 @@ onMounted(() => {
                     display: block;
                     height: 0;
                     visibility: hidden;
-                }
-            }
-            .m-multi{
-                margin: 20px 0;
-                padding-bottom: 20px;
-                .down-ul{
-                    height: 65px;
-                    margin-bottom: 10px;
-                    background: url('@/assets/images/sprite.png') no-repeat;
-                    background-position: 0 -392px;
-                    .item{
-                        float: left;
-                        .ios{
-                            display: block;
-                            width: 42px;
-                            height: 48px;
-                            cursor: pointer;
-                            &:hover{
-                                background: url('@/assets/images/sprite.png') no-repeat;
-                                background-position: 0 -472px;
-                            }
-                        }
-                        .pc{
-                            display: block;
-                            width: 60px;
-                            margin: 0 26px 0 30px;
-                            height: 48px;
-                            cursor: pointer;
-                            &:hover{
-                                background: url('@/assets/images/sprite.png') no-repeat;
-                                background-position: -72px -472px;
-                            }
-                        }
-                        .aos{
-                            display: block;
-                            width: 42px;
-                            height: 48px;
-                            cursor: pointer;
-                            &:hover{
-                                background: url('@/assets/images/sprite.png') no-repeat;
-                                background-position: -158px -472px;
-                            }
-                        }
-                    }
-                }
-                p{
-                    color: #999;
                 }
             }
         }
