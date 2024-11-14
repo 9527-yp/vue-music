@@ -62,7 +62,7 @@
                     <td>
                         <div class="text">
                             <template v-for="(key, i) in item.ar" :key="i">
-                                <span class="text-hov" :title="key.name" @click="toSinger(item.id)">{{key.name}}</span><i v-if="i !== item.ar.length-1">/</i>
+                                <span class="text-hov" :title="key.name" @click="toSinger(key.id)">{{key.name}}</span><i v-if="i !== item.ar.length-1">/</i>
                             </template>
                         </div>
                     </td>

@@ -46,95 +46,79 @@
                     </span>
                 </div>
                 <div class="hotsong-list">
-                    <table class="m-table">
-                        <tbody>
-                            <tr class="even item">
-                                <td class="index">
-                                    <div class="hd">
-                                        <i class="play-icn"></i>
-                                        <span class="num">1</span>
-                                    </div>
-                                </td>
-                                <td class="">
-                                    <div class="song-name">
-                                        <div class="ttc">
-                                            <span class="txt">
-                                                <span class="tit text-hov" title="云烟成雨">云烟成雨</span>
-                                                <span title="动画《我是江小白》片尾曲"> - 动画《我是江小白》片尾曲</span>
-                                                <span class="mv-icn" title="播放mv">播放mv</span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="music-time">
-                                    <span class="time">04:00</span>
-                                    <div class="opt-btns">
-                                        <i class="add-icn" title="添加到播放列表" @click="addMusic(item)"></i>
-                                        <i class="icn collect-icn" title="收藏" @click="collectMusic(item)"></i>
-                                        <i class="icn share-icn" title="分享" @click="notFeatureTip"></i>
-                                        <i class="icn down-icn" title="下载" @click="notFeatureTip"></i>
-                                    </div>
-                                </td>
-                                <td class="album">
-                                    <span class="text text-hov" title="云烟成雨">云烟成雨</span>
-                                </td>
-                            </tr>
-                            <tr class="item">
-                                <td class="index">
-                                    <div class="hd">
-                                        <i class="play-icn"></i>
-                                        <span class="num">1</span>
-                                    </div>
-                                </td>
-                                <td class="">
-                                    <div class="song-name">
-                                        <div class="ttc">
-                                            <span class="txt">
-                                                <span class="tit text-hov" title="云烟成雨">云烟成雨</span>
-                                                <span title="动画《我是江小白》片尾曲"> - 动画《我是江小白》片尾曲</span>
-                                                <span class="mv-icn" title="播放mv">播放mv</span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="music-time">
-                                    <span class="time">04:00</span>
-                                    <div class="opt-btns">
-                                        <i class="add-icn" title="添加到播放列表" @click="addMusic(item)"></i>
-                                        <i class="icn collect-icn" title="收藏" @click="collectMusic(item)"></i>
-                                        <i class="icn share-icn" title="分享" @click="notFeatureTip"></i>
-                                        <i class="icn down-icn" title="下载" @click="notFeatureTip"></i>
-                                    </div>
-                                </td>
-                                <td class="album">
-                                    <span class="text text-hov" title="云烟成雨">云烟成雨</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <SongListTable :playList="playList" :loading="loading" />
                 </div>
             </div>
         </div>
         <div class="singer-side">
+            <div class="side-cnt">
+                <h3 class="header">
+                    <span>相似歌手</span>
+                </h3>
+                <ul class="simi-ul">
+                    <li class="item" v-for="(item, index) in simiList.splice(0,6)" :key="index">
+                        <div class="hd" :title="item?.name">
+                            <img :src="item?.img1v1Url" alt="">
+                        </div>
+                        <p>
+                            <span class="text text-hov thide" :title="item?.name">{{item?.name}}</span>
+                        </p>
+                    </li>
+                </ul>
+                <Side />
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { getSingerDetail } from '@/api/singer.ts';
+import { getSingerDetail, getplayList, getSimi } from '@/api/singer.ts';
 import type { ResponseType } from '@/types/index';
+import { useRoute } from 'vue-router';
+import SongListTable from './song-list-table/SongListTable.vue';
+import Side from '@/components/side-info/Side.vue';
 
 
+const route = useRoute();
+
+
+// 歌手基本信息
 const singerInfo = ref({})
 function getSingerInfo() {
-    getSingerDetail({id: 1050282}).then((res: ResponseType) => {
+    getSingerDetail({id: route.query.id}).then((res: ResponseType) => {
         if(res.code === 200) {
             singerInfo.value = res.data ?? {}
         }
     })
 }
 getSingerInfo();
+
+// 歌手歌曲
+const playList = ref([]);
+const loading = ref<boolean>(false)
+function getplayListData() {
+    loading.value = true;
+    getplayList({id: route.query.id}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            loading.value = false;
+            playList.value = res.hotSongs ?? []
+        }
+    })
+}
+getplayListData();
+
+
+// 相似歌手
+const simiList = ref([]);
+function getSimiList() {
+    getSimi({id: route.query.id}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            simiList.value = res.artists ?? []
+        }
+    })
+}
+getSimiList();
 </script>
 
 
@@ -343,171 +327,57 @@ getSingerInfo();
                     visibility: hidden;
                 }
             }
-            .hotsong-list{
-                .m-table{
-                    border: none;
-                    width: 100%;
-                    border-collapse: collapse;
-                    border-spacing: 0;
-                    table-layout: fixed;
-                    .item{
-                        &:hover{
-                            
-                            .time{
-                                display: none !important;
-                            }
-                            .opt-btns{
-                                position: relative;
-                                margin-right: -10px;
-                                display: block !important;
-                            }
-                        }
-                    }
-                    td{
-                        padding: 6px 10px;
-                        line-height: 18px;
-                        text-align: left;
-                        // background: url('@/assets/images/my-music/table.png') no-repeat 0 9999px;
-                    }
-                    .index{
-                        width: 74px;
-                        .hd{
-                            height: 18px;
-                            .play-icn{
-                                float: right;
-                                width: 17px;
-                                height: 17px;
-                                cursor: pointer;
-                                background: url('@/assets/images/my-music/table.png') no-repeat 0 9999px;
-                                background-position: 0 -103px;
-                                &:hover{
-                                    background-position: 0 -128px;
-                                }
-                            }
-                            .num{
-                                margin-left: 5px;
-                                color: #999;
-                            }
-                        }
-                    }
-                    .song-name{
-                        float: left;
-                        width: 100%;
-                        .ttc{
-                            height: 18px;
-                            margin-right: 20px;
-                            .txt{
-                                position: relative;
-                                display: inline-block;
-                                padding-right: 25px;
-                                margin-right: -25px;
-                                max-width: 99%;
-                                height: 20px;
-                                color: #999;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                                white-space: nowrap;
-                                .tit{
-                                    color: #333;
-                                }
-                                .mv-icn{
-                                    width: 23px;
-                                    height: 17px;
-                                    margin: 1px 0 0 0;
-                                    position: absolute;
-                                    top: 0;
-                                    right: 0;
-                                    overflow: hidden;
-                                    text-indent: -999px;
-                                    cursor: pointer;
-                                    background: url('@/assets/images/my-music/table.png') no-repeat 0 9999px;
-                                    background-position: 0 -151px;
-                                }
-                            }
-                        }
-                        &:after{
-                            clear: both;
-                            content: '.';
-                            display: block;
-                            height: 0;
-                            visibility: hidden;
-                        }
-                    }
-                    .music-time{
-                        width: 69px;
-                        color: #666;
-                        .opt-btns{
-                            float: left;
-                            display: none;
-                            .add-icn{
-                                margin-top: 2px;
-                                float: left;
-                                overflow: hidden;
-                                vertical-align: middle;
-                                width: 13px;
-                                height: 13px;
-                                background: url('@/assets/images/icon.png') no-repeat;
-                                background-position: 0 -700px;
-                                cursor: pointer;
-                                &:hover{
-                                    background-position: -22px -700px;
-                                }
-                            }
-                            .icn{
-                                float: left;
-                                width: 18px;
-                                height: 16px;
-                                margin: 2px 0 0 4px;
-                                overflow: hidden;
-                                text-indent: -999px;
-                                background: url('@/assets/images/my-music/table.png') no-repeat;
-                                cursor: pointer;
-                            }
-                            .collect-icn{
-                                background-position: 0 -174px;
-                                &:hover{
-                                    background-position: -20px -174px;
-                                }
-                            }
-                            .share-icn{
-                                background-position: 0 -195px;
-                                &:hover{
-                                    background-position: -20px -195px;
-                                }
-                            }
-                            .down-icn{
-                                background-position: -81px -174px;
-                                &:hover{
-                                    background-position: -104px -174px;
-                                }
-                            }
-                        }
-                    }
-                    .album{
-                        width: 20%;
-                        .text{
-                            color: #333;
-                            width: 100%;
-                            position: relative;
-                            zoom: 1;
-                            overflow: hidden;
-                            white-space: nowrap;
-                            text-overflow: ellipsis;
-                        }
-                    }
-                    .even{
-                        td{
-                            background-color: #f7f7f7;
-                        }
-                    }
-                }
-            }
         }
     }
     .singer-side{
         display: inline-block;
         width: 270px;
         vertical-align: top;
+        .side-cnt{
+            padding: 20px 40px 40px 30px;
+            .header{
+                position: relative;
+                height: 23px;
+                margin-bottom: 20px;
+                border-bottom: 1px solid #ccc;
+                color: #333;
+                font-size: 100%;
+            }
+            .simi-ul{
+                margin-left: -25px;
+                .item{
+                    float: left;
+                    width: 50px;
+                    height: 92px;
+                    padding-left: 25px;
+                    .hd{
+                        width: 50px;
+                        height: 50px;
+                        cursor: pointer;
+                        img{
+                            width: 50px;
+                            height: 50px;
+                        }
+                    }
+                    p{
+                        margin-top: 7px;
+                        text-align: center;
+                        .text{
+                            display: inline-block;
+                            width: 50px;
+                            vertical-align: middle;
+                        }
+                    }
+                }
+                &:after{
+                    clear: both;
+                    content: '.';
+                    display: block;
+                    height: 0;
+                    visibility: hidden;
+                }
+            }
+        }
     }
 }
 </style>

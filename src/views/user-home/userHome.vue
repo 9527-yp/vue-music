@@ -9,12 +9,12 @@
               @follow="follow"
             />
             <!-- 听歌排行 -->
-            <template v-show="songTableShow">
+            <div v-show="songTableShow">
                 <RankingTable
                   :recordInfo="recordInfo"
                   @tagschange="tagschange"
                 />
-            </template>
+            </div>
             <!-- 创建的歌单 -->
             <UserSongList title="我创建的歌单" :list="songSheetList.createdSongSheet" />
             <!-- 收藏的歌单 -->
