@@ -265,17 +265,17 @@ function deleteCancel() {
 
 // 收藏
 function collectMusic(item: songType) {
-    let index = isCopyright(item.id)
+    // let index = isCopyright(item.id)
 
-    if(index === 0) {
-        playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
-        playDialog.value = true;
-        return;
-    }else if(index === 1){
-        playDialogText.value = '该歌曲为付费歌曲，请购买后聆听';
-        playDialog.value = true;
-        return;
-    }
+    // if(index === 0) {
+    //     playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
+    //     playDialog.value = true;
+    //     return;
+    // }else if(index === 1){
+    //     playDialogText.value = '该歌曲为付费歌曲，请购买后聆听';
+    //     playDialog.value = true;
+    //     return;
+    // }
     
     dialogStore.setSongId(item.id);
     dialogStore.setSongListShow(true);
@@ -376,6 +376,9 @@ function toSinger(id: number) {
                     }
                     .play-z-slt{
                         background-position: -20px -128px;
+                        &:hover{
+                            background-position: -20px -128px;
+                        }
                     }
                 }
             }

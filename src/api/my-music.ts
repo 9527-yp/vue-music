@@ -78,7 +78,7 @@ export const getSongSheetInfo = ({id}: {id :string | number}): AxiosPromise => {
 }
 
 /**
- * @description 歌单歌曲添加 、 删除
+ * @description 歌单歌曲添加收藏 、 删除收藏
  * @param param.pid  歌单id
  * @param param.tracks  歌曲 id,可多个,用逗号隔开
  * @param param.op  从歌单增加单曲为 add, 删除为 del

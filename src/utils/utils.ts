@@ -99,7 +99,7 @@ export function formatDateTime(timestamp : number, format: string): string {
             formattedDate = formattedDate.replace(regex, formatMap[key] as string);  
         }  
     }
-    return formattedDate;  
+    return formattedDate;
 }
 
 
