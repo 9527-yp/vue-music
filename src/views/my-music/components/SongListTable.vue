@@ -68,7 +68,7 @@
                     </td>
                     <td>
                         <div class="text">
-                            <span class="text-hov">{{item?.al?.name}}</span>
+                            <span class="text-hov" @click="toAlbum(item?.al?.id)">{{item?.al?.name}}</span>
                         </div>
                     </td>
                 </tr>
@@ -302,6 +302,15 @@ function toSinger(id: number) {
         }
     })
 }
+
+function toAlbum(id: number) {
+    router.push({
+        path: '/album',
+        query: {
+            id
+        }
+    })
+}
 </script>
 
 
@@ -337,7 +346,7 @@ function toSinger(id: number) {
             padding: 6px 10px;
             line-height: 18px;
             text-align: left;
-            background: url('@/assets/images/my-music/table.png') no-repeat 0 9999px;
+            // background: url('@/assets/images/my-music/table.png') no-repeat 0 9999px;
         }
         .first{
             width: 74px;
