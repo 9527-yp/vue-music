@@ -1,45 +1,49 @@
 <template>
     <div class="music-side">
-        <h3 class="header">
-            <span>包含这首歌的歌单</span>
-        </h3>
-        <ul class="recommend-ul">
-            <li class="item" v-for="item in playListData" :key="item.id">
-                <div class="song-img" :title="item.name" @click="toPlayList(item.id)">
-                    <img :src="item.coverImgUrl" alt="">
-                </div>
-                <div class="info">
-                    <p class="thide">
-                        <span class="song-name text-hov" @click="toPlayList(item.id)">{{item.name}}</span>
-                    </p>
-                    <p>
-                        <span class="by">by</span>
-                        <span class="nm thide text-hov" :title="item.creator.nickname" @click="toUserHome(item.userId)">{{item.creator.nickname}}</span>
-                    </p>
-                </div>
-            </li>
-        </ul>
-        <h3 class="header">
-            <span>相似的歌曲</span>
-        </h3>
-        <ul class="m-sglist">
-            <li class="sglist-item" v-for="item in songList" :key="item.id">
-                <div class="item-left">
-                    <div class="thide">
-                        <span class="text-tit text-hov" :title="item.name" @click="toSong(item.id)">{{item.name}}</span>
+        <template v-if="playListData.length > 0">
+            <h3 class="header">
+                <span>包含这首歌的歌单</span>
+            </h3>
+            <ul class="recommend-ul">
+                <li class="item" v-for="item in playListData" :key="item.id">
+                    <div class="song-img" :title="item.name" @click="toPlayList(item.id)">
+                        <img :src="item.coverImgUrl" alt="">
                     </div>
-                    <div class="thide">
-                        <template v-for="(key, i) in item?.artists" :key="i">
-                            <span class="text-hov" :title="key.name">{{key.name}}</span><i v-show="i !== item?.artists.length-1">/</i>
-                        </template>
+                    <div class="info">
+                        <p class="thide">
+                            <span class="song-name text-hov" @click="toPlayList(item.id)">{{item.name}}</span>
+                        </p>
+                        <p>
+                            <span class="by">by</span>
+                            <span class="nm thide text-hov" :title="item.creator.nickname" @click="toUserHome(item.userId)">{{item.creator.nickname}}</span>
+                        </p>
                     </div>
-                </div>
-                <div class="item-right">
-                    <i class="play-icn icn" @click="playMusic(item.id)"></i>
-                    <i class="add-icn icn" @click="addMusic(item.id)"></i>
-                </div>
-            </li>
-        </ul>
+                </li>
+            </ul>
+        </template>
+        <template v-if="songList.length > 0">
+            <h3 class="header">
+                <span>相似的歌曲</span>
+            </h3>
+            <ul class="m-sglist">
+                <li class="sglist-item" v-for="item in songList" :key="item.id">
+                    <div class="item-left">
+                        <div class="thide">
+                            <span class="text-tit text-hov" :title="item.name" @click="toSong(item.id)">{{item.name}}</span>
+                        </div>
+                        <div class="thide">
+                            <template v-for="(key, i) in item?.artists" :key="i">
+                                <span class="text-hov" :title="key.name">{{key.name}}</span><i v-show="i !== item?.artists.length-1">/</i>
+                            </template>
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <i class="play-icn icn" @click="playMusic(item.id)"></i>
+                        <i class="add-icn icn" @click="addMusic(item.id)"></i>
+                    </div>
+                </li>
+            </ul>
+        </template>
         <Side />
     </div>
 </template>
