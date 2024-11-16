@@ -25,14 +25,14 @@
                 <p class="des">
                     歌手：
                     <template v-for="(item, index) in songDetailData.songs?.[0]?.ar" :key="item.id">
-                        <span class="text">{{item.name}}</span>
+                        <span class="text" @click="toSinger(item.id)">{{item.name}}</span>
                         <i v-show="index !== songDetailData.songs[0].ar.length-1">/</i>
                     </template>
                     
                 </p>
                 <p class="des">
                     所属专辑：
-                    <span class="text">{{songDetailData.songs?.[0]?.al?.name}}</span>
+                    <span class="text" @click="toAlbum(songDetailData.songs?.[0]?.al?.id)">{{songDetailData.songs?.[0]?.al?.name}}</span>
                 </p>
                 <div class="m-btns">
                     <span class="btns-bag play" title="播放" @click="playMusic">
@@ -75,7 +75,27 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
+
+function toSinger(id: number) {
+    router.push({
+        path: '/singer',
+        query: {
+            id
+        }
+    })
+}
+
+function toAlbum(id: number) {
+    router.push({
+        path: '/album',
+        query: {
+            id
+        }
+    })
+}
 const props = defineProps({
     songDetailData: {
         type: Object,

@@ -1,5 +1,5 @@
 <template>
-    <div class="ranking-title">
+    <div class="ranking-title" v-show="songTableShow">
         <h3 class="title">听歌排行</h3>
         <h4 class="listen-music-total">累积听歌{{recordInfo.listenSongs}}首</h4>
         <span class="n-iconpoint">
@@ -97,6 +97,10 @@ import Dialog from '@/components/dialog/dialog.vue';
             default: {}
         },
         isMore: {
+            type: Boolean,
+            default: true
+        },
+        songTableShow: {
             type: Boolean,
             default: true
         }

@@ -10,16 +10,16 @@
         </ul>
         <h3 class="header">
             <span class="hed-l">Ta的其他热门专辑</span>
-            <span class="more text-hov">全部></span>
+            <span class="more text-hov" @click="skip('singer', singerId)">全部></span>
         </h3>
         <ul class="m-rctlist">
             <li class="item-album" v-for="item in albumList" :key="item.id">
-                <div class="u-cover" :title="item.name" @click="skip(item.id)">
+                <div class="u-cover" :title="item.name" @click="skip('/album', item.id)">
                     <img class="img" :src="`${item?.picUrl}?param=50y50`" alt="">
                 </div>
                 <div class="info">
                     <p class="thide">
-                        <span class="text-hov tit" @click="skip(item.id)">{{item.name}}</span>
+                        <span class="text-hov tit" @click="skip('/album', item.id)">{{item.name}}</span>
                     </p>
                     <p>{{formatDateTime(item?.publishTime / 1000, 'Y-M-D')}}</p>
                 </div>
@@ -36,13 +36,17 @@ defineProps({
     albumList: {
         type: Array,
         default: []
+    },
+    singerId: {
+        type: Number,
+        default: 0
     }
 })
 
 const emit = defineEmits(['skip']);
 
-function skip(id: number) {
-    emit('skip',{'/album', id})
+function skip(path: string, id: number) {
+    emit('skip',{path, id})
 }
 </script>
 

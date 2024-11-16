@@ -2,12 +2,12 @@
     <div class="m-timeline">
         <ul class="timeline-ul" v-if="dynamicList.length > 0">
             <li class="item" v-for="(item, index) in dynamicList" :key="index">
-                <div class="u-cover">
+                <div class="u-cover" @click="toUserHome(item?.user?.userId)">
                     <img class="u-img" :src="item?.user?.avatarUrl" alt="">
                 </div>
                 <div class="item-r">
                     <div class="item-header">
-                        <span class="u-name text-hov">{{item?.user?.nickname}}</span>
+                        <span class="u-name text-hov" @click="toUserHome(item?.user?.userId)">{{item?.user?.nickname}}</span>
                         <span class="u-vip-icn" v-if="item?.user?.avatarDetail">
                             <img :src="item?.user?.avatarDetail?.identityIconUrl" alt="">
                         </span>
@@ -71,8 +71,10 @@
 
 <script setup lang="ts">
 import { formatDate } from '@/utils/utils.ts';
-import ItemContent from './ItemContent.vue'
+import ItemContent from './ItemContent.vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 defineProps({
     dynamicList: {
         type: Array,
@@ -83,6 +85,15 @@ defineProps({
         default: {}
     }
 })
+
+function toUserHome(id: number) {
+    router.push({
+        path: '/user/home',
+        query: {
+            id
+        }
+    })
+}
 
 </script>
 
@@ -103,6 +114,7 @@ defineProps({
             top: 20px;
             left: 0;
             width: 54px;
+            cursor: pointer;
             .u-img{
                 width: 45px;
                 height: 45px;

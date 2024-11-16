@@ -108,7 +108,7 @@
     <!-- 转发 -->
     <div class="item-content" v-if="item.type === 22">
         <div class="retrans-tit">
-            <span class="activity text-hov">{{item?.jsonData?.event?.user?.nickname}}</span>
+            <span class="activity text-hov" @click="toUserHome(item?.jsonData?.event?.user?.userId)">{{item?.jsonData?.event?.user?.nickname}}</span>
                 <span v-html="item?.jsonData?.event?.jsonData?.msg"></span>
                 <br v-if="item?.jsonData?.event?.actName && item?.jsonData?.event?.jsonData?.msg" />
                 <span v-if="item?.jsonData?.event?.actName" class="activity text-hov">#{{item?.jsonData?.event?.actName}}#</span>
@@ -145,6 +145,10 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
 defineOptions({
   name: "ItemContent"
 })
@@ -156,6 +160,15 @@ defineProps({
         default: {}
     }
 })
+
+function toUserHome(id: number) {
+    router.push({
+        path: '/user/home',
+        query: {
+            id
+        }
+    })
+}
 </script>
 
 

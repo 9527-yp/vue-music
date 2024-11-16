@@ -34,7 +34,7 @@
             />
         </div>
         <div class="album-side">
-            <AlbumSide :albumList="albumList" @skip="skip" />
+            <AlbumSide :singerId="albumInfo?.artist?.id" :albumList="albumList" @skip="skip" />
         </div>
         <!-- 播放权限弹框 -->
         <Dialog 

@@ -1,12 +1,12 @@
 <template>
     <ul class="comment-ul">
         <li class="hot-item" v-for="(item, index) in list" :key="index">
-            <div class="item-header">
+            <div class="item-header" @click="toUserHome(item?.user?.userId)">
                 <img class="user-img" :src="item?.user?.avatarUrl" alt="">
             </div>
             <div class="cntwrap">
                 <div class="cntwrap-top cntwrap-brk">
-                    <span class="user-name text-hov">{{item?.user?.nickname}}</span>
+                    <span class="user-name text-hov" @click="toUserHome(item?.user?.userId)">{{item?.user?.nickname}}</span>
                     <img
                      class="brand-vip"
                      v-if="item?.user?.vipRights?.redplus"
@@ -28,7 +28,7 @@
                             <span>该评论已删除</span>
                         </template>
                         <template v-else>
-                            <span class="user-name text-hov">{{i?.user?.nickname}}</span>
+                            <span class="user-name text-hov" @click="toUserHome(item?.user?.userId)">{{i?.user?.nickname}}</span>
                             <img
                               class="brand-vip"
                               v-if="i?.user?.vipRights?.redplus"
@@ -97,6 +97,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import Cmmtipt from '../cmmtipt/Cmmtipt.vue'
 import Dialog from '@/components/dialog/dialog.vue';
 import useUserStore from '@/stores/modules/user.ts';
@@ -105,6 +106,8 @@ import { deleteComment, likeComment } from '@/api/comment.ts';
 import { formatDate } from '@/utils/utils.ts';
 
 const userStore = useUserStore();
+const router = useRouter();
+
 const userInfo = computed(() => userStore.getUserInfo)
 const emit = defineEmits(['recoverComment'])
 
@@ -190,6 +193,15 @@ function handelDeleteComment(id: number | string) {
 
 function publish() {
     emit('recoverComment')
+}
+
+function toUserHome(id: number) {
+    router.push({
+        path: '/user/home',
+        query: {
+            id
+        }
+    })
 }
 </script>
 <style lang="scss" scoped>

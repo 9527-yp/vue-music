@@ -1,10 +1,10 @@
 <template>
     <ul class="allAlbum-ul" v-if="list.length > 0">
-        <li class="item" v-for="(item, index) in list" :key="index">
+        <li class="item" v-for="(item, index) in list" :key="index" @click="toAlbum(item.id)">
             <div class="m-cover" :title="item.name">
                 <img class="img" :src="`${item.picUrl}?param=120y120`" alt="">
                 <span class="msk"></span>
-                <i class="play-icn" @click="playAlbum(item.id)"></i>
+                <i class="play-icn" @click.stop="playAlbum(item.id)"></i>
             </div>
             <p class="dec">
                 <span class="text-hov" :title="item.name">{{item.name}}</span>
@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { formatDateTime } from '@/utils/utils.ts';
 import { getAlbumMusic } from '@/api/singer.ts';
 import type { ResponseType } from '@/types/index';
@@ -33,6 +34,7 @@ import usePlaySong from '@/hooks/usePlaySong.ts';
 import usePlayStore from '@/stores/modules/play.ts';
 
 const playStore = usePlayStore();
+const router = useRouter();
 
 // 播放显示/隐藏
 const lock = computed(() => playStore.getplayLock);
@@ -114,6 +116,15 @@ function isCopyright(id?: number): number | undefined {
         // 可播放歌曲
         return 2;
     }
+}
+
+function toAlbum(id: number) {
+    router.push({
+        path: '/album',
+        query: {
+            id
+        }
+    })
 }
 </script>
 

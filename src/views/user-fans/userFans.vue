@@ -23,7 +23,7 @@
                         v-for="(item, index) in followedsInfo.list"
                         :key="index"
                         >
-                            <div class="user-cover" :title="item.nickname">
+                            <div class="user-cover" :title="item.nickname" @click="toUserHome(item.userId)">
                                 <img class="img" :src="item.avatarUrl" alt="">
                             </div>
                             <div class="info">

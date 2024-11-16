@@ -9,8 +9,9 @@
               @follow="follow"
             />
             <!-- 听歌排行 -->
-            <div v-show="songTableShow">
+            <div>
                 <RankingTable
+                  :songTableShow="songTableShow"
                   :recordInfo="recordInfo"
                   @tagschange="tagschange"
                 />
@@ -166,6 +167,9 @@ function records() {
             songTableShow.value = false;
             recordInfo.loading = false;
         }
+    }).catch(error => {
+        songTableShow.value = false;
+        recordInfo.loading = false;
     })
 }
 records()
