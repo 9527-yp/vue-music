@@ -20,7 +20,7 @@
           <div class="intr">
             <b>歌手：</b>
             <template v-for="item in albumInfo?.artists" :key="item.id">
-                <span class="text-hov text">{{item?.name}}</span>
+                <span class="text-hov text" @click="skip(item.id)">{{item?.name}}</span>
             </template>
           </div>
           <div class="intr">
@@ -29,13 +29,13 @@
           </div>
         </div>
         <div class="m-btns">
-          <span class="btns-bag play" title="播放" @click="playMusic">
+          <span class="btns-bag play" title="播放" @click="playorAdd('play')">
             <i class="i-box btns-bag">
               <i class="play-icn btns-bag"></i>
               播放
             </i>
           </span>
-          <span class="add btns-bag" title="添加到播放列表" @click="addMusic"></span>
+          <span class="add btns-bag" title="添加到播放列表" @click="playorAdd('add')"></span>
           <span class="btns-bag btn-jointly collect" @click="collectMusic">
             <i class="collect-icn icn btns-bag">收藏</i>
           </span>
@@ -62,15 +62,141 @@
 
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { formatDateTime } from '@/utils/utils';
+import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
+import usePlaySong from '@/hooks/usePlaySong.ts';
+import usePlayStore from '@/stores/modules/play.ts';
+import useDialogStore from '@/stores/modules/dialog.ts';
 
+const playStore = usePlayStore();
+const dialogStore = useDialogStore();
+
+// 播放显示/隐藏
+const lock = computed(() => playStore.getplayLock);
 
 const props = defineProps({
-    albumInfo: {
-        type: Object,
-        default: {}
-    }
+  albumInfo: {
+    type: Object,
+    default: {}
+  },
+  list: {
+    type: Array,
+    default: []
+  }
 })
+
+const playDialog = defineModel('playDialog', {
+  type: Boolean,
+  default: false
+})
+
+const playDialogText = defineModel('playDialogText', {
+  type: String,
+  default: ''
+})
+
+const emit = defineEmits(['jumpToComment','skip']);
+
+function jumpToComment() {
+  emit('jumpToComment')
+}
+
+function skip(id: number) {
+  emit('skip',{path: '/singer', id})
+}
+// 播放 or 添加到播放列表
+let timer = null;
+function playorAdd(type: string): undefined {
+
+  let list = props.list.filter((item) => isCopyright(item.id) === 2 );
+
+  if(props.list.length === 0){
+      playDialogText.value = '专辑还没有添加歌曲';
+      playDialog.value = true;
+      return;
+  }else if(list.length === 0){
+      playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
+      playDialog.value = true;
+      return;
+  }
+  
+  if(type === 'play') {
+    usePlaySong(list[0]);
+    // 播放，需先清空当前的播放列表
+    useSongAddPlaylist(list, {clear: true});
+  }
+
+  if(type === 'add') {
+    useSongAddPlaylist(list);
+  }
+  playStore.setAddPlayListTip(true)
+  playStore.setAddPlayListTipText(type === 'play' ? '已开始播放' : '已添加到播放列表')
+  if(!lock.value){
+      playStore.setPlayLock(true)
+  }
+  timer && clearTimeout(timer)
+  timer = setTimeout(() => {
+      playStore.setPlayLock(false)
+      playStore.setAddPlayListTip(false)
+  }, 1500)
+}
+
+// 收藏
+function collectMusic() {
+  if(props.list.length === 0){
+    playDialogText.value = '专辑还没有添加歌曲';
+    playDialog.value = true;
+    return;
+  }
+
+  const ids = props.list.map((item: { id: number }) => item.id)
+  dialogStore.setSongId(ids.join());
+  dialogStore.setSongListShow(true);
+}
+
+function notFeatureTip() {
+  dialogStore.setMessage({
+      type: 0,
+      text: '功能暂未开发',
+      visible: true,
+  })
+  timer && clearTimeout( timer);
+  timer = setTimeout(() => {
+      dialogStore.setMessage({
+          type: 0,
+          text: '功能暂未开发',
+          visible: false,
+      })
+  }, 1500);
+}
+
+// 歌曲是否有版权
+type itemType = {
+    privilege?: {
+        cp: number,
+        dl: number,
+        fee: number
+    }
+}
+
+function isCopyright(id: number): number | undefined {
+    const item: itemType = props.list.find(
+        (item: { id: number }) => item.id === id
+    );
+    if (item?.privilege?.dl === 0) {
+        if(item?.privilege.fee === 0){
+            // 无版权
+            return 0;
+        }else if(item?.privilege.fee === 1){
+            // 付费歌曲
+            return 1;
+        }
+    }else{
+        // 可播放歌曲
+        return 2;
+    }
+}
 </script>
 
 <style lang="scss" scoped>

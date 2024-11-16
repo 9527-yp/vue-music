@@ -43,3 +43,21 @@ export const getComment = ({id, limit, offset}: MusicItem): AxiosPromise => {
         params
     })
 }
+
+
+/**
+ * @description 获取最近 5 个听了这首歌的用户
+ * @param id 歌曲id
+ */
+export const getSimiUser = ({id}: {id: number|string}): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+        id,
+    };
+
+    return axios.request({
+        url: '/simi/user',
+        method: 'get',
+        params
+    })
+}

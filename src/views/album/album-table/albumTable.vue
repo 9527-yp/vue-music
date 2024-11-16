@@ -45,13 +45,13 @@
                         <td class="left">
                             <div class="index-hd">
                                 <span class="index">{{index+1}}</span>
-                                <i class="play-icn" :class="{'play-z-slt' : playSongId === item.id}"></i>
+                                <i class="play-icn" :class="{'play-z-slt' : playSongId === item.id}" @click="playOrAddMusic(item, 'play')"></i>
                             </div>
                         </td>
                         <td>
                             <div class="song-name">
                                 <div class="song-name-box">
-                                    <span class="text-hov" @click="toSong(item.id)">{{item.name}}</span>
+                                    <span class="text-hov" @click="skip('song', item.id)">{{item.name}}</span>
                                     <span class="song-other" v-if="item?.alia.length > 0"> - ({{item?.alia[0]}})</span>
                                     <i v-if="item.mv" class="mv-icn"></i>
                                 </div>
@@ -60,7 +60,7 @@
                         <td class="song-time-box">
                             <span class="song-time">{{ timeStampToDuration(item.dt / 1000) || '00:00' }}</span>
                             <div class="btns">
-                                <i class="add-icn" title="添加到播放列表" @click="addMusic(item)"></i>
+                                <i class="add-icn" title="添加到播放列表" @click="playOrAddMusic(item, 'add')"></i>
                                 <i class="icn collect-icn" title="收藏" @click="collectMusic(item)"></i>
                                 <i class="icn share-icn" title="分享" @click="notFeatureTip"></i>
                                 <i class="icn down-icn" title="下载" @click="notFeatureTip"></i>
@@ -69,7 +69,7 @@
                         <td>
                             <div class="text">
                                 <template v-for="(key, i) in item.ar" :key="i">
-                                    <span class="text-hov" :title="key.name" @click="toSinger(key.id)">{{key.name}}</span><i v-if="i !== item.ar.length-1">/</i>
+                                    <span class="text-hov" :title="key.name" @click="skip('singer', key.id)">{{key.name}}</span><i v-if="i !== item.ar.length-1">/</i>
                                 </template>
                             </div>
                         </td>
@@ -82,10 +82,20 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { timeStampToDuration } from '@/utils/utils.ts';
 import usePlayStore from '@/stores/modules/play.ts';
+import type { songType } from '@/hooks/methods/songFormat.ts';
+import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
+import usePlaySong from '@/hooks/usePlaySong.ts';
+import useDialogStore from '@/stores/modules/dialog.ts';
 
 const playStore = usePlayStore();
+const dialogStore = useDialogStore();
+const router = useRouter();
+
+// 播放显示/隐藏
+const lock = computed(() => playStore.getplayLock);
 
 // 当前播放歌曲ID
 const playSongId = computed(() => playStore.getPlaySongId);
@@ -100,6 +110,86 @@ const props = defineProps({
         default: ''
     }
 })
+
+const playDialog = defineModel('playDialog', {
+  type: Boolean,
+  default: false
+})
+
+const playDialogText = defineModel('playDialogText', {
+  type: String,
+  default: ''
+})
+
+const emit = defineEmits(['skip']);
+
+function skip(path: string, id: number) {
+    emit('skip',{path, id})
+}
+
+// 播放 or 添加到播放列表
+let timer = null;
+function playOrAddMusic(item: songType, type: string) {
+    let index = isCopyright(item.id)
+
+    if(index === 0) {
+        playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
+        playDialog.value = true;
+        return;
+    }else if(index === 1){
+        playDialogText.value = '该歌曲为付费歌曲，请购买后聆听';
+        playDialog.value = true;
+        return;
+    }
+    if(type === 'play'){
+        usePlaySong(item);
+    }
+    useSongAddPlaylist(item);
+    playStore.setAddPlayListTip(true)
+    playStore.setAddPlayListTipText(type === 'play' ? '已开始播放' : '已添加到播放列表')
+    if(!lock.value){
+        playStore.setPlayLock(true)
+    }
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => {
+        playStore.setPlayLock(false)
+        playStore.setAddPlayListTip(false)
+    }, 1500)
+}
+
+// 收藏
+function collectMusic(item: songType) {
+    // let index = isCopyright(item.id)
+
+    // if(index === 0) {
+    //     playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
+    //     playDialog.value = true;
+    //     return;
+    // }else if(index === 1){
+    //     playDialogText.value = '该歌曲为付费歌曲，请购买后聆听';
+    //     playDialog.value = true;
+    //     return;
+    // }
+    
+    dialogStore.setSongId(item.id);
+    dialogStore.setSongListShow(true);
+}
+
+function notFeatureTip() {
+    dialogStore.setMessage({
+      type: 0,
+      text: '功能暂未开发',
+      visible: true,
+    })
+    timer && clearTimeout( timer);
+    timer = setTimeout(() => {
+        dialogStore.setMessage({
+            type: 0,
+            text: '功能暂未开发',
+            visible: false,
+        })
+    }, 1500);
+}
 
 // 歌曲是否有版权
 type privilegeItem = {

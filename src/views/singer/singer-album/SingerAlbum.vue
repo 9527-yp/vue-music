@@ -67,9 +67,11 @@ async function playAlbum(id: number) {
     if(playList.length === 0){
         playDialogText.value = '专辑还没有添加歌曲';
         playDialog.value = true;
+        return;
     }else if(list.length === 0){
         playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
         playDialog.value = true;
+        return;
     }
 
     usePlaySong(list[0]);
