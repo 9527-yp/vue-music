@@ -58,9 +58,9 @@
                  @progressChange="volumeProgressChange"
                 />
                 <i class="icn icn-vol" @click="volumeShow"></i>
-                <i class="icn icn-one" title="单曲循环" v-if="mode.modeIndex === 1" @click="modeChange('单曲循环')"></i>
-                <i class="icn icn-loop" title="循环" v-if="mode.modeIndex === 2" @click="modeChange('循环')"></i>
-                <i class="icn icn-shuffle" title="随机" v-if="mode.modeIndex === 3" @click="modeChange('随机')"></i>
+                <i class="icn icn-one" title="单曲循环" v-if="mode.modeIndex === 1" @click="modeChange('循环')"></i>
+                <i class="icn icn-loop" title="循环" v-if="mode.modeIndex === 2" @click="modeChange('随机')"></i>
+                <i class="icn icn-shuffle" title="随机" v-if="mode.modeIndex === 3" @click="modeChange('单曲循环')"></i>
                 <div class="mode-tooltip" v-show="mode.visible">{{mode.modeName}}</div>
                 <span class="add" @click="playListChange">
                   <span class="tip" v-show="addPlayListTip">{{ addPlayListTipText }}</span>

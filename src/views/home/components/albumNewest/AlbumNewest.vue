@@ -12,14 +12,15 @@
                 <div class="disc-content">
                     <ul class="list" :style="listStyle">
                         <li class="item" v-for="(item, index) in album" :key="index">
-                            <div class="item-cover">
+                            <div class="item-cover" :title="item.name" @click="toAlbum(item.id)">
                                 <img class="item-img" :src="`${item?.picUrl}?param=100y100`" alt="">
                                 <div class="mask"></div>
-                                <i class="play-icn"></i>
+                                <i class="play-icn" title="播放" @click.stop="playMusic(item?.id)"></i>
                             </div>
-                            <p class="f-thide text-hov" :title="item.name">{{item.name}}</p>
+                            <p class="f-thide text-hov" :title="item.name" @click="toAlbum(item.id)">{{item.name}}</p>
                             <template v-for="(i, ind) in item?.artists" :key="ind">
-                                <p class="f-thide tit text-hov" :title="i.name">{{i.name}}</p>
+                                <span class="f-thide tit text-hov" :title="i.name" @click="toSinger(i?.id)">{{i.name}}</span>
+                                <i v-show="ind !== item?.artists.length-1">/</i>
                             </template>
                             
                         </li>
@@ -29,14 +30,28 @@
                 <button class="btn right-btn" @click="albumNext"></button>
             </div>
         </div>
+        <!-- 播放权限弹框 -->
+        <Dialog 
+            :visible="playDialog"
+            showCustomButton
+            @cancel='playCancel'
+        >
+            <p class="content-text">{{ playDialogText }}</p>
+        </Dialog>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue';
-import { albumNewest } from '@/api/home.ts'
+import Dialog from '@/components/dialog/dialog.vue';
+import { useRouter } from 'vue-router';
+import { albumNewest } from '@/api/home.ts';
+import { getAlbumDetail } from '@/api/album-detail.ts';
 import { throttle } from 'lodash';
 import type { ResponseType } from '@/types/index';
+import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
+import usePlaySong from '@/hooks/usePlaySong.ts';
+import usePlayStore from '@/stores/modules/play.ts';
 
 type albumItem = {
     id: number;
@@ -48,6 +63,18 @@ type albumItem = {
     }[];
 }
 
+const router = useRouter();
+const playStore = usePlayStore();
+
+// 播放显示/隐藏
+const lock = computed(() => playStore.getplayLock);
+
+const playDialog = ref(false);
+const playDialogText = ref('');
+
+function playCancel() {
+    playDialog.value = false
+}
 // 列表偏移、样式
 const listOffest = reactive({
   index: 0,
@@ -79,6 +106,93 @@ function getAlbumNewest() {
     })
 }
 getAlbumNewest()
+
+// 播放专辑
+let songs = [];
+let timer = null;
+async function playMusic(id: number) {
+    let res = await getAlbumDetail({id})
+    console.log(res, 'res')
+    if(res.code !== 200) return ;
+
+    songs = res?.songs ?? []
+
+    let list = songs.filter((item) => isCopyright(item.id) === 2 );
+
+    if(songs.length === 0){
+        playDialogText.value = '专辑还没有添加歌曲';
+        playDialog.value = true;
+        return;
+    }else if(list.length === 0){
+        playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
+        playDialog.value = true;
+        return;
+    }
+    
+    usePlaySong(list[0]);
+    // 播放，需先清空当前的播放列表
+    useSongAddPlaylist(list, {clear: true});
+
+    playStore.setAddPlayListTip(true)
+    playStore.setAddPlayListTipText('已开始播放')
+    if(!lock.value){
+        playStore.setPlayLock(true)
+    }
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => {
+        playStore.setPlayLock(false)
+        playStore.setAddPlayListTip(false)
+    }, 1500)
+
+
+}
+
+// 歌曲是否有版权
+type itemType = {
+    privilege?: {
+        cp: number,
+        dl: number,
+        fee: number
+    }
+}
+function isCopyright(id: number): number | undefined {
+    const item: itemType = songs.find(
+        (item: { id: number }) => item.id === id
+    );
+    if (item?.privilege?.dl === 0) {
+        if(item?.privilege.fee === 0){
+            // 无版权
+            return 0;
+        }else if(item?.privilege.fee === 1){
+            // 付费歌曲
+            return 1;
+        }else{
+            // 可播放歌曲
+            return 2;
+        }
+    }else{
+        // 可播放歌曲
+        return 2;
+    }
+}
+
+function toAlbum(id: number) {
+    router.push({
+        path: '/album',
+        query: {
+            id
+        }
+    })
+}
+
+function toSinger(id: number) {
+    router.push({
+        path: '/singer',
+        query: {
+            id
+        }
+    })
+}
 
 // 上一页
 const albumPerv = throttle(
@@ -233,6 +347,11 @@ const albumNext = throttle(
                             background: url('@/assets/images/play/iconall.png') no-repeat;
                             background-position: 0 -85px;
                         }
+                        &:hover{
+                            .play-icn{
+                                display: block;
+                            }
+                        }
                     }
                     .f-thide{
                         width: 90%;
@@ -241,11 +360,6 @@ const albumNext = throttle(
                         text-overflow: ellipsis;
                         white-space: nowrap;
                         word-wrap: normal;
-                    }
-                    &:hover{
-                        .play-icn{
-                            display: block;
-                        }
                     }
                 }
             }

@@ -25,15 +25,15 @@
                  v-for="(item,_index) in hotRecommend"
                  :key="item.id"
                  :class="_index % 4 === 3 ? 'last-item' : ''">
-                    <div class="item-img-box">
+                    <div class="item-img-box" :title="item?.name" @click="toPlayList(item.id)">
                         <img class="item-img" :src="item?.picUrl" alt="">
                         <div class="info">
                             <i class="info-icn"></i>
                             <span class="num">{{item?.playCount}}</span>
-                            <i class="info-icon-right" title="播放"></i>
+                            <i class="info-icon-right" title="播放" @click.stop="playMusic(item?.id)"></i>
                         </div>
                     </div>
-                    <div class="item-bottom text-hov">
+                    <div class="item-bottom text-hov" :title="item?.name" @click="toPlayList(item.id)">
                         {{item?.name}}
                     </div>
                 </li>
@@ -43,15 +43,15 @@
                     v-for="(item,_index) in individualizat.slice(0,3)"
                     :key="item.id"
                     :class="_index === 1 ? 'last-item' : ''">
-                        <div class="item-img-box">
+                        <div class="item-img-box" :title="item?.name" @click="toPlayList(item.id)">
                             <img class="item-img" :src="item?.picUrl" alt="">
                             <div class="info">
                                 <i class="info-icn"></i>
                                 <span class="num">{{item?.playcount}}</span>
-                                <i class="info-icon-right" title="播放"></i>
+                                <i class="info-icon-right" title="播放" @click.stop="playMusic(item?.id)"></i>
                             </div>
                         </div>
-                        <div class="item-bottom text-hov">
+                        <div class="item-bottom text-hov" :title="item?.name" @click="toPlayList(item.id)">
                             {{item?.name}}
                         </div>
                     </li>
@@ -98,17 +98,21 @@
                 <li class="item"
                   v-for="(item,_index) in individualizat.slice(0,3)"
                   :key="item.id"
-                  :class="_index === 1 ? 'last-item' : ''">
-                    <div class="item-img-box">
+                  :class="_index === 2 ? 'last-item' : ''">
+                    <div class="item-img-box" :title="item?.name" @click="toPlayList(item.id)">
                         <img class="item-img" :src="item?.picUrl" alt="">
                         <div class="info">
                             <i class="info-icn"></i>
                             <span class="num">{{item?.playcount}}</span>
-                            <i class="info-icon-right" title="播放"></i>
+                            <i class="info-icon-right" title="播放" @click.stop="playMusic(item?.id)"></i>
                         </div>
                     </div>
-                    <div class="item-bottom text-hov">
+                    <div class="item-bottom text-hov" :title="item?.name" @click="toPlayList(item.id)">
                         {{item?.name}}
+                    </div>
+                    <div class="idv">
+                        <em>猜你喜欢</em>
+                        <span class="not-interest">不感兴趣</span>
                     </div>
                 </li>
             </ul>
@@ -131,18 +135,28 @@
 
 <script setup lang="ts">
     import { ref, computed, watch } from 'vue';
-    import { recommendSongList, recommendResource, recommendDjprogram } from '@/api/home.ts'
+    import { useRouter} from 'vue-router';
+    import { recommendSongList, recommendResource, recommendDjprogram } from '@/api/home.ts';
+    import { getSongSheetInfo } from '@/api/my-music.ts';
     import type { ResponseType } from '@/types/index';
     import type { SongType } from '@/types/home.ts';
-    import useUserStore from '@/stores/modules/user.ts'
+    import useUserStore from '@/stores/modules/user.ts';
+    import usePlayStore from '@/stores/modules/play.ts';
+    import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
+    import usePlaySong from '@/hooks/usePlaySong.ts';
     import { getBigNumberTransform, getCurrentWeekday, getDate } from '@/utils/utils.ts';
-    import AlbumNewest from '../albumNewest/AlbumNewest.vue'
-    import Bilst from '../bilst/Bilst.vue'
+    import AlbumNewest from '../albumNewest/AlbumNewest.vue';
+    import Bilst from '../bilst/Bilst.vue';
 
     const userStore = useUserStore();
+    const playStore = usePlayStore();
+    const router = useRouter();
 
     // 是否登录
     const isLogin = computed<boolean>(() => userStore.getIsLogin)
+
+    // 播放显示/隐藏
+    const lock = computed(() => playStore.getplayLock);
 
     
     watch(() => isLogin.value,
@@ -226,6 +240,62 @@
         })
     }
     getHotDjprogram()
+
+    function toPlayList(id: number) {
+        router.push({
+            path: '/playList',
+            query: {
+                id
+            }
+        })
+    }
+
+
+    // 播放歌单音乐
+    let privileges = [];
+    let songs = [];
+    let timer = null;
+    async function playMusic(id: number) {
+        let res = await getSongSheetInfo({id})
+        if(res.code !== 200) return;
+
+        privileges = res?.privileges ?? [];
+        songs = res?.playlist?.tracks ?? []
+
+        // 过滤无版权
+        const songList: songType[] = songs.filter(
+            (item: { id: number }) => !isCopyright(item.id)
+        );
+
+        // 将歌曲添加到播放列表 - 清空当前播放列表
+        useSongAddPlaylist(songList, {clear: true})
+        // 播放第一首歌
+        usePlaySong(songList[0])
+
+        playStore.setAddPlayListTip(true)
+        playStore.setAddPlayListTipText('已开始播放')
+        if(!lock.value){
+            playStore.setPlayLock(true)
+        }
+        timer && clearTimeout(timer)
+        timer = setTimeout(() => {
+            playStore.setPlayLock(false)
+            playStore.setAddPlayListTip(false)
+        }, 1500)
+    }
+
+    // 歌曲是否有版权
+    function isCopyright(id: number): boolean | undefined {
+        const privilege: {cp?: number} = privileges?.find(
+            (item: { id: number }) => item.id === id
+        );
+
+        if (privilege?.cp === 0) {
+            return true;
+        }
+
+        return false;
+    }
 
 </script>
 
@@ -376,6 +446,9 @@
                         cursor: pointer;
                         background: url('@/assets/images/home/name-Db6Jvh02.png') no-repeat 0 9999px;
                         background-position: 0 0;
+                        &:hover{
+                            background-position: 0 -60px;
+                        }
                     }
                 }
             }
@@ -398,6 +471,37 @@
                     margin-right: 8px;
                     background: url('@/assets/images/icon.png') no-repeat 0 9999px;
                     background-position: -31px -655px;
+                }
+            }
+            .idv{
+                width: 100%;
+                color: #999;
+                margin-top: 3px;
+                position: relative;
+                z-index: 2;
+                cursor: pointer;
+                em{
+                    min-height: 30px;
+                    display: inline-block;
+                }
+                .not-interest{
+                    display: none;
+                    color: #666;
+                    width: 63px;
+                    height: 26px;
+                    margin-top: 0px;
+                    text-align: center;
+                    line-height: 26px;
+                    background: url('@/assets/images/home/index.png') no-repeat;
+                    background-position: 0 -130px;
+                }
+                &:hover{
+                    .not-interest{
+                        display: block;
+                    }
+                    em{
+                        display: none;
+                    }
                 }
             }
             .item-lick{

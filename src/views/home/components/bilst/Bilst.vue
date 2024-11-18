@@ -12,8 +12,9 @@
                 <div class="top-title">
                     <div class="title-text text-hov" :title="item?.playlist?.name">{{item?.playlist?.name}}</div>
                     <div class="btn">
-                        <i class="play-icn icn" title="播放"></i>
-                        <i class="collect-icn icn" title="收藏"></i>
+                        <i class="play-icn icn" title="播放" @click="playMusic(item)"></i>
+                        <i class="collect-icn icn" title="收藏" v-if="!item?.playlist?.subscribed" @click="colSongList(item?.playlist?.id)"></i>
+                        <i class="verify-collect-icn icn" title="已收藏" v-else ></i>
                     </div>
                 </div>
             </dt>
@@ -43,12 +44,21 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { topList, playlistDetail } from '@/api/home.ts'
+import { topList, playlistDetail } from '@/api/home.ts';
 import type { ResponseType } from '@/types/index';
-import { songType } from '@/hooks/methods/songFormat'
-import usePlaySong from '@/hooks/usePlaySong.ts'
-import useSongAddPlayList from '@/hooks/useSongAddPlayList.ts'
+import { songType } from '@/hooks/methods/songFormat';
+import usePlaySong from '@/hooks/usePlaySong.ts';
+import useDialogStore from '@/stores/modules/dialog.ts';
+import useSongAddPlayList from '@/hooks/useSongAddPlayList.ts';
+import usePlayStore from '@/stores/modules/play.ts';
+import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
+import { collectPlayList } from '@/api/song-list.ts';
 
+const playStore = usePlayStore();
+const dialogStore = useDialogStore();
+
+// 播放显示/隐藏
+const lock = computed(() => playStore.getplayLock);
 
 type songListItem = {
     id?: number;
@@ -63,6 +73,9 @@ type songListItem = {
         noCopyrightRcmd: unknown;
         }[];
     };
+    privileges?: {
+        cp: number
+    }[]
 }
 
 function playBtn(item: songType) {
@@ -105,6 +118,71 @@ function getSongSheetDetail(id: number): Promise<unknown> {
       })
       .catch(() => reject());
   });
+}
+
+// 收藏歌单
+function colSongList(id: number) {
+    collectPlayList({
+        t: 1,
+        id
+    }).then((res: ResponseType) => {
+        if(res.code === 200) {
+            dialogStore.setMessage({
+                type: 1,
+                text: '收藏成功',
+                visible: true,
+            })
+            timer && clearTimeout(timer);
+            timer = setTimeout(() => {
+                dialogStore.setMessage({
+                    type: 0,
+                    text: '',
+                    visible: false,
+                })
+            }, 1500);
+        }
+    })
+}
+
+// 播放
+let privileges = [];
+let timer = null;
+function playMusic(item: songListItem){
+    privileges = item.privileges;
+
+    // 过滤无版权
+    const songList: songType[] = item?.playlist?.tracks.filter(
+        (item: { id: number }) => !isCopyright(item.id)
+    );
+
+    // 将歌曲添加到播放列表 - 清空当前播放列表
+    useSongAddPlaylist(songList, {clear: true})
+    // 播放第一首歌
+    usePlaySong(songList[0])
+
+    playStore.setAddPlayListTip(true)
+    playStore.setAddPlayListTipText('已开始播放')
+    if(!lock.value){
+        playStore.setPlayLock(true)
+    }
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => {
+        playStore.setPlayLock(false)
+        playStore.setAddPlayListTip(false)
+    }, 1500)
+}
+
+// 歌曲是否有版权
+function isCopyright(id: number): boolean | undefined {
+    const privilege: {cp?: number} = privileges?.find(
+        (item: { id: number }) => item.id === id
+    );
+
+    if (privilege?.cp === 0) {
+        return true;
+    }
+
+    return false;
 }
 </script>
 
@@ -180,6 +258,9 @@ function getSongSheetDetail(id: number): Promise<unknown> {
                     &:hover{
                         background-position: -300px -235px;
                     }
+                }
+                .verify-collect-icn{
+                    background-position: -330px -235px;
                 }
             }
         }

@@ -33,7 +33,7 @@ export const getPlayList = ({order, cat, limit, offset}: playListItem): AxiosPro
 
 /**
  * @description 收藏/取消收藏歌单
- * @param t : 类型,1:收藏,2:取消收藏 id : 歌单 id
+ * @param t : 类型,1:收藏,2:取消收藏
  * @param id : 歌单 id
  */
 export const collectPlayList = ({t, id}: {t: number|string, id: number|string}): AxiosPromise => {

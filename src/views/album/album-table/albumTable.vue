@@ -131,6 +131,7 @@ function skip(path: string, id: number) {
 let timer = null;
 function playOrAddMusic(item: songType, type: string) {
     let index = isCopyright(item.id)
+    console.log(index, 'index')
 
     if(index === 0) {
         playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
@@ -203,6 +204,7 @@ function isCopyright(id?: number): number | undefined {
     const item: privilegeItem = props.list.find(
         (item: { id: number }) => item.id === id
     );
+    console.log(item, 'item')
     if (item?.privilege?.dl === 0) {
         if(item?.privilege.fee === 0){
             // 无版权
@@ -210,6 +212,9 @@ function isCopyright(id?: number): number | undefined {
         }else if(item?.privilege.fee === 1){
             // 付费歌曲
             return 1;
+        }else{
+            // 可播放歌曲
+            return 2;
         }
     }else{
         // 可播放歌曲

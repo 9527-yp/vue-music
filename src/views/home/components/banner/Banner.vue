@@ -12,12 +12,14 @@
                           v-show="item?.imageUrl === banner?.currentUrl" 
                           :src="item.imageUrl" 
                           :class="{'switching-img' : bannerImgSwitching && item?.imageUrl === banner?.currentUrl}" 
+                          @click="jumpDetail(item)"
                           alt="">
                     </template>
                 </div>
                 <button class="b-btn b-btn-left" @click="bannerPrev" @mouseenter="bannerEnter"></button>
                 <button class="b-btn b-btn-right" @click="bannerNext" @mouseenter="bannerEnter"></button>
             </div>
+            <!-- 小圆点 -->
             <ul class="warp-dots">
                 <li v-for="(item, _index) in banner?.list" :key="_index" class="dots-item"
                   :class="banner?.index == _index ? 'dots-active-item' : ''"
@@ -37,7 +39,7 @@
 <script setup lang="ts">
 import { bannerImgUrl } from '@/api/home.ts';
 import type { ResponseType } from '@/types/index';
-
+import { useRouter } from 'vue-router';
 import { reactive, ref, watch, onUnmounted } from 'vue';
 
 type Banner = {
@@ -48,10 +50,12 @@ type Banner = {
 
 type BannerItem = {
   imageUrl: string;
-//   targetType: number;
-//   targetId: number;
-//   url: string;
+  targetType: number;
+  targetId: number;
+  url: string;
 };
+
+const router = useRouter();
 
 const banner = reactive<Banner>({
   list: [],
@@ -167,6 +171,30 @@ function autoBanner(): boolean | undefined {
       banner.currentUrl = banner.list[banner.index].imageUrl;
     }, 1000);
   }, 4000);
+}
+
+function jumpDetail(item: BannerItem) {
+    const { targetType, targetId, url} = item;
+
+    // 歌曲
+    if (targetType === 1) {
+        router.push({ path: '/song', query: { id: targetId } });
+    }
+
+    // 专辑
+    if (targetType === 10) {
+        router.push({ path: '/album', query: { id: targetId } });
+    }
+
+    // 歌单
+    if (targetType === 1000) {
+        router.push({ path: '/playList', query: { id: targetId } });
+    }
+
+    // 外部链接
+    if (targetType === 3000) {
+        window.open(url, '', '');
+    }
 }
 
 onUnmounted(() => {
