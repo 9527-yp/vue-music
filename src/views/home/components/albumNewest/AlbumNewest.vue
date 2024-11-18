@@ -30,20 +30,11 @@
                 <button class="btn right-btn" @click="albumNext"></button>
             </div>
         </div>
-        <!-- 播放权限弹框 -->
-        <Dialog 
-            :visible="playDialog"
-            showCustomButton
-            @cancel='playCancel'
-        >
-            <p class="content-text">{{ playDialogText }}</p>
-        </Dialog>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue';
-import Dialog from '@/components/dialog/dialog.vue';
 import { useRouter } from 'vue-router';
 import { albumNewest } from '@/api/home.ts';
 import { getAlbumDetail } from '@/api/album-detail.ts';
@@ -69,12 +60,15 @@ const playStore = usePlayStore();
 // 播放显示/隐藏
 const lock = computed(() => playStore.getplayLock);
 
-const playDialog = ref(false);
-const playDialogText = ref('');
+const playDialog = defineModel('playDialog', {
+    type: Boolean,
+    default: false
+})
+const playDialogText = defineModel('playDialogText', {
+    type: String,
+    default: ''
+})
 
-function playCancel() {
-    playDialog.value = false
-}
 // 列表偏移、样式
 const listOffest = reactive({
   index: 0,

@@ -34,7 +34,7 @@
                     <td class="tr-index">
                         <div class="index-hd">
                             <span class="index">{{index+1}}</span>
-                            <i class="play-icn" :class="{'play-z-slt' : playSongId === item.id}" @click="playMusic(item)"></i>
+                            <i class="play-icn" :class="{'play-z-slt' : playSongId === item.id}" title="播放" @click="playMusic(item)"></i>
                         </div>
                     </td>
                     <td>

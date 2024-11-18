@@ -118,7 +118,7 @@
             </ul>
         </div>
         <!-- 新碟上架 -->
-        <AlbumNewest />
+        <AlbumNewest v-model:playDialog="playDialog" v-model:playDialogText="playDialogText" />
         <!-- 榜单 -->
         <div class="item-content-box">
             <div class="item-c-h">
@@ -128,8 +128,16 @@
                     <i class="move-icn"></i>
                 </div>
             </div>
-            <Bilst />
+            <Bilst v-model:playDialog="playDialog" v-model:playDialogText="playDialogText" />
         </div>
+        <!-- 播放权限弹框 -->
+        <Dialog 
+            :visible="playDialog"
+            showCustomButton
+            @cancel='playCancel'
+        >
+            <p class="content-text">{{ playDialogText }}</p>
+        </Dialog>
     </div>
 </template>
 
@@ -145,6 +153,7 @@
     import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
     import usePlaySong from '@/hooks/usePlaySong.ts';
     import { getBigNumberTransform, getCurrentWeekday, getDate } from '@/utils/utils.ts';
+    import Dialog from '@/components/dialog/dialog.vue';
     import AlbumNewest from '../albumNewest/AlbumNewest.vue';
     import Bilst from '../bilst/Bilst.vue';
 
@@ -158,7 +167,13 @@
     // 播放显示/隐藏
     const lock = computed(() => playStore.getplayLock);
 
-    
+    const playDialog = ref(false);
+    const playDialogText = ref('');
+
+    function playCancel() {
+        playDialog.value = false
+    }
+
     watch(() => isLogin.value,
         (value) => {
             if (!value) {

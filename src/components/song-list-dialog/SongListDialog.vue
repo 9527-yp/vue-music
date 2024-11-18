@@ -23,11 +23,6 @@
             </div>
         </template>
     </Dialog>
-    <div class="warning-tip" v-if="warningInfo.visible">
-        <i v-if="warningInfo.type" class="success-icn"></i>
-        <i v-else class="warning-icn"></i>
-        <span class="text">{{warningInfo.text}}</span>
-    </div>
 </template>
 
 <script setup lang="ts">
@@ -74,12 +69,8 @@ type SongList = {
     coverImgUrl: string,
     trackCount: number | string,
 }
-const warningInfo = reactive({
-    text: '',
-    visible: false,
-    type:0, // 0:警告 ，1：成功
-    time: null
-})
+
+let timer = null;
 async function addMusicSongList(item: SongList) {
     let res = await songAddorDel({
         op: 'add',
@@ -87,18 +78,28 @@ async function addMusicSongList(item: SongList) {
         tracks: songId.value
     })
     if(res.body.code === 502) {
-        warningInfo.type = 0;
-        warningInfo.text = '歌曲已存在！';
+        dialogStore.setMessage({
+            type: 0,
+            text: '歌曲已存在！',
+            visible: true,
+        })
     }else if(res.body.code === 200){
-        warningInfo.type = 1;
-        warningInfo.text = '收藏成功';
+        dialogStore.setMessage({
+            type: 1,
+            text: '收藏成功',
+            visible: true,
+        })
         // 刷新歌单数据
         dialogStore.setIsRefreshSongList(true);
     }
-    warningInfo.visible = true;
-    warningInfo.time && clearTimeout( warningInfo.time);
-    warningInfo.time = setTimeout(() => {
-        warningInfo.visible = false;
+    
+    timer && clearTimeout(timer);
+    timer = setTimeout(() => {
+        dialogStore.setMessage({
+            type: 0,
+            text: '',
+            visible: false,
+        })
     }, 1500);
     dialogStore.setSongListShow(false);
 }
@@ -171,44 +172,6 @@ function songCancel() {
                 background: #f2f2f2;
             }
         }
-    }
-}
-.warning-tip{
-    width: 280px;
-    background: #fff;
-    color: #333;
-    line-height: 52px;
-    text-align: center;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    position: absolute;
-    top:50%;
-    left: 50%;
-    z-index: 20002;
-    margin-top: -40px;
-    margin-left: -140px;
-    vertical-align: middle;
-    .warning-icn{
-        width: 20px;
-        height: 20px;
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 3px;
-        background: url('@/assets/images/icon.png') no-repeat;
-        background-position: -24px -406px;
-    }
-    .success-icn{
-        width: 20px;
-        height: 20px;
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 3px;
-        background: url('@/assets/images/icon.png') no-repeat;
-        background-position: -24px -430px;
-    }
-    .text{
-        display: inline-block;
-        vertical-align: middle;
     }
 }
 </style>
