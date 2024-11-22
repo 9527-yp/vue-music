@@ -103,6 +103,14 @@ const routes: Array<RouteRecordRaw> = [
           import(
             /* webpackChunkName: "download" */ '../views/album/album.vue')
       },
+      {
+        /** 电台详情 */
+        path: '/dj-detail',
+        name: 'djDetail',
+        component: () =>
+          import(
+            /* webpackChunkName: "download" */ '../views/dj-detail/dj.vue')
+      },
     ]
   }
 ]

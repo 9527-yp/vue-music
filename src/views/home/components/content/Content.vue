@@ -60,7 +60,9 @@
                 <li class="item"
                  v-for="(item,_index) in hotDjprogram"
                  :key="item.id"
-                 :class="_index === 2 ? 'last-item' : ''">
+                 :class="_index === 2 ? 'last-item' : ''"
+                 @click="toDjDetail(item.id)"
+                >
                     <div class="item-img-box">
                         <img class="item-img" :src="item?.picUrl" alt="">
                         <div class="info">
@@ -259,6 +261,15 @@
     function toPlayList(id: number) {
         router.push({
             path: '/playList',
+            query: {
+                id
+            }
+        })
+    }
+
+    function toDjDetail(id: number) {
+        router.push({
+            path: '/dj-detail',
             query: {
                 id
             }
