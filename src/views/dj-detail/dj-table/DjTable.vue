@@ -17,8 +17,7 @@
                     v-for="(item, index) in djInfo?.songs"
                     :key="item.id"
                     :class="{
-                    'even' : index % 2 !== 0,
-                    'list-disabled' : isCopyright(item.id) === 0
+                    'even' : index % 2 !== 0
                 }"
                 >
                     <td class="tr-index">
@@ -67,6 +66,7 @@
 import {ref, computed } from 'vue';
 import usePlayStore from '@/stores/modules/play.ts';
 import { timeStampToDuration } from '@/utils/utils.ts';
+import { getDetail } from '@/api/song.ts'
 
 
 const playStore = usePlayStore();
@@ -92,23 +92,23 @@ type privilegeItem = {
     dl?: number,
     fee?: number
 }
-function isCopyright(id?: number): number | undefined {
-    return;
-    // const privilege: privilegeItem = props.djInfo?.songs.find(
-    //     (item: { id: number }) => item.id === id
-    // );
-    // if (privilege?.dl === 0) {
-    //     if(privilege.fee === 0){
-    //         // 无版权
-    //         return 0;
-    //     }else if(privilege.fee === 1){
-    //         // 付费歌曲
-    //         return 1;
-    //     }
-    // }else{
-    //     // 可播放歌曲
-    //     return 2;
-    // }
+async function isCopyright(id?: number): Promise<undefined | number> {
+    let res = getDetail({ids: id})
+    const privilege: privilegeItem = res?.privileges.find(
+        (item: { id: number }) => item.id === id
+    );
+    if (privilege?.dl === 0) {
+        if(privilege.fee === 0){
+            // 无版权
+            return 0;
+        }else if(privilege.fee === 1){
+            // 付费歌曲
+            return 1;
+        }
+    }else{
+        // 可播放歌曲
+        return 2;
+    }
 }
 </script>
 

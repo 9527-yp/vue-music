@@ -7,6 +7,7 @@
             <div class="cntwrap">
                 <div class="cntwrap-top cntwrap-brk">
                     <span class="user-name text-hov" @click="toUserHome(item?.user?.userId)">{{item?.user?.nickname}}</span>
+                    <img class="user-tip-img" v-if="item?.user?.avatarDetail" :src="`${item?.user?.avatarDetail?.identityIconUrl}`" alt="">
                     <img
                      class="brand-vip"
                      v-if="item?.user?.vipRights?.redplus"
@@ -226,6 +227,12 @@ function toUserHome(id: number) {
                 margin-right: 5px;
                 color: #0c73c2;
                 cursor: pointer;
+            }
+            .user-tip-img{
+                width: 13px;
+                height: 13px;
+                margin-right: 5px;
+                vertical-align: -2px;
             }
             .brand-vip{
                 height: 12px;
