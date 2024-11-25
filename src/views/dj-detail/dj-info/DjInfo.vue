@@ -12,7 +12,7 @@
             </div>
             <div class="rdiname">
                 <i class="rdiname-icn"></i>
-                <span class="txt text-hov">{{djInfo?.radio?.name}}</span>
+                <span class="txt text-hov" @click="toRadio(djInfo?.radio?.id)">{{djInfo?.radio?.name}}</span>
                 <span class="subscribe icn-bag m-btn">
                     <i class="icn-bag m-btn">
                         <em class="sub-icn"></em>
@@ -69,6 +69,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { formatDateTime } from '@/utils/utils';
 
 const props = defineProps({
@@ -77,6 +78,8 @@ const props = defineProps({
         default: () => {}
     }
 })
+
+const router = useRouter();
 
 watch(() => props.djInfo, () => {
     programDesc.value = props?.djInfo?.programDesc.slice(0,10)
@@ -91,6 +94,15 @@ function unfoldDesc() {
     }else{
         programDesc = props.djInfo?.programDesc.slice(0,10)
     }
+}
+
+function toRadio(id: number) {
+    router.push({
+        path: 'radio-detail',
+        query: {
+            id
+        }
+    })
 }
 </script>
 

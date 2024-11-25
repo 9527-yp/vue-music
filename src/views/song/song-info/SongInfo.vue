@@ -9,7 +9,7 @@
                 <div class="player">
                     <i class="player-icn"></i>
                     <a
-                        class="text"
+                        class="text text-hov"
                         :href="`https://music.163.com/#/outchain/1/${id}`"
                     >
                         生成外链播放器
@@ -181,7 +181,6 @@ function jumpToComment() {
             .text{
                 cursor: pointer;
                 color: #4996d1;
-                text-decoration: underline;
             }
         }
         .open-client{
