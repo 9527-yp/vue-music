@@ -58,7 +58,7 @@
             </span>
         </div>
         <p class="description" v-for="(item, index) in programDesc" :key="index">{{item.content}}</p>
-        <div class="spread" v-show="programDesc.length > 10">
+        <div class="spread" v-show="programDesc?.length > 10">
             <span class="text text-hov" @click="unfoldDesc">
                 {{descIsTotal ? '收起' : '展开'}}
                 <i class="spread-icn" :class="descIsTotal ? 'unfold' : 'pack'"></i>
@@ -79,7 +79,10 @@ const props = defineProps({
 })
 
 watch(() => props.djInfo, () => {
-    programDesc.value = props?.djInfo?.programDesc.slice(0,10)
+    if(Array.isArray(props?.djInfo?.programDesc)){
+        programDesc.value = props?.djInfo?.programDesc?.slice(0,10)
+    }
+    
 })
 
 const descIsTotal = ref(false);
@@ -89,7 +92,7 @@ function unfoldDesc() {
     if(descIsTotal.value){
         programDesc = props.djInfo?.programDesc
     }else{
-        programDesc = props.djInfo?.programDesc.slice(0,10)
+        programDesc = props.djInfo?.programDesc?.slice(0,10)
     }
 }
 </script>

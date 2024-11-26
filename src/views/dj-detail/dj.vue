@@ -4,7 +4,7 @@
             <!-- header -->
             <DjInfo :djInfo="djInfo" />
             <!-- 电台节目列表 -->
-            <div class="table-box">
+            <div class="table-box" v-if="djInfo?.songs?.length > 0">
                 <DjTable :djInfo="djInfo"/>
             </div>
             <!-- 评论 -->
@@ -21,30 +21,38 @@
                 @changePage="changePage"
             />
         </div>
-        <div class="dj-side">
-            <span class=""></span>
-        </div>
+        <!-- 电台节目右侧 -->
+        <DjSide :programList="programList" @toDjDetail="toDjDetail" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, watch } from 'vue';
 import DjInfo from './dj-info/DjInfo.vue';
 import DjTable from './dj-table/DjTable.vue';
+import DjSide from './dj-side/DjSide.vue';
 import Comment from '@/components/comment/Comment.vue';
 import Page from '@/components/page/Page.vue';
-import { djDetail, getComment } from '@/api/djDetail.ts';
-import { useRoute } from 'vue-router';
+import { djDetail, getComment, program } from '@/api/djDetail.ts';
+import { useRoute, useRouter } from 'vue-router';
 import type { ResponseType } from '@/types/index';
 import { handleCommentList } from '@/components/comment/handleCommentList.ts';
 
 const route = useRoute();
+const router = useRouter();
 
-const djInfo = ref({});
+type DjInfoType = {
+    radio?: {
+        id: number
+    },
+    id: number
+}
+const djInfo = ref<DjInfoType>({});
 function getDjDetail() {
     djDetail({id: route.query.id}).then((res: ResponseType) => {
         if(res.code === 200) {
-            djInfo.value = res?.program ?? {}
+            djInfo.value = res?.program ?? {};
+            getProgram();
         }
     })
 }
@@ -89,6 +97,43 @@ function changePage(val: number) {
     commentInfo.offset = val;
     getSongCommentList();
 }
+
+// 获取更多节目
+type ItemType = {
+    name: string,
+    id: number,
+    coverUrl: string,
+    radio?: {
+        id: number
+    }
+}
+const programList = ref([]);
+function getProgram() {
+    const id = djInfo.value?.id
+    program({rid: djInfo.value?.radio?.id}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            if(res?.programs.length > 0) {
+                programList.value = res?.programs.filter((item: ItemType) => {
+                    return item?.id !== id
+                })
+            }
+        }
+    })
+}
+
+function toDjDetail(id: number) {
+    router.push({
+        path: '/dj-detail',
+        query: {
+            id
+        }
+    })
+}
+
+watch(() => route.query.id, () => {
+    getDjDetail();
+    getSongCommentList();
+})
 </script>
 
 
@@ -110,11 +155,6 @@ function changePage(val: number) {
         .table-box{
             margin-top: 27px;
         }
-    }
-    .dj-side{
-        display: inline-block;
-        width: 270px;
-        vertical-align: top;
     }
 }
 </style>

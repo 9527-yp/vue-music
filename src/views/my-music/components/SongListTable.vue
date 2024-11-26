@@ -120,7 +120,7 @@ import Dialog from '@/components/dialog/dialog.vue';
 import { timeStampToDuration } from '@/utils/utils.ts';
 import useUserStore from '@/stores/modules/user.ts';
 import usePlayStore from '@/stores/modules/play.ts';
-import useDialogStore from '@/stores/modules/dialog.ts'
+import useDialogStore from '@/stores/modules/dialog.ts';
 import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
 import usePlaySong from '@/hooks/usePlaySong.ts';
 import type { songType } from '@/hooks/methods/songFormat.ts';

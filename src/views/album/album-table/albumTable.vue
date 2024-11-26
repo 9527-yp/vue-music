@@ -204,7 +204,6 @@ function isCopyright(id?: number): number | undefined {
     const item: privilegeItem = props.list.find(
         (item: { id: number }) => item.id === id
     );
-    console.log(item, 'item')
     if (item?.privilege?.dl === 0) {
         if(item?.privilege.fee === 0){
             // 无版权

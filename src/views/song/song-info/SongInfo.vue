@@ -25,7 +25,7 @@
                 <p class="des">
                     歌手：
                     <template v-for="(item, index) in songDetailData.songs?.[0]?.ar" :key="item.id">
-                        <span class="text" @click="toSinger(item.id)">{{item.name}}</span>
+                        <span class="text text-hov" @click="toSinger(item.id)">{{item.name}}</span>
                         <i v-show="index !== songDetailData.songs[0].ar.length-1">/</i>
                     </template>
                     

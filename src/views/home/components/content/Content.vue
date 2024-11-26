@@ -61,9 +61,8 @@
                  v-for="(item,_index) in hotDjprogram"
                  :key="item.id"
                  :class="_index === 2 ? 'last-item' : ''"
-                 @click="toDjDetail(item.id)"
                 >
-                    <div class="item-img-box">
+                    <div class="item-img-box" @click="toDjDetail(item.id)">
                         <img class="item-img" :src="item?.picUrl" alt="">
                         <div class="info">
                             <i class="info-icn"></i>
@@ -71,7 +70,7 @@
                             <i class="info-icon-right" title="播放"></i>
                         </div>
                     </div>
-                    <div class="item-bottom text-hov">
+                    <div class="item-bottom text-hov" @click="toDjDetail(item.id)">
                         <i class="radio-station"></i>
                         {{item?.name}}
                     </div>

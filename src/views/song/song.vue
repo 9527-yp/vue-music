@@ -113,7 +113,7 @@ type songDetailItem = {
     songs?: {
         id: number
     }[],
-    privilege?: {
+    privileges?: {
         dl: number,
         fee: number
     }[]
@@ -251,7 +251,7 @@ let timer = null;
 const playDialog = ref(false);
 const playDialogText = ref('');
 function playMusic(item: songType) {
-    let index = isCopyright(songDetailData.value?.privilege?.[0])
+    let index = isCopyright(songDetailData.value?.privileges?.[0])
 
     commonalityFun(index, songDetailData.value?.songs[0], 'play' )
 }
@@ -263,14 +263,14 @@ async function playSimiMusic(id: number): Promise<undefined> {
         return;
     }
 
-    let index = isCopyright(res?.privilege?.[0])
+    let index = isCopyright(res?.privileges?.[0])
 
     commonalityFun(index, res?.songs[0], 'play' )
 }
 
 // 添加到播放列表
 function addMusic() {
-    let index = isCopyright(songDetailData.value?.privilege?.[0])
+    let index = isCopyright(songDetailData.value?.privileges?.[0])
     commonalityFun(index, songDetailData.value?.songs[0], 'add' )
 }
 
@@ -281,7 +281,7 @@ async function addSimiMusic(id: number) {
         return;
     }
 
-    let index = isCopyright(res?.privilege?.[0])
+    let index = isCopyright(res?.privileges?.[0])
 
     commonalityFun(index, res?.songs[0], 'add' )
 }
@@ -321,7 +321,7 @@ function commonalityFun(index: number, songItem: {id: number}, type: string) {
 
 // 收藏
 function collectMusic() {
-    let index = isCopyright(songDetailData.value?.privilege?.[0])
+    let index = isCopyright(songDetailData.value?.privileges?.[0])
 
     if(index === 0) {
         playDialogText.value = '因合作方要求，该资源暂时无法收听，我们正在努力争取歌曲回归';
@@ -375,12 +375,11 @@ type privilegeItem = {
     fee?: number
 }
 function isCopyright(privilege: privilegeItem): number | undefined {
-    
-    if (privilege?.[0]?.dl === 0) {
-        if(privilege?.[0]?.fee === 0){
+    if (privilege?.dl === 0) {
+        if(privilege?.fee === 0){
             // 无版权
             return 0;
-        }else if(privilege?.[0]?.fee === 1){
+        }else if(privilege?.fee === 1){
             // 付费歌曲
             return 1;
         }

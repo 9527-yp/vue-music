@@ -62,7 +62,7 @@ export const addComment = ({id, content, type}: CommentItem): AxiosPromise => {
  * @description 回复评论
  * @param param.id  对应类型id
  * @param param.content  评论内容
- * @param param.type  资源类型,对应歌曲：0, mv：1,歌单：2, 专辑：3, 电台：4, 视频：5, 动态：6
+ * @param param.type  资源类型,对应 歌曲：0, mv：1,歌单：2, 专辑：3, 电台：4, 视频：5, 动态：6
  * @param param.t  1 发送, 2 回复 0 删除
  * @param param.commentId  当前评论id
  * @returns 

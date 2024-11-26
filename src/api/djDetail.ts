@@ -42,3 +42,21 @@ export const getComment = ({id, limit, offset}: Item): AxiosPromise => {
         params
     })
 }
+
+/**
+ * @description 电台更多节目
+ * @param { Object } params
+ * @param { number } params.rid - 电台节目id
+ */
+export const program = ({rid}: {rid: number}): AxiosPromise => {
+  const params = {
+    timestamp: new Date().getTime(),
+    rid
+  };
+
+  return axios.request({
+    url: '/dj/program',
+    method: 'get',
+    params
+  });
+};
