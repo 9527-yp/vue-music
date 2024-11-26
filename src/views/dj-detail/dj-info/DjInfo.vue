@@ -48,7 +48,7 @@
             </span>
         </div>
         <div class="sub">
-            <span class="sub-tag">音乐播客</span>
+            <span class="sub-tag">{{djInfo?.categoryName}}</span>
             <strong>
                 <span class="sub-from thide">{{djInfo?.radio?.name}}</span>第{{djInfo?.serialNum}}期
             </strong>
