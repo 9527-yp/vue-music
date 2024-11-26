@@ -75,7 +75,7 @@ import {ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import Dialog from '@/components/dialog/dialog.vue';
 import usePlayStore from '@/stores/modules/play.ts';
-import useDialogStore from '@/stores/modules/dialog.ts'
+import useDialogStore from '@/stores/modules/dialog.ts';
 import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
 import usePlaySong from '@/hooks/usePlaySong.ts';
 import { timeStampToDuration } from '@/utils/utils.ts';
@@ -86,6 +86,7 @@ import type { songType } from '@/hooks/methods/songFormat.ts';
 const playStore = usePlayStore();
 const dialogStore = useDialogStore();
 const router = useRouter();
+const emit = defineEmits(['notFeatureTip']);
 
 // 当前播放歌曲ID
 const playSongId = computed(() => playStore.getPlaySongId);
@@ -164,19 +165,7 @@ function collectMusic(item: songType) {
 }
 
 function notFeatureTip() {
-    dialogStore.setMessage({
-        type: 0,
-        text: '功能暂未开发',
-        visible: true,
-    })
-    timer && clearTimeout(timer);
-    timer = setTimeout(() => {
-        dialogStore.setMessage({
-            type: 0,
-            text: '功能暂未开发',
-            visible: false,
-        })
-    }, 1500);
+    emit('notFeatureTip', {type: 0, text: '功能暂未开发'})
 }
 
 // 歌曲是否有版权

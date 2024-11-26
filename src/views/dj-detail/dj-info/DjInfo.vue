@@ -12,11 +12,11 @@
             </div>
             <div class="rdiname">
                 <i class="rdiname-icn"></i>
-                <span class="txt text-hov" @click="toRadio(djInfo?.radio?.id)">{{djInfo?.radio?.name}}</span>
-                <span class="subscribe icn-bag m-btn">
+                <span class="txt text-hov" @click="toRadio">{{djInfo?.radio?.name}}</span>
+                <span class="subscribe icn-bag m-btn" @click="handleSubDj(djInfo?.radio?.id)">
                     <i class="icn-bag m-btn">
-                        <em class="sub-icn"></em>
-                        订阅({{djInfo?.radio?.subCount}})
+                        <em class="sub-icn" :class="djInfo?.radio?.subed ? 'to-sub' : 'not-sub'"></em>
+                        {{djInfo?.radio?.subed ? '已订阅' : '订阅'}}({{djInfo?.radio?.subCount}})
                     </i>
                 </span>
             </div>
@@ -24,22 +24,22 @@
     </div>
     <div class="m-prointr">
         <div class="btns">
-            <span class="play-icn btn icn-bag">
-                <i class="icn-bag btn">播放 15分28秒</i>
+            <span class="play-icn btn icn-bag" @click="playRadio(djInfo.mainSong)">
+                <i class="icn-bag btn">播放 {{djInfo?.duration}}</i>
             </span>
-            <span class="like-icn icn-bag like-btn">
+            <span class="like-icn icn-bag like-btn" @click="handelLike(djInfo?.id)">
                 <i class="icn-bag like-btn">
-                    <em class="icn-em icn-bag"></em>
+                    <em class="icn-em icn-bag" :class="djInfo?.liked ? 'to-like' : 'not-like'"></em>
                     <span>{{djInfo?.likedCount ? '(' + djInfo?.likedCount + ')' : '点赞'}}</span>
                 </i>
             </span>
             <span class="commit-icn btn icn-bag not-exploit-btn">
                 <i class=" btn icn-bag">{{djInfo?.commentCount ? '(' + djInfo?.commentCount + ')' : '评论'}}</i>
             </span>
-            <span class="share-icn btn icn-bag not-exploit-btn">
+            <span class="share-icn btn icn-bag not-exploit-btn" @click="notFeatureTip">
                 <i class="btn icn-bag">{{djInfo?.shareCount ? '(' + djInfo?.shareCount + ')' : '分享'}}</i>
             </span>
-            <span class="down-icn btn icn-bag not-exploit-btn">
+            <span class="down-icn btn icn-bag not-exploit-btn" @click="notFeatureTip">
                 <i class="btn icn-bag">下载</i>
             </span>
             <span class="u-outlink">
@@ -58,19 +58,36 @@
             </span>
         </div>
         <p class="description" v-for="(item, index) in programDesc" :key="index">{{item.content}}</p>
-        <div class="spread" v-show="programDesc?.length > 10">
+        <div class="spread" v-show="djInfo?.programDesc?.length > 10">
             <span class="text text-hov" @click="unfoldDesc">
                 {{descIsTotal ? '收起' : '展开'}}
                 <i class="spread-icn" :class="descIsTotal ? 'unfold' : 'pack'"></i>
             </span>
         </div>
     </div>
+    <!-- 订阅弹框 -->
+    <Dialog 
+      :visible="subDialog"
+      :showCustomButton="showCustomButton"
+      :showConfirmButton="showConfirmButton"
+      :showCancelButton="showCancelButton"
+      @cancel='subCancel'
+      @confirm="subConfirm"
+    >
+        <p class="content-text">{{ subDialogText }}</p>
+    </Dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, watch, computed } from 'vue';
 import { formatDateTime } from '@/utils/utils';
+import { subDj, resourceLike } from '@/api/djDetail.ts';
+import Dialog from '@/components/dialog/dialog.vue';
+import type { ResponseType } from '@/types/index';
+import type { songType } from '@/hooks/methods/songFormat.ts';
+import usePlayStore from '@/stores/modules/play.ts';
+import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
+import usePlaySong from '@/hooks/usePlaySong.ts';
 
 const props = defineProps({
     djInfo: {
@@ -78,8 +95,12 @@ const props = defineProps({
         default: () => {}
     }
 })
+const emit = defineEmits(['notFeatureTip', 'toRadio'])
 
-const router = useRouter();
+const playStore = usePlayStore();
+
+// 播放显示/隐藏
+const lock = computed(() => playStore.getplayLock);
 
 watch(() => props.djInfo, () => {
     if(Array.isArray(props?.djInfo?.programDesc)){
@@ -99,13 +120,86 @@ function unfoldDesc() {
     }
 }
 
-function toRadio(id: number) {
-    router.push({
-        path: 'radio-detail',
-        query: {
-            id
+// 播放电台节目
+let timer = null;
+function playRadio(item: songType) {
+    usePlaySong(item);
+    useSongAddPlaylist(item);
+    playStore.setAddPlayListTip(true)
+    playStore.setAddPlayListTipText('已开始播放')
+    if(!lock.value){
+        playStore.setPlayLock(true)
+    }
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => {
+        playStore.setPlayLock(false)
+        playStore.setAddPlayListTip(false)
+    }, 1500)
+}
+
+// 订阅操作逻辑
+const radioId = ref(undefined);
+const subDialog = ref(false);
+const subDialogText = ref('');
+const showCustomButton = ref(false); // 知道了按钮
+const showConfirmButton = ref(false); // 确认按钮
+const showCancelButton = ref(false); // 取消按钮
+// 订阅操作
+function handleSubDj(id: number) {
+    if(props?.djInfo?.radio?.subed){
+        // 取消订阅
+        showConfirmButton.value = true;
+        showCancelButton.value = true;
+        subDialogText.value = '确定取消订阅？'
+        subDialog.value = true;
+        radioId.value = id
+    }else{
+        subDj({rid: id, t: 1}).then((res: ResponseType) => {
+            if(res.code === 200) {
+                emit('notFeatureTip', {type: 1, text: '订阅成功'})
+            }
+        })
+    }
+}
+
+// 关闭弹框
+function subCancel() {
+    subDialog.value =false;
+    showConfirmButton.value = false;
+    showCancelButton.value = false;
+    showCustomButton.value = false;
+}
+
+// 确认取消订阅
+function subConfirm() {
+    subDj({rid: radioId.value, t: 0}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            subCancel()
+            emit('notFeatureTip', {type: 1, text: '取消订阅成功'})
         }
     })
+}
+
+// 点赞
+function handelLike(id: number) {
+    let params = {
+        type: 4,
+        t: props?.djInfo?.liked ? 0 : 1,
+        id
+    }
+    resourceLike(params).then((res: ResponseType) => {
+        if(res.code === 200) {
+            emit('notFeatureTip', {type: 1, text: props?.djInfo?.liked ? '取消点赞成功' : '点赞成功'})
+        }
+    })
+}
+
+function notFeatureTip(){
+    emit('notFeatureTip', {type: 0, text: '功能暂未开发'})
+}
+
+function toRadio() {
+    emit('toRadio')
 }
 </script>
 
@@ -197,6 +291,11 @@ function toRadio(id: number) {
                         height: 14px;
                         font-style: normal;
                         background: url('@/assets/images/icon2.png') no-repeat;
+                    }
+                    .to-sub{
+                        background-position: -70px 0;
+                    }
+                    .not-sub{
                         background-position: -50px 0;
                     }
                 }
@@ -271,6 +370,11 @@ function toRadio(id: number) {
                     width: 17px;
                     height: 15px;
                     margin: 8px 6px 0 0;
+                }
+                .to-like{
+                    background-position: -30px -95px;
+                }
+                .not-like{
                     background-position: 0 -95px;
                 }
             }

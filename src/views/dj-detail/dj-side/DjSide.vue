@@ -2,7 +2,7 @@
     <div class="dj-side">
         <h3 class="header">
             <span class="text">更多节目</span>
-            <span class="more text-hov">全部></span>
+            <span class="more text-hov" @click="toRadio">全部></span>
         </h3>
         <ul class="recommend-ul">
             <li class="item" v-for="(item, index) in programList.slice(0, 4)" :key="index">
@@ -19,11 +19,12 @@
                 </div>
             </li>
         </ul>
+        <SideMulti />
     </div>
 </template>
 
 <script setup lang="ts">
-
+import SideMulti from '@/components/side-info/Side-Multi.vue';
 const props = defineProps({
     programList: {
         type: Array,
@@ -31,10 +32,14 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['toDjDetail']);
+const emit = defineEmits(['toDjDetail', 'toRadio']);
 
 function toDjDetail(id: number) {
     emit('toDjDetail', id)
+}
+
+function toRadio() {
+    emit('toRadio')
 }
 </script>
 

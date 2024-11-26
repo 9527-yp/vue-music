@@ -2,10 +2,10 @@
     <div class="dj-detail">
         <div class="dj-content">
             <!-- header -->
-            <DjInfo :djInfo="djInfo" />
+            <DjInfo :djInfo="djInfo" @notFeatureTip="notFeatureTip" @toRadio="toRadio" />
             <!-- 电台节目列表 -->
             <div class="table-box" v-if="djInfo?.songs?.length > 0">
-                <DjTable :djInfo="djInfo"/>
+                <DjTable :djInfo="djInfo" @notFeatureTip="notFeatureTip" />
             </div>
             <!-- 评论 -->
             <Comment
@@ -22,7 +22,7 @@
             />
         </div>
         <!-- 电台节目右侧 -->
-        <DjSide :programList="programList" @toDjDetail="toDjDetail" />
+        <DjSide :programList="programList" @toDjDetail="toDjDetail" @toRadio="toRadio" />
     </div>
 </template>
 
@@ -35,26 +35,41 @@ import Comment from '@/components/comment/Comment.vue';
 import Page from '@/components/page/Page.vue';
 import { djDetail, getComment, program } from '@/api/djDetail.ts';
 import { useRoute, useRouter } from 'vue-router';
+import useDialogStore from '@/stores/modules/dialog.ts';
 import type { ResponseType } from '@/types/index';
 import { handleCommentList } from '@/components/comment/handleCommentList.ts';
 
 const route = useRoute();
 const router = useRouter();
+const dialogStore = useDialogStore();
 
 type DjInfoType = {
     radio?: {
         id: number
     },
-    id: number
+    id: number,
+    duration: string
 }
-const djInfo = ref<DjInfoType>({});
+const djInfo = ref<DjInfoType>({
+    id: undefined,
+    duration: undefined
+    });
 function getDjDetail() {
     djDetail({id: route.query.id}).then((res: ResponseType) => {
         if(res.code === 200) {
             djInfo.value = res?.program ?? {};
+            djInfo.value.duration = convertTime(res?.program?.duration)
             getProgram();
         }
     })
+}
+
+function convertTime(time: number) {
+    let newTime = Math.floor(time / 1000);
+    let m = Math.floor(newTime / 60);
+    let s = newTime % 60
+
+    return `${m}分${s}秒`
 }
 
 getDjDetail();
@@ -121,11 +136,41 @@ function getProgram() {
     })
 }
 
+let timer = null;
+function notFeatureTip(value: {type: number, text: string}) {
+    // 订阅、取消订阅操作，重新调用详情接口刷新数据
+    if(value.type === 1){
+        getDjDetail();
+    }
+    dialogStore.setMessage({
+        type: value.type,
+        text: value.text,
+        visible: true,
+    })
+    timer && clearTimeout(timer);
+    timer = setTimeout(() => {
+        dialogStore.setMessage({
+            type: value.type,
+            text: value.text,
+            visible: false,
+        })
+    }, 1500);
+}
+
 function toDjDetail(id: number) {
     router.push({
         path: '/dj-detail',
         query: {
             id
+        }
+    })
+}
+
+function toRadio() {
+    router.push({
+        path: 'radio-detail',
+        query: {
+            id: djInfo.value?.radio?.id
         }
     })
 }
