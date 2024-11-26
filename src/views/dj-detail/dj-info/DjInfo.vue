@@ -33,7 +33,7 @@
                     <span>{{djInfo?.likedCount ? '(' + djInfo?.likedCount + ')' : '点赞'}}</span>
                 </i>
             </span>
-            <span class="commit-icn btn icn-bag not-exploit-btn">
+            <span class="commit-icn btn icn-bag not-exploit-btn" @click="jumpToComment">
                 <i class=" btn icn-bag">{{djInfo?.commentCount ? '(' + djInfo?.commentCount + ')' : '评论'}}</i>
             </span>
             <span class="share-icn btn icn-bag not-exploit-btn" @click="notFeatureTip">
@@ -200,6 +200,14 @@ function notFeatureTip(){
 
 function toRadio() {
     emit('toRadio')
+}
+
+// 评论
+function jumpToComment() {
+    const commentDom = document.querySelector(
+        '.song-sheet-review'
+    ) as HTMLDivElement;
+    window.scrollTo(0, Number(commentDom.offsetTop) - 20);
 }
 </script>
 

@@ -151,7 +151,7 @@ function jumpToComment() {
 }
 
 // 跳转
-function skip(param) {
+function skip(param: {path: string, id: number}) {
     router.push({
         path: param.path,
         query: {
