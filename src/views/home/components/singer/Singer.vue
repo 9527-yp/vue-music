@@ -5,7 +5,7 @@
             <div class="more text-hov">查看更多></div>
         </div>
         <ul class="singer-list">
-            <li class="item" v-for="item in singerList" :key="item.userId">
+            <li class="item" v-for="item in singerList" :key="item.userId" @click="toUserHome(item)">
                 <div class="head">
                     <img :src="item.src" alt="">
                 </div>
@@ -25,7 +25,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 type MenuItem = {
     src: string,
     name: string,
@@ -65,6 +67,16 @@ const singerList = ref<MenuItem[]>([
         userId: 46998208
     }
 ]);
+    
+
+function toUserHome(item: MenuItem) {
+    router.push({
+        path: '/user/home',
+        query: {
+            id: item.userId
+        }
+    })
+}
 </script>
 
 <style lang="scss" scoped>

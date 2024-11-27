@@ -200,7 +200,7 @@ watch(() => route.path,
             color: #ccc;
             line-height: 70px;
             padding: 0 19px;
-            vertical-align: middle;
+            vertical-align: top;
           }
         }
         .active-item{

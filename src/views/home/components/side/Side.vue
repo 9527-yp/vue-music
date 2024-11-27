@@ -52,11 +52,11 @@
         </div>
         <ul class="dj-list">
             <li class="item" v-for="item in anchorList" :key="item?.userId">
-                <div class="dj-img">
+                <div class="dj-img" @click="toUserHome(item)">
                     <img :src="item.src" alt="">
                 </div>
                 <div class="dj-info">
-                    <p class="dj-name text-hov">{{item.name}}</p>
+                    <p class="dj-name text-hov" @click="toUserHome(item)">{{item.name}}</p>
                     <p class="dj-description">{{item.desc}}</p>
                 </div>
             </li>
@@ -67,7 +67,10 @@
 <script setup lang="ts">
 import Singer from '../singer/Singer.vue'
 import { ref, computed } from 'vue';
-import useUserStore from '@/stores/modules/user.ts'
+import useUserStore from '@/stores/modules/user.ts';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const userStore = useUserStore();
 
@@ -115,6 +118,15 @@ const anchorList = ref<MenuItem[]>([
     userId: 2688170
   }
 ]);
+
+function toUserHome(item: MenuItem) {
+    router.push({
+        path: '/user/home',
+        query: {
+            id: item.userId
+        }
+    })
+}
 </script>
 
 
