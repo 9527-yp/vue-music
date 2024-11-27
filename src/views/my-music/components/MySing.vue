@@ -8,12 +8,16 @@
             </div>
             <div class="singer-list">
                 <div class="item" v-for="item in mySingerInfo?.singerList" :key="item.id">
-                    <div class="singer-img">
-                        <img :src="item?.img1v1Url" alt="">
+                    <div class="singer-img" @click="toSinger(item?.id)">
+                        <img :src="`${item?.img1v1Url}?param=80y80`" alt="">
                     </div>
                     <div class="item-right">
-                        <h4 class="singer-name text-hov">{{ item.name }}</h4>
-                        <p class="singer-mv">{{ item?.albumSize }}个专辑&nbsp;&nbsp;&nbsp;&nbsp;{{ item?.mvSize }}个MV</p>
+                        <h4 class="singer-name text-hov" @click="toSinger(item?.id)">{{ item.name }}</h4>
+                        <p class="singer-mv">
+                            <span v-if="item?.albumSize">{{ item?.albumSize }}个专辑</span>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <span v-if="item?.mvSize">{{ item?.mvSize }}个MV</span>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -31,6 +35,7 @@
 
 <script setup lang="ts">
 import Page from '@/components/page/Page.vue';
+import { useRouter } from 'vue-router';
 
 const emit = defineEmits('changePage');
 const props = defineProps({
@@ -40,8 +45,19 @@ const props = defineProps({
     }
 })
 
+const router = useRouter();
+
 function changePage(value: number) {
     emit('changePage', value)
+}
+
+function toSinger(id: number) {
+    router.push({
+        path: '/singer',
+        query: {
+            id
+        }
+    })
 }
 </script>
 

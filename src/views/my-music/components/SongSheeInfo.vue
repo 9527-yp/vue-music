@@ -99,7 +99,7 @@ function notFeatureTip() {
     if(!props.playlist?.trackCount) {
         return false;
     }
-    emit('notFeatureTip')
+    emit('notFeatureTip', {type: 0, text: '功能暂未开发'})
 }
 
 // 歌曲是否有版权

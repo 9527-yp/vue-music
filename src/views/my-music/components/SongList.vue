@@ -98,7 +98,7 @@ function addSongList() {
 
 
 function editSongList() {
-    emit('notFeatureTip')
+    emit('notFeatureTip', {type: 0, text: '功能暂未开发'})
 }
 
 const deleteSongListDialog = ref(false);
@@ -256,6 +256,7 @@ function deleteCancel() {
                 }
             }
             &:hover{
+                background-color: #f4f2f2;
                 .oper{
                     display: block;
                 }
@@ -263,6 +264,9 @@ function deleteCancel() {
         }
         .active-item{
             background: #e6e6e6;
+            &:hover{
+                background: #e6e6e6;
+            }
         }
     }
 }

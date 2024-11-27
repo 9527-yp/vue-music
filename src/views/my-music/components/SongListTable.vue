@@ -282,7 +282,7 @@ function collectMusic(item: songType) {
 }
 
 function notFeatureTip() {
-    emit('notFeatureTip')
+    emit('notFeatureTip', {type: 0, text: '功能暂未开发'})
 }
 
 function toSong(id: number|string) {

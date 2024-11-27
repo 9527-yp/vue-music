@@ -12,7 +12,8 @@
             <div class="music-content">
                 <div class="musicsd">
                     <div>
-                        <h2 class="my-Singer" @click="mySingBtn">我的歌手({{options.mySinger.count}})</h2>
+                        <h2 v-if="options.mySinger.count" class="my-Singer" :class="{'menu-active' : menuActive === 1}" @click="mySingBtn">我的歌手({{options.mySinger.count}})</h2>
+                        <h2 v-if="options.myDjRadio.count" class="my-Singer" :class="{'menu-active' : menuActive === 2}" @click="myRadioBtn">我的电台({{options.myDjRadio.count}})</h2>
                         <SongList
                          title="创建的歌单"
                          :visible='options.createdSongSheet.visible'
@@ -33,7 +34,7 @@
                     </div>
                 </div>
                 <!-- 歌单详情 -->
-                <div v-if="songListInfoShow" class="my-music-main">
+                <div v-if="songListInfoShow === 'song'" class="my-music-main">
                     <div class="song-header">
                         <SongSheetInfo
                           :playlist="songSheetDetail.playlist"
@@ -71,7 +72,9 @@
                     />
                 </div>
                 <!-- 我的歌手列表 -->
-                <MySinger v-if="!songListInfoShow" :mySingerInfo="mySingerInfo" @changePage="mySingerchangePage" />
+                <MySinger v-if="songListInfoShow === 'singer'" :mySingerInfo="mySingerInfo" @changePage="mySingerchangePage" />
+                <!-- 我的电台 -->
+                <MyRadio v-if="songListInfoShow === 'radio'" :djRadioList="djRadioList" @notFeatureTip="notFeatureTip" />
             </div>
         </div>
     </div>
@@ -86,8 +89,9 @@ import SongSheetInfo from './components/SongSheeInfo.vue';
 import SongListTable from './components/SongListTable.vue';
 import Page from '@/components/page/Page.vue';
 import Comment from '@/components/comment/Comment.vue';
-import MySinger from './components/MySing.vue'
-import { getSongSubcount, getSongList, getSongSheetInfo, mySinger } from '@/api/my-music.ts';
+import MySinger from './components/MySing.vue';
+import MyRadio from './components/MyRadio.vue';
+import { getSongSubcount, getSongList, getSongSheetInfo, mySinger, mySubRadio } from '@/api/my-music.ts';
 import { getSongComment } from '@/api/comment.ts';
 import type { ResponseType } from '@/types/index';
 import { handleCommentList } from '@/components/comment/handleCommentList.ts';
@@ -101,10 +105,12 @@ const isRefreshSongList = computed(() => dialogStore.getIsRefreshSongList);
 const messageInfo = computed(() => dialogStore.getMessage);
 
 
-const songListInfoShow = ref(true);
+const songListInfoShow = ref('song');
+const menuActive = ref(3);
 function mySingBtn() {
     songSheetId.value = undefined;
-    songListInfoShow.value = false;
+    songListInfoShow.value = 'singer';
+    menuActive.value = 1
 }
 // 获取我的歌手数据
 const mySingerInfo = reactive({
@@ -132,13 +138,31 @@ function mySingerchangePage(value: number) {
     getMySinger();
 }
 
+// 电台
+function myRadioBtn() {
+    songSheetId.value = undefined;
+    songListInfoShow.value = 'radio';
+    menuActive.value = 2
+}
+
+const djRadioList = ref([]);
+function getMySubRadio() {
+    mySubRadio().then((res: ResponseType) => {
+        if(res.code === 200) {
+            djRadioList.value = res?.djRadios ?? []
+        }
+    })
+}
+getMySubRadio();
+
+
 // 登录
 function login():void {
   userStore.setLoginDialogShow(true)
 }
 
 const options = reactive({
-    mySinger: {
+    mySinger: { // 我的歌手
         count: 0,
         visible: false,
     },
@@ -146,11 +170,15 @@ const options = reactive({
         count: 0,
         visible: false,
     },
-    createdSongSheet: {
+    myDjRadio: {
+        count: 0,
+        visible: false,
+    },
+    createdSongSheet: { // 我创建的歌单
         visible: true,
         count: 0,
     },
-    subSongSheet: {
+    subSongSheet: { // 我收藏的歌单
         visible: false,
         count: 0,
     },
@@ -160,6 +188,7 @@ function getSongCount() {
         if(res.code === 200) {
             options.mySinger.count = res.artistCount ?? 0;
             options.myVideo.count = res.mvCount ?? 0;
+            options.myDjRadio.count = res.djRadioCount ?? 0;
             options.createdSongSheet.count = res.createdPlaylistCount ?? 0;
             options.subSongSheet.count = res.subPlaylistCount ?? 0;
         }
@@ -224,7 +253,8 @@ function songListItemChange(value: number) {
     if(songSheetId.value === value) {
         return;
     }
-    songListInfoShow.value = true;
+    songListInfoShow.value = 'song';
+    menuActive.value = 3
     songSheetId.value = value;
     commentInfo.offset = 1; // 切换歌单重置分页
     getSongInfo();
@@ -316,17 +346,21 @@ const warningInfo = reactive({
     time: null
 })
 
-function notFeatureTip() {
+function notFeatureTip(value: {type: number, text: string}) {
+    // 删除订阅操作，重新调用详情接口刷新数据
+    if(value.type === 1){
+        getMySubRadio();
+    }
     dialogStore.setMessage({
-        type: 0,
-        text: '功能暂未开发',
+        type: value.type,
+        text: value.text,
         visible: true,
     })
-    warningInfo.time && clearTimeout( warningInfo.time);
+    warningInfo.time && clearTimeout(warningInfo.time);
     warningInfo.time = setTimeout(() => {
         dialogStore.setMessage({
-            type: 0,
-            text: '功能暂未开发',
+            type: value.type,
+            text: value.text,
             visible: false,
         })
     }, 1500);
@@ -418,6 +452,12 @@ function jumpToComment() {
                 font-size: 14px;
                 cursor: pointer;
                 font-family: simsun, \5b8b\4f53;
+                &:hover{
+                    background: #eee;
+                }
+            }
+            .menu-active{
+                background: #eee;
             }
         }
         .my-music-main{

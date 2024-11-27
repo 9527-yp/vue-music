@@ -161,3 +161,21 @@ export const mySinger = ({ offset, limit }:{offset: string | number, limit: stri
         params
     })
 }
+
+/**
+ * @description 获取关注电台
+ * @param param.id  用户id
+ * @returns 
+ */
+
+export const mySubRadio = (): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+    };
+
+    return axios.request({
+        url: '/dj/sublist',
+        method: 'get',
+        params
+    })
+}
