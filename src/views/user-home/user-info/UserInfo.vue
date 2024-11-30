@@ -1,7 +1,7 @@
 <template>
     <div class="user-info">
         <div class="user-cov">
-            <img :src="userInfoData?.avatarUrl" alt="">
+            <img :src="`${userInfoData?.avatarUrl}?param=180y180`" alt="">
         </div>
         <div class="user-d">
             <div class="name">
@@ -227,6 +227,7 @@ function notFeatureTip() {
                     font-size: 14px;
                     font-weight: bold;
                     font-style: italic;
+                    font-family: Arial, Helvetica, sans-serif;
                 }
                 .right{
                     float: right;

@@ -41,3 +41,20 @@ export const getSongDetail = ({ids}: {ids: string | number}): AxiosPromise => {
         params
     })
 }
+
+/**
+ * @description 获取用户电台
+ * @param uid 用户id
+ */
+export const myAudio = ({uid}: {uid: string | number}): AxiosPromise => {
+    const params = {
+        timestamp: new Date().getTime(),
+        uid
+    };
+
+    return axios.request({
+        url: '/user/audio',
+        method: 'get',
+        params
+    })
+}

@@ -8,18 +8,19 @@
               :cityName="cityName"
               @follow="follow"
             />
+            <!-- 创建的电台 -->
+            <AudioTable :audioList="audioList" />
             <!-- 听歌排行 -->
-            <div>
+            <div v-if="songTableShow">
                 <RankingTable
-                  :songTableShow="songTableShow"
                   :recordInfo="recordInfo"
                   @tagschange="tagschange"
                 />
             </div>
             <!-- 创建的歌单 -->
-            <UserSongList title="我创建的歌单" :list="songSheetList.createdSongSheet" />
+            <UserSongList :title="songSheetList?.createdTitle" :list="songSheetList.createdSongSheet" />
             <!-- 收藏的歌单 -->
-            <UserSongList title="我收藏的歌单" :list="songSheetList.collectSongSheet" />
+            <UserSongList :title="songSheetList?.collectTitle" :list="songSheetList.collectSongSheet" />
         </div>
     </div>
 </template>
@@ -31,10 +32,11 @@ import useUserStore from '@/stores/modules/user.ts';
 import findCityZipCode from './city.ts';
 import { getSongList } from '@/api/my-music.ts';
 import { userInfo } from '@/api/login.ts';
-import { getRecords } from '@/api/user-home.ts';
+import { getRecords, myAudio } from '@/api/user-home.ts';
 import { addFollow } from '@/api/user-social.ts';
 import type { ResponseType } from '@/types/index';
 import UserInfo from './user-info/UserInfo.vue';
+import AudioTable from './audio-table/AudioTable.vue';
 import RankingTable from './ranking-table/RankingTable.vue';
 import UserSongList from './user-song-list/UserSongList.vue';
 
@@ -71,6 +73,8 @@ function getUserInfo() {
     userInfo({uid: route?.query?.id}).then((res:ResponseType) => {
         if(res.code === 200) {
             userInfoData.value = res?.profile;
+            getSongListData();
+            getMyAudio();
             let newAuthTypeOther = [
                 {
                     type: 200,
@@ -104,6 +108,7 @@ getUserInfo();
 type TypeSongSheetList = {
     name: string,
     subscribed: boolean,
+    userId: number,
     id: number,
     coverImgUrl: string,
     trackCount: number,
@@ -115,20 +120,27 @@ type TypeSongSheetList = {
 }
 
 type TypeSongSheet = {
+    createdTitle: string,
     createdSongSheet: TypeSongSheetList[],
+    collectTitle: string,
     collectSongSheet: TypeSongSheetList[],
 }
 
 
 // 歌单
 const songSheetList = reactive<TypeSongSheet>({
+    createdTitle: '',
     createdSongSheet: [],
+    collectTitle: '',
     collectSongSheet: [],
 })
 function getSongListData ()  {
     getSongList({uid: route?.query?.id}).then((res: ResponseType) => {
         if(res.code === 200) {
             if(route?.query?.id == myInfo.value?.profile?.userId){
+                songSheetList.createdTitle = '我创建的歌单';
+                songSheetList.collectTitle = '我收藏的歌单';
+
                 // 创建/收藏的歌单
                 songSheetList.createdSongSheet = res.playlist?.filter?.(
                     (item: TypeSongSheetList) => !item.subscribed
@@ -137,15 +149,40 @@ function getSongListData ()  {
                     (item: TypeSongSheetList) => item.subscribed
                 );
             }else{
-                // 其他的用户不用筛选收藏的歌单
-                songSheetList.createdSongSheet = res.playlist
-                songSheetList.collectSongSheet = []
+                songSheetList.createdTitle = userInfoData.value.nickname + '创建的歌单';
+                songSheetList.collectTitle = userInfoData.value.nickname + '收藏的歌单';
+                
+                // 创建/收藏的歌单
+                songSheetList.createdSongSheet = res.playlist?.filter?.(
+                    (item: TypeSongSheetList) => item.userId === Number(route?.query?.id)
+                );
+                songSheetList.collectSongSheet = res.playlist?.filter?.(
+                    (item: TypeSongSheetList) => item.userId !== Number(route?.query?.id)
+                );
             }
-            
         }
     })
 }
-getSongListData()
+
+// 创建的电台
+const audioList = reactive({
+    title: '',
+    list: []
+})
+function getMyAudio () {
+    myAudio({uid: route.query.id}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            if(route?.query?.id == myInfo.value?.profile?.userId){
+                audioList.title = '我创建的电台';
+            }else{
+                audioList.title = userInfoData.value.nickname + '创建的电台';
+                
+            }
+
+            audioList.list = res.djRadios ?? []
+        }
+    })
+}
 
 // 听歌排行
 const songTableShow = ref<boolean>(true); //  是否有权限访问

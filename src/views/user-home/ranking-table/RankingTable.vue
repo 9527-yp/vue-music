@@ -1,5 +1,5 @@
 <template>
-    <div class="ranking-title" v-show="songTableShow">
+    <div class="ranking-title">
         <h3 class="title">听歌排行</h3>
         <h4 class="listen-music-total">累积听歌{{recordInfo.listenSongs}}首</h4>
         <span class="n-iconpoint">
@@ -82,8 +82,8 @@ import type { songType } from '@/hooks/methods/songFormat.ts';
 import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
 import usePlaySong from '@/hooks/usePlaySong.ts';
 import usePlayStore from '@/stores/modules/play.ts';
-import useDialogStore from '@/stores/modules/dialog.ts'
-import { getSongDetail } from '@/api/user-home.ts'
+import useDialogStore from '@/stores/modules/dialog.ts';
+import { getSongDetail } from '@/api/user-home.ts';
 import Dialog from '@/components/dialog/dialog.vue';
 
     const playStore = usePlayStore();
@@ -100,10 +100,6 @@ import Dialog from '@/components/dialog/dialog.vue';
             type: Boolean,
             default: true
         },
-        songTableShow: {
-            type: Boolean,
-            default: true
-        }
     })
 
     const emit = defineEmits(['tagschange'])

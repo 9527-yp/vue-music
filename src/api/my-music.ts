@@ -49,7 +49,9 @@ export const getSongSubcount = (): AxiosPromise => {
 export const getSongList = ({uid}: {uid :string | number}): AxiosPromise => {
     const params = {
         timestamp: new Date().getTime(),
-        uid
+        uid,
+        limit: 999,
+        offset: 0
     };
 
     return axios.request({
