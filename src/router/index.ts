@@ -119,6 +119,14 @@ const routes: Array<RouteRecordRaw> = [
           import(
             /* webpackChunkName: "download" */ '../views/radio/radio.vue')
       },
+      {
+        /** 每日推荐 */
+        path: '/home-recommend',
+        name: 'recommend',
+        component: () =>
+          import(
+            /* webpackChunkName: "download" */ '../views/recommend/recommend.vue')
+      },
     ]
   }
 ]

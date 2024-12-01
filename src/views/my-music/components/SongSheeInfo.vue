@@ -379,6 +379,12 @@ function goToUserHome() {
                 .collect-icn{
                     background-position: 0 -977px;
                 }
+                &:hover{
+                    background-position: right -1106px;
+                    .collect-icn{
+                        background-position: 0 -1063px;
+                    }
+                }
             }
             .share{
                 background-position: right -1020px;

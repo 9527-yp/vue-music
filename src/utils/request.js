@@ -43,14 +43,14 @@ icemAxios.interceptors.response.use(
         const res = response.headers['content-type'].includes('application/json')
             ? response.data
             : response;
-        if (res?.code === 250) {
+        if (res?.code == 432) {
             // setMessage({ type: 'error', title: res?.message });
         }
 
         return Promise.resolve(res);
     },
     (error) => {
-      return Promise.reject(error)
+      return Promise.reject(error.response)
     }
 )
 

@@ -84,13 +84,13 @@
             </div>
             <ul class="list-content">
                 <li class="item">
-                    <div class="item-img-box">
+                    <div class="item-img-box" @click="toHomeRecommend">
                         <i class="individuation-img" ></i>
                         <span class="head">{{ getCurrentWeekday() }}</span>
                         <span class="head-text">{{ getDate() }}</span>
                         <span class="head-mask"></span>
                     </div>
-                    <div class="item-bottom text-hov">
+                    <div class="item-bottom text-hov" @click="toHomeRecommend">
                         每日歌曲推荐
                     </div>
                     <em class="item-lick" title="根据你的口味生成,每天6:00更新"> 根据你的口味生成,每天6:00更新 </em>
@@ -272,6 +272,12 @@
             query: {
                 id
             }
+        })
+    }
+
+    function toHomeRecommend() {
+        router.push({
+            path: '/home-recommend'
         })
     }
 
