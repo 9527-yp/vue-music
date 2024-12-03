@@ -51,6 +51,7 @@ function getSongListData ()  {
             res.playlist?.forEach?.((item: SongSheetList) => {
                 if (item.name?.includes?.('喜欢的音乐')) {
                     item.name = '我喜欢的音乐';
+                    userStore.setLikeSongCount(item?.trackCount)
                 }
             });
             

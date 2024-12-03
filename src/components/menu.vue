@@ -36,7 +36,7 @@
     },
     {
       title: '排行榜',
-      path: '/'
+      path: '/home-toplist'
     },
     {
       title: '歌单',
@@ -59,6 +59,9 @@
   // 切换
   function hanldSubMenu(item: SubMenuItem, index: number) {
     userStore.setSubMenuIndex(index)
+    router.push({
+      path: item.path,
+    })
   }
 
   // 监听路由变化，修改选中菜单

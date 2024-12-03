@@ -17,9 +17,9 @@
                 </div>
             </li>
         </ul>
-        <div class="apply-Musician">
+        <a class="apply-Musician" href="https://music.163.com/st/musician" target="_blank">
             <span>申请成为网易音乐人</span>
-        </div>
+        </a>
     </div>
 </template>
 
@@ -166,6 +166,12 @@ function toUserHome(item: MenuItem) {
         cursor: pointer;
         background: url('@/assets/images/home/side/button2.png') no-repeat 0 9999px;
         background-position: right -100px;
+        &:hover{
+            background-position: right -182px;
+            span{
+                background-position: 0 -141px;
+            }
+        }
         span{
             width: 170px;
             font-weight: bold;

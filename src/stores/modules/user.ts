@@ -21,6 +21,7 @@ const userStore = defineStore("user", {
      * menuIndex： 顶部菜单选中的index
      * subMenuIndex：首页-菜单选中的index
      * loginDialogShow：登录弹框
+     * likeSongCount：喜欢的音乐数量
      */
     // 存储数据state
     state: (): any => {
@@ -30,7 +31,8 @@ const userStore = defineStore("user", {
         isLogin: faultTolerant('isLogin') || false,
         menuIndex: faultTolerant('menuIndex') || 0,
         subMenuIndex: faultTolerant('subMenuIndex') || 0,
-        loginDialogShow: false
+        loginDialogShow: false,
+        likeSongCount: 0
       };
     },
     
@@ -63,6 +65,9 @@ const userStore = defineStore("user", {
       setLoginDialogShow(value: boolean) {
         this.loginDialogShow = value;
       },
+      setLikeSongCount(value: number) {
+        this.likeSongCount = value;
+      },
       // 退出登录
       setLogout() {
         this.token = ''
@@ -81,6 +86,7 @@ const userStore = defineStore("user", {
         getMenuIndex: state => state.menuIndex,
         getSubMenuIndex: state => state.subMenuIndex,
         getLoginDialogShow: state => state.loginDialogShow,
+        getLikeSongCount: state => state.likeSongCount,
     }
   });
   

@@ -22,14 +22,12 @@
             </div>
             <div class="song-list-box">
                 <h3 class="title">歌曲列表</h3>
-                <span class="song-num">30首歌</span>
+                <span class="song-num">{{songList.length}}首歌</span>
             </div>
             <!-- 歌曲列表 -->
             <SongTable :playlist="songList" @delsong="delsong" />
         </div>
-        <div class="recommend-side">
-
-        </div>
+        <Side :playCount="userInfo?.listenSongs" :singerCount="singerCount" :likeSongCount="likeSongCount" />
     </div>
 </template>
 
@@ -37,20 +35,28 @@
 import { ref, computed } from 'vue';
 import { getCurrentWeekday, getDate } from '@/utils/utils.ts';
 import SongTable from './song-table/SongTable.vue';
+import Side from './side/Side.vue';
 import { recommendSong, delSongList } from '@/api/recommend.ts';
+import { mySinger } from '@/api/my-music.ts';
 import type { ResponseType } from '@/types/index';
 import type { songType } from '@/hooks/methods/songFormat.ts';
 import useSongAddPlaylist from '@/hooks/useSongAddPlayList.ts';
 import usePlaySong from '@/hooks/usePlaySong.ts';
 import usePlayStore from '@/stores/modules/play.ts';
+import useUserStore from '@/stores/modules/user.ts';
 import useDialogStore from '@/stores/modules/dialog.ts';
 
 
 const playStore = usePlayStore();
 const dialogStore = useDialogStore();
+const userStore = useUserStore();
 
 // 播放显示/隐藏
 const lock = computed(() => playStore.getplayLock);
+
+const userInfo = computed(() => userStore.getUserInfo);
+
+const likeSongCount = computed(() => userStore.getLikeSongCount);
 
 const songList = ref([]);
 function getSongList () {
@@ -62,6 +68,19 @@ function getSongList () {
 }
 
 getSongList();
+
+const singerCount = ref(0);
+function getMySinger() {
+    mySinger({
+        offset: 0,
+        limit: 25
+    }).then((res: ResponseType) => {
+        if(res.code === 200) {
+            singerCount.value = res.count ?? 0
+        }
+    })
+}
+getMySinger()
 
 
 // 播放列表歌曲
@@ -107,7 +126,6 @@ type privilegeItem = {
 }
 
 function delsong(id: number, index: number) {
-    console.log(id, index ,'index')
     delSongList({id}).then((res: ResponseType) => {
         if(res.code === 200) {
             // 删除指定索引的项
@@ -119,7 +137,6 @@ function delsong(id: number, index: number) {
             console.log(songList.value, 'songList.value')
         }
     }).catch(error => {
-        console.log(error, 'error')
         // 删除指定索引的项
         songList.value.splice(index, 1);
         dialogStore.setMessage({
@@ -317,13 +334,6 @@ function isCopyright(privilege: privilegeItem): boolean | undefined {
                     color: #666;
                 }
             }
-    }
-    .recommend-side{
-        display: inline-block;
-        width: 270px;
-        vertical-align: top;
-        padding: 20px 40px 40px 30px;
-        box-sizing: border-box;
     }
 }
 </style>

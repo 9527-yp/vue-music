@@ -127,6 +127,14 @@ const routes: Array<RouteRecordRaw> = [
           import(
             /* webpackChunkName: "download" */ '../views/recommend/recommend.vue')
       },
+      {
+        /** 排行榜 */
+        path: '/home-toplist',
+        name: 'toplist',
+        component: () =>
+          import(
+            /* webpackChunkName: "download" */ '../views/home-toplist/homeToplist.vue')
+      },
     ]
   }
 ]

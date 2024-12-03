@@ -4,7 +4,7 @@
     </div>
     <div class="user-login" v-if="!isLogin">
         <p class="note">登录网易云音乐，可以享受无限收藏的乐趣，并且无限同步到手机</p>
-        <div class="login-btn">用户登录</div>
+        <div class="login-btn" @click="login">用户登录</div>
     </div>
     <!-- 已登录 -->
     <div v-if="isLogin" class="side-user">
@@ -74,8 +74,6 @@ const router = useRouter();
 
 const userStore = useUserStore();
 
-console.log(userStore.getUserInfo, 'userStore.getUserInfo')
-
 // 是否登录
 const isLogin = computed<boolean>(() => userStore.getIsLogin)
 
@@ -127,6 +125,11 @@ function toUserHome(item: MenuItem) {
         }
     })
 }
+
+// 登录
+function login():void {
+  userStore.setLoginDialogShow(true)
+}
 </script>
 
 
@@ -161,6 +164,9 @@ function toUserHome(item: MenuItem) {
         text-shadow: 0 1px 0 #8a060b;
         background: url('@/assets/images/home/index.png') no-repeat;
         background-position: 0 -195px;
+        &:hover{
+            background-position: -110px -195px;
+        }
     }
 }
 .side-user{
