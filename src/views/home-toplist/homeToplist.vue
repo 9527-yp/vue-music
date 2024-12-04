@@ -1,31 +1,116 @@
 <template>
     <div class="home-toplist">
         <div class="toplist-menu">
-            <div class="menu-box">
-                <h2 class="tit">云音乐特色榜</h2>
-                <ul class="menu-list">
-                    <li class="item" v-for="item in 4">
-                        <div class="item-box">
-                            <div class="item-left">
-                                <img src="http://p1.music.126.net/rIi7Qzy2i2Y_1QD7cd0MYA==/109951170048506929.jpg?param=40y40" alt="">
-                                <span class="mask"></span>
-                            </div>
-                            <p class="name">飙升榜</p>
-                            <p>每天更新</p>
-                        </div>
-                    </li>
-                </ul>
-                <h2 class="tit two">全球媒体榜</h2>
-            </div>
+            <ToplistMenu :hotList="hotList" :common="common" />
         </div>
         <div class="toplist-content">
-
+            <div class="song-info">
+                <ToplistInfo 
+                    :playlist="songSheetDetail.playlist" 
+                    :privileges="songSheetDetail.privileges"
+                    @jumpToComment="jumpToComment"
+                    @notFeatureTip="notFeatureTip"
+                />
+            </div>
+            <div class="song-table">
+                <div class="song-list-box">
+                    <h3 class="title">歌曲列表</h3>
+                    <span class="song-num">{{songSheetDetail?.playlist?.trackCount}}首歌</span>
+                    <div class="more">
+                        播放：<i class="num">{{songSheetDetail?.playlist?.playCount}}</i>次
+                    </div>
+                </div>
+                <div class="table-box">
+                    <ToplistTable
+                        :playlist="songSheetDetail.playlist"
+                        :privileges="songSheetDetail.privileges"
+                        @notFeatureTip="notFeatureTip"
+                    />
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { ref, reactive } from 'vue';
+import { topList, playlistDetail } from '@/api/home.ts';
+import type { ResponseType } from '@/types/index';
+import ToplistMenu from './toplist-menu/ToplistMenu.vue';
+import ToplistInfo from './toplist-info/ToplistInfo.vue';
+import ToplistTable from './toplist-table/ToplistTable.vue';
+import useDialogStore from '@/stores/modules/dialog.ts';
 
+const dialogStore = useDialogStore();
+
+const hotList = ref([]);
+const common = ref([]);
+function getToplist() {
+    topList().then((res: ResponseType) => {
+        if(res.code === 200) {
+            hotList.value = res?.list.slice(0, 4) ?? [];
+            common.value = res?.list.slice(4) ?? [];
+        }
+    })
+}
+
+getToplist();
+
+type TypeSongSheetDetail = {
+    playlist: {
+        coverImgUrl?: string,
+        name?: string,
+        id?: number,
+        playCount?: number,
+        trackCount?: number,
+        subscribed?: boolean,
+        tracks?: {
+            id: number;
+        }[];
+    },
+    privileges: {
+        id: number;
+    }[];
+}
+
+const songSheetDetail = reactive<TypeSongSheetDetail>({
+    playlist: {},
+    privileges: []
+})
+function getPlaylistDetail() {
+    playlistDetail({id: 19723756}).then((res: ResponseType) => {
+        if(res.code === 200) {
+            songSheetDetail.playlist = res.playlist ?? {};
+            songSheetDetail.privileges = res.privileges ?? [];
+        }
+    })
+}
+getPlaylistDetail();
+
+let timer = null;
+function notFeatureTip(value: {type: number, text: string}) {
+    dialogStore.setMessage({
+        type: value.type,
+        text: value.text,
+        visible: true,
+    })
+    timer && clearTimeout(timer);
+    timer = setTimeout(() => {
+        dialogStore.setMessage({
+            type: value.type,
+            text: value.text,
+            visible: false,
+        })
+    }, 1500);
+}
+
+// 评论滚动对应位置
+function jumpToComment() {
+    const commentDom = document.querySelector(
+        '.song-sheet-review'
+    ) as HTMLDivElement;
+    window?.scrollTo(0, Number(commentDom.offsetTop) - 20);
+}
 </script>
 
 
@@ -43,74 +128,52 @@
         display: inline-block;
         width: 239px;
         vertical-align: top;
-        .menu-box{
-            margin-top: 40px;
-            .tit{
-                padding: 0 10px 12px 15px;
-                font-size: 14px;
-                color: #000;
-                font-family: simsun, \5b8b\4f53;
-            }
-            .two{
-                margin-top: 20px;
-            }
-            .menu-list{
-                .item{
-                    padding: 10px 0 10px 20px;
-                    position: relative;
-                    height: 42px;
-                    cursor: pointer;
-                    .item-box{
-                        padding-left: 50px;
-                        .item-left{
-                            float: left;
-                            margin-left: -50px;
-                            overflow: hidden;
-                            width: 40px;
-                            height: 40px;
-                            position: relative;
-                            img{
-                                width: 40px;
-                                height: 40px;
-                            }
-                            .mask{
-                                position: absolute;
-                                top: 0;
-                                left: 0;
-                                width: 100%;
-                                height: 100%;
-                            }
-                        }
-                        p{
-                            color: #999;
-                        }
-                        .name{
-                            width: 150px;
-                            overflow: hidden;
-                            margin-top: 2px;
-                            margin-bottom: 8px;
-                            color: #000;
-                        }
-                    }
-                    &:hover{
-                        background-color: #f4f2f2;
-                    }
-                    &:after{
-                        clear: both;
-                        content: '.';
-                        display: block;
-                        height: 0;
-                        visibility: hidden;
-                    }
-                }
-            }
-        }
     }
     .toplist-content{
         position: relative;
         display: inline-block;
         width: 740px;
         vertical-align: top;
+        .song-info{
+            padding: 40px;
+            &:after{
+                clear: both;
+                content: '.';
+                display: block;
+                height: 0;
+                visibility: hidden;
+            }
+        }
+        .song-table{
+            padding: 0 30px 40px 40px;
+            .song-list-box{
+                width: 100%;
+                height: 35px;
+                border-bottom: 2px solid #c20c0c;
+                box-sizing: border-box;
+                .title{
+                    font-size: 20px;
+                    line-height: 28px;
+                    float: left;
+                    font-family: "Microsoft Yahei", Arial, Helvetica, sans-serif;
+                    font-weight: normal;
+                }
+                .song-num{
+                    margin: 9px 0 0 20px;
+                    float: left;
+                    color: #666;
+                }
+                .more{
+                    margin-top: 5px;
+                    float: right;
+                    color: #666;
+                    .num{
+                        color: #c20c0c;
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
     }
 }
 </style>

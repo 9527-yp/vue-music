@@ -102,7 +102,6 @@ const dialogStore = useDialogStore();
 const isLogin = computed(() => userStore.getIsLogin);
 const userInfo = computed(() => userStore.getUserInfo);
 const isRefreshSongList = computed(() => dialogStore.getIsRefreshSongList);
-const messageInfo = computed(() => dialogStore.getMessage);
 
 
 const songListInfoShow = ref('song');
