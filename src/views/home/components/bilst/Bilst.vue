@@ -35,7 +35,7 @@
                     </li>
                 </ol>
                 <div class="more">
-                    <span class="more-text text-hov">查看全部></span>
+                    <span class="more-text text-hov" @click="toHomeToplist(item?.playlist?.id)">查看全部></span>
                 </div>
             </dd>
         </dl>
@@ -68,6 +68,12 @@ const playDialogText = defineModel('playDialogText', {
     type: String,
     default: ''
 })
+
+const emit = defineEmits(['toHomeToplist'])
+
+function toHomeToplist(id: number) {
+    emit('toHomeToplist', id)
+}
 
 type songListItem = {
     id?: number;

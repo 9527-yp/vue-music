@@ -2,7 +2,7 @@
     <div class="menu-box">
         <h2 class="tit">云音乐特色榜</h2>
         <ul class="menu-list">
-            <li class="item" v-for="(item, index) in hotList" :key="index">
+            <li class="item" :class="{'active-item' : item.id === id}" v-for="(item, index) in hotList" :key="index" @click="toHomeToplist(item.id)">
                 <div class="item-box">
                     <div class="item-left">
                         <img :src="`${item?.coverImgUrl}?param=40y40`" alt="">
@@ -30,6 +30,8 @@
 </template>
 
 <script setup lang="ts">
+
+const emit = defineEmits(['toHomeToplist'])
 const props = defineProps({
     hotList: {
         type: Array,
@@ -39,7 +41,15 @@ const props = defineProps({
         type: Array,
         default: []
     },
+    id: {
+        type: Number,
+        default: undefined
+    }
 })
+
+function toHomeToplist(id: number) {
+    emit('toHomeToplist', id)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -101,6 +111,12 @@ const props = defineProps({
                 display: block;
                 height: 0;
                 visibility: hidden;
+            }
+        }
+        .active-item{
+            background: #e6e6e6;
+            &:hover{
+                background: #e6e6e6;
             }
         }
     }

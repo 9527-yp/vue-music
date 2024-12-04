@@ -26,27 +26,27 @@
             >
                 <td>
                     <div class="hd">
-                        <span class="num">1</span>
+                        <span class="num">{{index+1}}</span>
                         <div class="rk">
                             <i class="new-icn"></i>
                         </div>
                     </div>
                 </td>
-                <td class="rank">
+                <td class="rank" :class="{'rank-other': index > 2}">
                     <div class="tit-cnt">
-                        <img src="http://p2.music.126.net/lmyFhYelH4PuVGOA7ZXTdQ==/109951170200859005.jpg?param=50y50&quality=100" alt="">
+                        <img v-if="index < 3" :src="`${item?.al?.picUrl}?param=50y50&quality=100`" alt="">
                         <span class="play-icn" :class="{'play-z-slt' : playSongId === item.id}" title="播放" @click="playMusic(item)"></span>
                         <div class="ttc">
                             <span class="txt">
-                                <span class="name text-hov" title="滥俗的歌 - (电影《好东西》插曲)">滥俗的歌</span>
-                                <span> - (电影《好东西》插曲)</span>
-                                <span class="mv-icn" title="播放mv"></span>
+                                <span class="name text-hov" :title="item?.name" @click="toSong(item.id)">{{item?.name}}</span>
+                                <span v-if="item?.alia.length > 0"> - ({{item?.alia[0]}})</span>
+                                <span v-if="item.mv" class="mv-icn" title="播放mv"></span>
                             </span>
                         </div>
                     </div>
                 </td>
                 <td class="time-td">
-                    <span class="song-time">04:36</span>
+                    <span class="song-time">{{ timeStampToDuration(item.dt / 1000) || '00:00' }}</span>
                     <div class="btns">
                         <i class="add-icn" title="添加到播放列表" @click="addMusic(item)"></i>
                         <i class="icn collect-icn" title="收藏" @click="collectMusic(item)"></i>
@@ -56,7 +56,9 @@
                 </td>
                 <td>
                     <div class="singer">
-                        <span class="text-hov">钟楚曦</span>
+                        <template v-for="(key, i) in item.ar" :key="i">
+                            <span class="text-hov" :title="key.name" @click="toSinger(key.id)">{{key.name}}</span><i v-if="i !== item.ar.length-1">/</i>
+                        </template>
                     </div>
                 </td>
             </tr>
@@ -387,6 +389,18 @@ function toAlbum(id: number) {
                 visibility: hidden;
             }
         }
+        .rank-other{
+            padding-top: 6px;
+            padding-bottom: 6px;
+            .tit-cnt{
+                .play-icn{
+                    margin-top: 0px;
+                }
+                .ttc{
+                    margin-top: 0px;
+                }
+            }
+        }
         .time-td{
             color: #666;
             .btns{
@@ -460,6 +474,14 @@ function toAlbum(id: number) {
                     display: block;
                 }
             }
+        }
+    }
+    .even{
+        td{
+            background-color: #f7f7f7;
+        }
+        .ttc{
+
         }
     }
 }

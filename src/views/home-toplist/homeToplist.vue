@@ -1,7 +1,7 @@
 <template>
     <div class="home-toplist">
         <div class="toplist-menu">
-            <ToplistMenu :hotList="hotList" :common="common" />
+            <ToplistMenu :id="Number(route.query.id)" :hotList="hotList" :common="common" @toHomeToplist="toHomeToplist" />
         </div>
         <div class="toplist-content">
             <div class="song-info">
@@ -21,32 +21,55 @@
                     </div>
                 </div>
                 <div class="table-box">
+                    <Loading v-if="songSheetDetail.loading" />
                     <ToplistTable
+                        v-else
                         :playlist="songSheetDetail.playlist"
                         :privileges="songSheetDetail.privileges"
                         @notFeatureTip="notFeatureTip"
                     />
                 </div>
+                <!-- 评论 -->
+                <Comment
+                    :commentInfo="commentInfo" 
+                    @publishComment="publishComment"
+                />
+                <!-- 底部分页 -->
+                <Page
+                    v-if="commentInfo.totalCount > commentInfo.limit"
+                    :total="commentInfo.totalCount"
+                    :pageSize="commentInfo.limit"
+                    :page="commentInfo.offset"
+                    @changePage="changePage"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { topList, playlistDetail } from '@/api/home.ts';
+import { getSongComment } from '@/api/comment.ts';
 import type { ResponseType } from '@/types/index';
 import ToplistMenu from './toplist-menu/ToplistMenu.vue';
 import ToplistInfo from './toplist-info/ToplistInfo.vue';
 import ToplistTable from './toplist-table/ToplistTable.vue';
+import Page from '@/components/page/Page.vue';
+import Comment from '@/components/comment/Comment.vue';
+import Loading from '@/components/loading/Loading.vue';
 import useDialogStore from '@/stores/modules/dialog.ts';
+import { handleCommentList } from '@/components/comment/handleCommentList.ts';
 
 const dialogStore = useDialogStore();
+const router = useRouter();
+const route = useRoute();
 
 const hotList = ref([]);
 const common = ref([]);
 function getToplist() {
-    topList().then((res: ResponseType) => {
+    return topList().then((res: ResponseType) => {
         if(res.code === 200) {
             hotList.value = res?.list.slice(0, 4) ?? [];
             common.value = res?.list.slice(4) ?? [];
@@ -54,9 +77,8 @@ function getToplist() {
     })
 }
 
-getToplist();
-
 type TypeSongSheetDetail = {
+    loading: boolean,
     playlist: {
         coverImgUrl?: string,
         name?: string,
@@ -74,18 +96,60 @@ type TypeSongSheetDetail = {
 }
 
 const songSheetDetail = reactive<TypeSongSheetDetail>({
+    loading: false,
     playlist: {},
     privileges: []
 })
 function getPlaylistDetail() {
-    playlistDetail({id: 19723756}).then((res: ResponseType) => {
+    songSheetDetail.loading = true;
+    playlistDetail({id: route.query.id}).then((res: ResponseType) => {
         if(res.code === 200) {
+            songSheetDetail.loading = false;
             songSheetDetail.playlist = res.playlist ?? {};
             songSheetDetail.privileges = res.privileges ?? [];
         }
     })
 }
-getPlaylistDetail();
+
+// 评论数据
+const commentInfo = reactive({
+    id: null,
+    type: 2,
+    offset: 1,
+    limit: 20,
+    totalCount: 0,
+    hotCommentList: [], // 热门评论
+    newCommentList: [] // 最新评论
+})
+function getSongCommentList() {
+    commentInfo.id = Number(route.query.id);
+    const params = {
+        id: route.query.id,
+        offset: (commentInfo.offset - 1) * commentInfo.limit,
+        limit: commentInfo.limit
+    }
+    getSongComment(params).then((res: ResponseType) => {
+        const result = handleCommentList(res)
+        commentInfo.hotCommentList = result?.hotComments ?? []
+        
+        commentInfo.newCommentList = result?.comments ?? []
+        
+        commentInfo.totalCount = result?.total ?? 0
+    })
+}
+
+// 评论操作
+async function publishComment() {
+    // 需先调详情接口，评论数据才获取最新的数据
+    await playlistDetail({id: route.query.id});
+    getSongCommentList();
+}
+
+// 分页点击获取当前页评论
+function changePage(value: number) {
+    commentInfo.offset = value;
+    getSongCommentList();
+}
 
 let timer = null;
 function notFeatureTip(value: {type: number, text: string}) {
@@ -111,6 +175,41 @@ function jumpToComment() {
     ) as HTMLDivElement;
     window?.scrollTo(0, Number(commentDom.offsetTop) - 20);
 }
+
+function toHomeToplist(id: number) {
+    router.push({
+        path: '/home-toplist',
+        query: {
+            id
+        }
+    })
+
+    getPlaylistDetail();
+    getSongCommentList();
+}
+
+watch(() => route, async () => {
+    if(route.path !== '/home-toplist'){
+        return ;
+    }
+
+    await getToplist();
+    if(!route.query.id){
+        router.push({
+            path: 'home-toplist',
+            query: {
+                id: hotList.value[0].id
+            }
+        })
+        return ;
+    }
+
+    getPlaylistDetail();
+    getSongCommentList();
+},{
+    immediate: true,
+    deep: true
+})
 </script>
 
 

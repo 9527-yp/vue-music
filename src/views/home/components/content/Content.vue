@@ -125,11 +125,11 @@
             <div class="item-c-h">
                 <div class="h-title">榜单</div>
                 <div class="more">
-                    <span class="tab-text text-hov">更多</span>
+                    <span class="tab-text text-hov" @click="toHomeToplist('')">更多</span>
                     <i class="move-icn"></i>
                 </div>
             </div>
-            <Bilst v-model:playDialog="playDialog" v-model:playDialogText="playDialogText" />
+            <Bilst v-model:playDialog="playDialog" v-model:playDialogText="playDialogText" @toHomeToplist="toHomeToplist" />
         </div>
         <!-- 播放权限弹框 -->
         <Dialog 
@@ -279,6 +279,21 @@
         router.push({
             path: '/home-recommend'
         })
+    }
+
+    function toHomeToplist(id: number | string) {
+        if(id){
+            router.push({
+                path: '/home-toplist',
+                query: {
+                    id
+                }
+            })
+        }else{
+            router.push({
+                path: '/home-toplist',
+            })
+        }
     }
 
 
