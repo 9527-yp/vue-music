@@ -66,8 +66,15 @@ function getDjDetail() {
 
 function convertTime(time: number) {
     let newTime = Math.floor(time / 1000);
-    let m = Math.floor(newTime / 60);
-    let s = newTime % 60
+    let m: string | number = Math.floor(newTime / 60);
+    let s: string | number = newTime % 60
+
+    if(m < 10){
+        m = '0' + m
+    }
+    if(s < 10){
+        s = '0' + s
+    }
 
     return `${m}分${s}秒`
 }

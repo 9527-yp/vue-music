@@ -423,9 +423,9 @@ function jumpToComment() {
     overflow-y: scroll;
     position: relative;
     zoom: 1;
-    height: calc(100vh - 75px);
+    height: calc(100vh - 95px);
     .music-content{
-        min-height: calc(100vh - 75px);
+        min-height: calc(100vh - 95px);
         width: 980px;
         margin: 0 auto;
         border: 1px solid #d3d3d3;

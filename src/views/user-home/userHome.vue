@@ -64,6 +64,7 @@ type UserInfo = {
         desc: string,
         tags: string[] | null
     }[]
+    nickname: string
 }
 const userInfoData = ref<UserInfo>({});
 const level = ref(0); // 等级
@@ -140,6 +141,12 @@ function getSongListData ()  {
             if(route?.query?.id == myInfo.value?.profile?.userId){
                 songSheetList.createdTitle = '我创建的歌单';
                 songSheetList.collectTitle = '我收藏的歌单';
+
+                res.playlist?.forEach?.((item: TypeSongSheetList) => {
+                    if (item.name?.includes?.('喜欢的音乐')) {
+                        item.name = '我喜欢的音乐';
+                    }
+                });
 
                 // 创建/收藏的歌单
                 songSheetList.createdSongSheet = res.playlist?.filter?.(

@@ -67,7 +67,7 @@
                         <div class="info">
                             <i class="info-icn"></i>
                             <span class="num">{{item?.program?.adjustedPlayCount}}</span>
-                            <i class="info-icon-right" title="播放"></i>
+                            <i class="info-icon-right" title="播放" @click.stop="playRadio(item?.program?.mainSong)"></i>
                         </div>
                     </div>
                     <div class="item-bottom text-hov" @click="toDjDetail(item.id)">
@@ -294,6 +294,22 @@
                 path: '/home-toplist',
             })
         }
+    }
+
+    // 播放电台节目
+    function playRadio(item: songType) {
+        usePlaySong(item);
+        useSongAddPlaylist(item);
+        playStore.setAddPlayListTip(true)
+        playStore.setAddPlayListTipText('已开始播放')
+        if(!lock.value){
+            playStore.setPlayLock(true)
+        }
+        timer && clearTimeout(timer)
+        timer = setTimeout(() => {
+            playStore.setPlayLock(false)
+            playStore.setAddPlayListTip(false)
+        }, 1500)
     }
 
 

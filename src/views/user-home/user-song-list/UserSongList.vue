@@ -103,7 +103,6 @@ const songSheetDetail = reactive<TypeSongSheetDetail>({
 const songSheetId = ref(undefined);
 let timer = null;
 async function PlayListBtn(item: TypeSongSheetList) {
-    console.log(item, 'item')
     songSheetId.value = item.id
 
     let res = await getSongSheetInfo({id: songSheetId.value})

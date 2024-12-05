@@ -31,6 +31,12 @@
                       @delSong="delSong"
                       @notFeatureTip="notFeatureTip"
                     />
+                    <div v-else class="n-nmusic">
+                        <div class="not-title">
+                            <i class="icn"></i>
+                            <h3 class="text">暂无音乐！</h3>
+                        </div>
+                    </div>
                     <!-- 评论 -->
                     <Comment
                       class="playList-comment"
@@ -324,6 +330,31 @@ onMounted(() => {
     // overflow-y: scroll;
     // position: relative;
     // height: calc(100vh - 75px);
+}
+.n-nmusic{
+    padding: 105px 0 105px 0;
+    text-align: center;
+    .not-title{
+        width: 100%;
+        padding-bottom: 16px;
+        margin: 0 auto;
+        font-size: 18px;
+        color: #333;
+        text-align: center;
+        .icn{
+            display: inline-block;
+            width: 64px;
+            height: 50px;
+            margin-right: 17px;
+            vertical-align: middle;
+            background: url('@/assets/images/icon.png') no-repeat 0 9999px;
+            background-position: 0 -347px;
+        }
+        .text{
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
 }
 .my-playList{
     width: 980px;
