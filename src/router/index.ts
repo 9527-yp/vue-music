@@ -135,6 +135,14 @@ const routes: Array<RouteRecordRaw> = [
           import(
             /* webpackChunkName: "download" */ '../views/home-toplist/homeToplist.vue')
       },
+      {
+        /** 首页-歌单 */
+        path: '/home-playList',
+        name: 'homePlayList',
+        component: () =>
+          import(
+            /* webpackChunkName: "download" */ '../views/home-playList/homePlayList.vue')
+      },
     ]
   }
 ]

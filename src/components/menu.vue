@@ -40,7 +40,7 @@
     },
     {
       title: '歌单',
-      path: '/'
+      path: '/home-playList'
     },
     {
       title: '主播电台',
