@@ -43,26 +43,9 @@
                 <div class="ft"></div>
             </div>
             <ul class="playList-ul">
-                <li class="item" v-for="(item, index) in songListInfo.list" :key="index">
-                    <div class="cover">
-                        <img :src="`${item?.coverImgUrl}?param=140y140`" alt="">
-                        <i class="high-quality" v-if="item?.highQuality"></i>
-                        <span class="msk" :title="item?.name"></span>
-                        <div class="item-bottom">
-                            <i class="play-icn"></i>
-                            <i class="headset-icn"></i>
-                            <span class="num">{{getBigNumberTransform(item.playCount)}}</span>
-                        </div>
-                    </div>
-                    <p class="tit">
-                        <span class="tit-txt text-hov thide" :title="item?.name">{{item?.name}}</span>
-                    </p>
-                    <p>
-                        <span class="by">by</span>
-                        <span class="name text-hov thide" :title="item?.creator?.nickname">{{item?.creator?.nickname}}</span>
-                        <img class="icon" v-if="item?.creator?.avatarDetail" :src="item?.creator?.avatarDetail?.identityIconUrl" alt="">
-                    </p>
-                </li>
+                <template v-for="(item, index) in songListInfo.list" :key="index">
+                    <SongItem :item="item" :type="2" />
+                </template>
             </ul>
             <!-- 底部分页 -->
             <Page
@@ -82,6 +65,7 @@ import { catlist, songList } from '@/api/home-playList.ts';
 import type { ResponseType } from '@/types/index';
 import Page from '@/components/page/Page.vue';
 import { getBigNumberTransform } from '@/utils/utils.ts';
+import SongItem from '@/components/song-item/SongItem.vue';
 
 type MenuItem = {
     title: string,
@@ -159,6 +143,9 @@ function getsongList() {
         limit: songListInfo.limit
     }).then((res: ResponseType) => {
         if(res.code === 200) {
+            res?.playlists.forEach((item: {playCount: number, playCountStr: string}) => {
+                item.playCountStr = getBigNumberTransform(item.playCount)
+            })
             songListInfo.list = res?.playlists
             songListInfo.totalCount = res?.total
         }
@@ -371,107 +358,6 @@ function changePage(value: number) {
         }
         .playList-ul{
             margin: 30px 0 0 -50px;
-            .item{
-                float: left;
-                width: 140px;
-                height: 188px;
-                overflow: hidden;
-                padding: 0 0 30px 50px;
-                line-height: 1.4;
-                .cover{
-                    width: 140px;
-                    height: 140px;
-                    position: relative;
-                    img{
-                        width: 100%;
-                        height: 100%;
-                    }
-                    .high-quality{
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 40px;
-                        height: 40px;
-                        background: url('@/assets/images/icon2.png') no-repeat;
-                        background-position: -135px -220px;
-                    }
-                    .msk{
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: url('@/assets/images/home/name-D5CGUEo8.png') no-repeat;
-                        background-position: 0 0;
-                        cursor: pointer;
-                    }
-                    .item-bottom{
-                        position: absolute;
-                        bottom: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 27px;
-                        background: url('@/assets/images/home/name-D5CGUEo8.png') no-repeat;
-                        background-position: 0 -537px;
-                        color: #ccc;
-                        .play-icn{
-                            position: absolute;
-                            right: 10px;
-                            bottom: 5px;
-                            width: 16px;
-                            height: 17px;
-                            background: url('@/assets/images/home/name-Db6Jvh02.png') no-repeat;
-                            background-position: 0 0;
-                            cursor: pointer;
-                            &:hover{
-                                background-position: 0 -60px;
-                            }
-                        }
-                        .headset-icn{
-                            float: left;
-                            width: 14px;
-                            height: 11px;
-                            background: url('@/assets/images/home/name-Db6Jvh02.png') no-repeat;
-                            background-position: 0 -24px;
-                            margin: 9px 5px 9px 10px;
-                        }
-                        .num{
-                            float: left;
-                            margin: 7px 0 0 0;
-                        }
-                    }
-                }
-                p{
-                    width: 100%;
-                }
-                .tit{
-                    margin: 8px 0 3px;
-                    font-size: 14px;
-                    .tit-txt{
-                        display: inline-block;
-                        max-width: 100%;
-                        vertical-align: middle;
-                        color: #000;
-                    }
-                }
-                .by{
-                    color: #999;
-                }
-                .name{
-                    max-width: 76%;
-                    color: #666;
-                    margin-left: 3px;
-                    display: inline-block;
-                    vertical-align: middle;
-                }
-                .icon{
-                    height: 13px;
-                    width: 13px;
-                    margin-left: 3px;
-                    display: inline-block;
-                    vertical-align: middle;
-                }
-            }
             &:after{
                 clear: both;
                 content: '.';

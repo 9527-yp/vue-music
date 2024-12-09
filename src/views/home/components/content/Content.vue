@@ -21,40 +21,14 @@
             </div>
             <!-- 未登录展示5条推荐歌单，登录后，后3条替换未个性化推荐 -->
             <ul class="list-content">
-                <li class="item"
-                 v-for="(item,_index) in hotRecommend"
-                 :key="item.id"
-                 :class="_index % 4 === 3 ? 'last-item' : ''">
-                    <div class="item-img-box" :title="item?.name" @click="toPlayList(item.id)">
-                        <img class="item-img" :src="item?.picUrl" alt="">
-                        <div class="info">
-                            <i class="info-icn"></i>
-                            <span class="num">{{item?.playCount}}</span>
-                            <i class="info-icon-right" title="播放" @click.stop="playMusic(item?.id)"></i>
-                        </div>
-                    </div>
-                    <div class="item-bottom text-hov" :title="item?.name" @click="toPlayList(item.id)">
-                        {{item?.name}}
-                    </div>
-                </li>
+                <template v-for="(item, _index) in hotRecommend" :key="_index">
+                    <SongItem :class="_index % 4 === 3 ? 'last-item' : ''" :item="item" :type="1" />
+                </template>
                 <!-- 登录后展示个性化推荐 -->
                 <template v-if="isLogin">
-                    <li class="item"
-                    v-for="(item,_index) in individualizat.slice(0,3)"
-                    :key="item.id"
-                    :class="_index === 1 ? 'last-item' : ''">
-                        <div class="item-img-box" :title="item?.name" @click="toPlayList(item.id)">
-                            <img class="item-img" :src="item?.picUrl" alt="">
-                            <div class="info">
-                                <i class="info-icn"></i>
-                                <span class="num">{{item?.playcount}}</span>
-                                <i class="info-icon-right" title="播放" @click.stop="playMusic(item?.id)"></i>
-                            </div>
-                        </div>
-                        <div class="item-bottom text-hov" :title="item?.name" @click="toPlayList(item.id)">
-                            {{item?.name}}
-                        </div>
-                    </li>
+                    <template v-for="(item, _index) in individualizat.slice(0,3)" :key="_index">
+                        <SongItem :class="_index === 1 ? 'last-item' : ''" :item="item" :type="1" />
+                    </template>
                 </template>
                 <!-- 推荐电台 -->
                 <li class="item"
@@ -96,26 +70,14 @@
                     <em class="item-lick" title="根据你的口味生成,每天6:00更新"> 根据你的口味生成,每天6:00更新 </em>
                 </li>
                 <!-- 登录后展示个性化推荐 -->
-                <li class="item"
-                  v-for="(item,_index) in individualizat.slice(0,3)"
-                  :key="item.id"
-                  :class="_index === 2 ? 'last-item' : ''">
-                    <div class="item-img-box" :title="item?.name" @click="toPlayList(item.id)">
-                        <img class="item-img" :src="item?.picUrl" alt="">
-                        <div class="info">
-                            <i class="info-icn"></i>
-                            <span class="num">{{item?.playcount}}</span>
-                            <i class="info-icon-right" title="播放" @click.stop="playMusic(item?.id)"></i>
+                <template v-for="(item, _index) in individualizat.slice(0,3)" :key="_index">
+                    <SongItem :class="_index === 2 ? 'last-item' : ''" :item="item" :type="1" >
+                        <div class="idv">
+                            <em>猜你喜欢</em>
+                            <span class="not-interest">不感兴趣</span>
                         </div>
-                    </div>
-                    <div class="item-bottom text-hov" :title="item?.name" @click="toPlayList(item.id)">
-                        {{item?.name}}
-                    </div>
-                    <div class="idv">
-                        <em>猜你喜欢</em>
-                        <span class="not-interest">不感兴趣</span>
-                    </div>
-                </li>
+                    </SongItem>
+                </template>
             </ul>
         </div>
         <!-- 新碟上架 -->
@@ -157,6 +119,7 @@
     import Dialog from '@/components/dialog/dialog.vue';
     import AlbumNewest from '../albumNewest/AlbumNewest.vue';
     import Bilst from '../bilst/Bilst.vue';
+    import SongItem from '@/components/song-item/SongItem.vue';
 
     const userStore = useUserStore();
     const playStore = usePlayStore();
@@ -215,8 +178,8 @@
         }
         recommendSongList({ limit }).then((res: ResponseType) => {
             if(res.code === 200) {
-                res?.result.forEach((item: {playCount: string | number}) => {
-                    item.playCount = getBigNumberTransform(item.playCount)
+                res?.result.forEach((item: {playCount: number, playCountStr: string}) => {
+                    item.playCountStr = getBigNumberTransform(item.playCount)
                 })
                 hotRecommend.value = res?.result || []
             }
@@ -233,8 +196,8 @@
         }
         recommendResource().then((res: ResponseType) => {
             if(res.code === 200) {
-                res?.recommend.forEach((item: {playcount: string | number}) => {
-                    item.playcount = getBigNumberTransform(item.playcount)
+                res?.recommend.forEach((item: {playcount: number, playCountStr: string}) => {
+                    item.playCountStr = getBigNumberTransform(item.playcount)
                 })
                 individualizat.value = res?.recommend || []
             }
@@ -256,15 +219,6 @@
         })
     }
     getHotDjprogram()
-
-    function toPlayList(id: number) {
-        router.push({
-            path: '/playList',
-            query: {
-                id
-            }
-        })
-    }
 
     function toDjDetail(id: number) {
         router.push({
@@ -297,6 +251,7 @@
     }
 
     // 播放电台节目
+    let timer = null;
     function playRadio(item: songType) {
         usePlaySong(item);
         useSongAddPlaylist(item);
@@ -310,53 +265,6 @@
             playStore.setPlayLock(false)
             playStore.setAddPlayListTip(false)
         }, 1500)
-    }
-
-
-    // 播放歌单音乐
-    let privileges = [];
-    let songs = [];
-    let timer = null;
-    async function playMusic(id: number) {
-        let res = await getSongSheetInfo({id})
-        if(res.code !== 200) return;
-
-        privileges = res?.privileges ?? [];
-        songs = res?.playlist?.tracks ?? []
-
-        // 过滤无版权
-        const songList: songType[] = songs.filter(
-            (item: { id: number }) => !isCopyright(item.id)
-        );
-
-        // 将歌曲添加到播放列表 - 清空当前播放列表
-        useSongAddPlaylist(songList, {clear: true})
-        // 播放第一首歌
-        usePlaySong(songList[0])
-
-        playStore.setAddPlayListTip(true)
-        playStore.setAddPlayListTipText('已开始播放')
-        if(!lock.value){
-            playStore.setPlayLock(true)
-        }
-        timer && clearTimeout(timer)
-        timer = setTimeout(() => {
-            playStore.setPlayLock(false)
-            playStore.setAddPlayListTip(false)
-        }, 1500)
-    }
-
-    // 歌曲是否有版权
-    function isCopyright(id: number): boolean | undefined {
-        const privilege: {cp?: number} = privileges?.find(
-            (item: { id: number }) => item.id === id
-        );
-
-        if (privilege?.cp === 0) {
-            return true;
-        }
-
-        return false;
     }
 
 </script>
