@@ -128,7 +128,7 @@ const routes: Array<RouteRecordRaw> = [
             /* webpackChunkName: "download" */ '../views/recommend/recommend.vue')
       },
       {
-        /** 排行榜 */
+        /** 首页-排行榜 */
         path: '/home-toplist',
         name: 'toplist',
         component: () =>
@@ -142,6 +142,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import(
             /* webpackChunkName: "download" */ '../views/home-playList/homePlayList.vue')
+      },
+      {
+        /** 首页-主播电台 */
+        path: '/home-djradio',
+        name: 'homeDjradio',
+        component: () =>
+          import(
+            /* webpackChunkName: "download" */ '../views/home-djradio/homeDjradio.vue')
       },
     ]
   }

@@ -44,7 +44,7 @@
     },
     {
       title: '主播电台',
-      path: '/'
+      path: '/home-djradio'
     },
     {
       title: '歌手',
