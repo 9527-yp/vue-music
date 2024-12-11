@@ -3,7 +3,7 @@
         <div class="home-play">
             <div class="play-hd">
                 <h3>
-                    <span class="text">全部</span>
+                    <span class="text">{{route.query.cat ? route.query.cat : '全部'}}</span>
                     <span class="classify icn" @click="sltlyrShow = !sltlyrShow">
                         <i class="icn">
                             选择分类
@@ -12,7 +12,7 @@
                     </span>
                 </h3>
                 <div class="hot-btn">
-                    <span class="text-hov">热门</span>
+                    <span class="text-hov" @click="allBtn">热门</span>
                 </div>
             </div>
             <div class="n-sltlyr" v-show="sltlyrShow">
@@ -21,7 +21,7 @@
                 </div>
                 <div class="bd">
                     <h3>
-                        <span class="all-btn text-hov">全部风格</span>
+                        <span class="all-btn text-hov" @click="allBtn">全部风格</span>
                     </h3>
                     <dl v-for="(item, index) in playCatList" :key="index">
                         <dt>
@@ -34,7 +34,7 @@
                         </dt>
                         <dd :class="{'last-dd' : index === playCatList.length-1}">
                             <template v-for="(key, i) in item.list" :key="i">
-                                <span class="text text-hov">{{key.name}}</span>
+                                <span class="text text-hov" :class="{'item-active' : key.name === route.query.cat}" @click="catBtn(key.name)">{{key.name}}</span>
                                 <span class="line">|</span>
                             </template>
                         </dd>
@@ -60,13 +60,17 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { catlist, songList } from '@/api/home-playList.ts';
 import type { ResponseType } from '@/types/index';
 import Page from '@/components/page/Page.vue';
 import { getBigNumberTransform } from '@/utils/utils.ts';
 import SongItem from '@/components/song-item/SongItem.vue';
+import { useRouter, useRoute } from 'vue-router';
 
+
+const router = useRouter();
+const route = useRoute();
 type MenuItem = {
     title: string,
     list: {
@@ -128,9 +132,10 @@ function getCatlist() {
 getCatlist();
 
 
-// 评论数据
+// 歌单
 const songListInfo = reactive({
-    cat: '全部',
+    order: 'hot',
+    cat: undefined,
     offset: 1,
     limit: 35,
     totalCount: 0,
@@ -138,6 +143,7 @@ const songListInfo = reactive({
 })
 function getsongList() {
     songList({
+        order: songListInfo.order,
         cat: songListInfo.cat,
         offset: (songListInfo.offset - 1) * songListInfo.limit,
         limit: songListInfo.limit
@@ -151,12 +157,42 @@ function getsongList() {
         }
     })
 }
-getsongList();
 
 function changePage(value: number) {
     songListInfo.offset = value;
     getsongList();
 }
+
+function catBtn(name: string) {
+    if(route.query.cat === name) return;
+    sltlyrShow.value = false;
+    router.push({
+        path: '/home-playList',
+        query: {
+            cat: name
+        }
+    })
+}
+
+function allBtn() {
+    if(!route.query.cat) return;
+    sltlyrShow.value = false;
+    router.push({
+        path: '/home-playList'
+    })
+}
+
+watch(() => route, () => {
+    if(route.query.cat){
+        songListInfo.cat = route.query?.cat
+    }else{
+        songListInfo.cat = '全部'
+    }
+    getsongList();
+}, {
+    immediate: true,
+    deep: true
+})
 </script>
 
 
@@ -336,6 +372,14 @@ function changePage(value: number) {
                         .line{
                             margin: 0 8px 0 10px;
                             color: #d8d8d8;
+                        }
+                        .item-active{
+                            background: #a7a7a7;
+                            color: #fff;
+                            padding: 2px 6px;
+                            &:hover{
+                                color: #fff;
+                            }
                         }
                     }
                     .last-dd{

@@ -47,7 +47,7 @@
             </div>
             <div class="tag-box" v-if="playlist?.tags && playlist?.tags.length > 0">
                 <span class="tag-label">标签：</span>
-                <div class="tag-item" v-for="item in playlist?.tags">
+                <div class="tag-item" v-for="item in playlist?.tags" @click="toHomePlayList(item)">
                     <i class="text">{{item}}</i>
                 </div>
             </div>
@@ -183,6 +183,15 @@ function goToUserHome() {
         path: '/user/home',
         query: {
             id: props.playlist?.userId
+        }
+    })
+}
+
+function toHomePlayList(name: string) {
+    router.push({
+        path: '/home-playList',
+        query: {
+            cat: name
         }
     })
 }

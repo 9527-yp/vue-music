@@ -4,18 +4,18 @@
             <div class="item-c-h">
                 <div class="h-title">热门推荐</div>
                 <div class="h-tab">
-                    <span class="tab-text text-hov">华语</span>
+                    <span class="tab-text text-hov" @click="toHomePlayList('华语')">华语</span>
                     <span class="line">|</span>
-                    <span class="tab-text text-hov">流行</span>
+                    <span class="tab-text text-hov" @click="toHomePlayList('流行')">流行</span>
                     <span class="line">|</span>
-                    <span class="tab-text text-hov">摇滚</span>
+                    <span class="tab-text text-hov" @click="toHomePlayList('摇滚')">摇滚</span>
                     <span class="line">|</span>
-                    <span class="tab-text text-hov">民谣</span>
+                    <span class="tab-text text-hov" @click="toHomePlayList('民谣')">民谣</span>
                     <span class="line">|</span>
-                    <span class="tab-text text-hov">电子</span>
+                    <span class="tab-text text-hov" @click="toHomePlayList('电子')">电子</span>
                 </div>
                 <div class="more">
-                    <span class="tab-text text-hov">更多</span>
+                    <span class="tab-text text-hov" @click="toHomePlayList('')">更多</span>
                     <i class="move-icn"></i>
                 </div>
             </div>
@@ -248,6 +248,21 @@
                 path: '/home-toplist',
             })
         }
+    }
+
+    function toHomePlayList(name: string) {
+        if(!name){
+            router.push({
+                path: '/home-playList'
+            })
+            return;
+        }
+        router.push({
+            path: '/home-playList',
+            query: {
+                cat: name
+            }
+        })
     }
 
     // 播放电台节目

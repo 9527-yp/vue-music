@@ -19,6 +19,7 @@ export const catlist = (): AxiosPromise => {
 
 
 type paramItem = {
+    order: string,
     cat: string,
     limit: number,
     offset: number
@@ -30,10 +31,10 @@ type paramItem = {
  * @param params.limit 分页-数量
  * @param params.offset 分页-页数
  */
-export const songList = ({cat, limit, offset}: paramItem): AxiosPromise => {
+export const songList = ({order, cat, limit, offset}: paramItem): AxiosPromise => {
     const params = {
       timestamp: new Date().getTime(),
-      order: 'hot',
+      order,
       cat,
       limit,
       offset
