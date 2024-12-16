@@ -123,3 +123,48 @@ export const playlistDetail = ({
     params
   });
 };
+
+
+/**
+ * @description 获取节目分类
+ */
+export const djCateList = (): AxiosPromise => {
+  const params = { timestamp: new Date().getTime() };
+
+  return axios.request({
+    url: '/dj/catelist',
+    method: 'get',
+    params
+  });
+};
+
+/**
+ * @description 获取节目推荐
+ */
+export const recommend = (): AxiosPromise => {
+  const params = { timestamp: new Date().getTime() };
+
+  return axios.request({
+    url: '/program/recommend',
+    method: 'get',
+    params
+  });
+};
+
+
+/**
+ * @description 获取节目-排行榜
+ */
+export const ranking = ({limit, offset}: {limit: number, offset: number}): AxiosPromise => {
+  const params = { 
+    timestamp: new Date().getTime(),
+    limit,
+    offset
+  };
+
+  return axios.request({
+    url: '/dj/program/toplist',
+    method: 'get',
+    params
+  });
+};
