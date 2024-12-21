@@ -13,7 +13,7 @@
 ## 项目使用技术栈
 
 * Vue
-* Vuex
+* pinia
 * TypeScript
 
 ## 加入项目
@@ -25,17 +25,17 @@
 启动项目
 
 ```
-yarn install
+pnpm install
 ```
 
 ```
-yarn dev
+pnpm run dev
 ```
 
 项目打包
 
 ```
-yarn build
+pnpm build
 ```
 
 ## 效果图
