@@ -7,48 +7,25 @@
             <!-- 节目排行榜 -->
             <RankingList />
         </div>
-        <div class="rdimore">
+        <div class="rdimore" v-for="itemType in djradioType" :key="itemType.type">
             <div class="u-title">
                 <h3>
-                    <span class="text-hov">音乐播客</span>
+                    <span class="text-hov">{{ itemType.title }}</span>
                     <span class="radiu">·</span>
                     电台
                 </h3>
                 <span class="more text-hov">更多 ></span>
             </div>
             <ul class="rdilist">
-                <li class="item" :class="{'borbot': index > 1}" v-for="(item, index) in 4">
+                <li class="item" :class="{'borbot': index > 1}" v-for="(item, index) in itemType?.list">
                     <div class="u-cover">
-                        <img src="http://p1.music.126.net/pv2LAjNqvMzi-FELRfeUpQ==/109951170261183048.jpg?param=200y200" alt="">
+                        <img :src="`${item?.intervenePicUrl}?param=200y200`" alt="">
                     </div>
                     <div class="cnt">
                         <h3>
-                            <span class="text text-hov" title="日本流行音乐收听指南">日本流行音乐收听指南</span>
+                            <span class="text text-hov" :title="item?.name">{{ item?.name }}</span>
                         </h3>
-                        <p class="note">在Jpop金曲里，探究日本独特流行文化</p>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        <div class="rdimore">
-            <div class="u-title">
-                <h3>
-                    <span class="text-hov">生活</span>
-                    <span class="radiu">·</span>
-                    电台
-                </h3>
-                <span class="more text-hov">更多 ></span>
-            </div>
-            <ul class="rdilist">
-                <li class="item" :class="{'borbot': index > 1}" v-for="(item, index) in 4">
-                    <div class="u-cover">
-                        <img src="http://p1.music.126.net/pv2LAjNqvMzi-FELRfeUpQ==/109951170261183048.jpg?param=200y200" alt="">
-                    </div>
-                    <div class="cnt">
-                        <h3>
-                            <span class="text text-hov" title="日本流行音乐收听指南">日本流行音乐收听指南</span>
-                        </h3>
-                        <p class="note">在Jpop金曲里，探究日本独特流行文化</p>
+                        <p class="note">{{ item?.rcmdtext }}</p>
                     </div>
                 </li>
             </ul>
@@ -58,7 +35,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { djCateList } from '@/api/home.ts';
+import { djCateList, recommendType } from '@/api/home.ts';
 import type { ResponseType } from '@/types/index';
 import CateList from './cate-list/CateList.vue';
 import RecommendList from './recommend-list/RecommendList.vue';
@@ -75,6 +52,59 @@ function getDjList() {
 }
 
 getDjList();
+
+type djradioTypeItem = {
+    type: number,
+    title: string,
+    list: {
+        id?: number,
+        intervenePicUrl?: string,
+        rcmdtext?: string,
+        name?: string,
+    }[],
+}
+const djradioType = ref<djradioTypeItem[]>([
+    {
+        type: 2,
+        title: '音乐播客',
+        list: [],
+    },
+    {
+        type: 6,
+        title: '生活',
+        list: [],
+    },
+    {
+        type: 3,
+        title: '情感',
+        list: [],
+    },
+    {
+        type: 2001,
+        title: '创作翻唱',
+        list: [],
+    },
+    {
+        type: 11,
+        title: '知识',
+        list: [],
+    },
+])
+function getType() {
+    Promise.allSettled(
+        djradioType.value.map(item => recommendType({type: item.type}))
+    ).then((res: ResponseType) => {
+        console.log(res, 'res')
+        res.forEach(item => {
+            djradioType.value.forEach(itemType => {
+                if(item.value.djRadios[1].categoryId === itemType.type) {
+                    itemType.list = item.value.djRadios.slice(0,4)
+                }
+            })
+        })
+    })
+}
+getType();
 
 </script>
 

@@ -168,3 +168,20 @@ export const ranking = ({limit, offset}: {limit: number, offset: number}): Axios
     params
   });
 };
+
+
+/**
+ * @description 获取电台-分类推荐
+ */
+export const recommendType = ({type}: {type: number}): AxiosPromise => {
+  const params = { 
+    timestamp: new Date().getTime(),
+    type,
+  };
+
+  return axios.request({
+    url: '/dj/recommend/type',
+    method: 'get',
+    params
+  });
+};
