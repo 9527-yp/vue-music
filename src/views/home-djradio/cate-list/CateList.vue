@@ -2,15 +2,15 @@
     <div class="rditype">
         <div class="rdtype-box">
             <ul class="rd-ul" v-if="rdtype">
-                <li class="rd-item" v-for="item in djList.slice(0,18)" :key="item?.id">
-                    <div class="item-cnt">
-                        <div class="bag" :style="{backgroundImage:`url(${item?.picWebUrl})`}"></div>
+                <li class="rd-item" v-for="item in djList.slice(0,18)" :key="item?.id" @click="toHomeDjradioCategory(item.id)">
+                    <div class="item-cnt" :class="{'item-active': route.query.id && route.query.id == item.id}">
+                        <div class="bag" :class="{'bag-active': route.query.id && route.query.id == item.id}" :style="{backgroundImage: `url(${item?.picWebUrl})`}"></div>
                         <em>{{item?.name}}</em>
                     </div>
                 </li>
             </ul>
             <ul class="rd-ul" v-if="!rdtype">
-                <li class="rd-item" v-for="item in djList.slice(18,34)" :key="item?.id">
+                <li class="rd-item" v-for="item in djList.slice(18,34)" :key="item?.id" @click="toHomeDjradioCategory(item.id)">
                     <div class="item-cnt">
                         <div class="bag" :style="{backgroundImage:`url(${item?.picWebUrl})`}"></div>
                         <em>{{item?.name}}</em>
@@ -41,7 +41,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
+
+const router = useRouter();
+const route = useRoute();
 defineProps({
     djList: {
         type: Array,
@@ -70,6 +74,15 @@ function problem() {
 }
 function anchor() {
     window.open('https://music.163.com/st/ncreator/manage/voice')
+}
+
+function toHomeDjradioCategory(id: number) {
+    router.push({
+        path: '/home-djradio-category',
+        query: {
+            id
+        }
+    })
 }
 </script>
 
@@ -115,6 +128,17 @@ function anchor() {
                     &:hover{
                         background-position: 0 0;
                         text-decoration: none;
+                    }
+                }
+                .item-active{
+                    color: #d35757;
+                    background-position: -70px 0;
+                    &:hover{
+                        background-position: -70px 0;
+                        text-decoration: none;
+                    }
+                    .bag-active{
+                        background-position: -48px 0;
                     }
                 }
             }

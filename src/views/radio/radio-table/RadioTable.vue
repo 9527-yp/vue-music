@@ -18,7 +18,7 @@
     </div>
     <table class="table-box">
         <tbody>
-            <tr class="item" v-for="(item, index) in list" :key="item.id">
+            <tr class="item" :class="{'item-even' : index%2 !== 0}" v-for="(item, index) in list" :key="item.id">
                 <td class="col1">
                     <div class="index">
                         <span class="play-icn" :class="{'play-z-slt' : playSongId === item?.mainSong?.id}" title="播放" @click="playOrAddMusic(item?.mainSong, 'play')"></span>
@@ -316,7 +316,7 @@ function notFeatureTip() {
         }
     }
     .item-even{
-
+        background-color: #f7f7f7;
     }
 }
 </style>

@@ -20,7 +20,7 @@
                         <span class="text-hov" :title="item?.radio?.name" @click="radioDetail(item?.radio?.id)">{{item?.radio?.name}}</span>
                     </p>
                 </div>
-                <span class="tag">{{item?.radio?.category}}</span>
+                <span class="tag" @click="toHomeDjradioCategory(item?.radio?.categoryId)">{{item?.radio?.category}}</span>
             </li>
         </ul>
     </div>
@@ -84,6 +84,15 @@ function toDjDetail(id: number) {
 function radioDetail(id: number) {
     router.push({
         path: '/radio-detail',
+        query: {
+            id
+        }
+    })
+}
+
+function toHomeDjradioCategory(id: number) {
+    router.push({
+        path: '/home-djradio-category',
         query: {
             id
         }

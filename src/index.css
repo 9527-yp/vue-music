@@ -66,6 +66,14 @@
     word-wrap: normal;
   }
 
+  .thide2{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; /* 限制显示的行数 */
+    overflow: hidden;
+    text-overflow: ellipsis; /* 超出部分显示省略号 */
+  }
+
   textarea {
     resize: none;
     overflow: auto;

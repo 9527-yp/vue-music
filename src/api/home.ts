@@ -185,3 +185,30 @@ export const recommendType = ({type}: {type: number}): AxiosPromise => {
     params
   });
 };
+
+
+/**
+ * @description 获取电台-二级页面-最热
+ */
+export const radiolist = ({
+  cateId,
+  limit,
+  offset
+}: {
+  cateId: string,
+  limit: number,
+  offset: number
+}): AxiosPromise => {
+  const params = { 
+    timestamp: new Date().getTime(),
+    cateId,
+    limit,
+    offset
+  };
+
+  return axios.request({
+    url: '/dj/radio/hot',
+    method: 'get',
+    params
+  });
+};

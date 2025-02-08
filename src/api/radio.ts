@@ -27,6 +27,8 @@ export const djDetail = ({rid}: {rid: number|string}): AxiosPromise => {
 export const djList = ({rid, asc}: {rid: number|string, asc: boolean}): AxiosPromise => {
     const params = {
         timestamp: new Date().getTime(),
+        offset: 0,
+        limit: 100,
         rid,
         asc
     };

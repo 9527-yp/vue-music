@@ -14,16 +14,16 @@
                     <span class="radiu">·</span>
                     电台
                 </h3>
-                <span class="more text-hov">更多 ></span>
+                <span class="more text-hov" @click="toHomeDjradioCategory(itemType.type)">更多 ></span>
             </div>
             <ul class="rdilist">
                 <li class="item" :class="{'borbot': index > 1}" v-for="(item, index) in itemType?.list">
-                    <div class="u-cover">
+                    <div class="u-cover" @click="toRadioDetail(item.id)">
                         <img :src="`${item?.intervenePicUrl}?param=200y200`" alt="">
                     </div>
                     <div class="cnt">
                         <h3>
-                            <span class="text text-hov" :title="item?.name">{{ item?.name }}</span>
+                            <span class="text text-hov" :title="item?.name" @click="toRadioDetail(item.id)">{{ item?.name }}</span>
                         </h3>
                         <p class="note">{{ item?.rcmdtext }}</p>
                     </div>
@@ -35,13 +35,14 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { djCateList, recommendType } from '@/api/home.ts';
 import type { ResponseType } from '@/types/index';
 import CateList from './cate-list/CateList.vue';
 import RecommendList from './recommend-list/RecommendList.vue';
 import RankingList from './ranking-list/RankingList.vue';
 
-
+const router = useRouter();
 const djList = ref([]);
 function getDjList() {
     djCateList().then((res: ResponseType) => {
@@ -105,6 +106,24 @@ function getType() {
     })
 }
 getType();
+
+function toRadioDetail(id: number) {
+    router.push({
+        path: '/radio-detail',
+        query: {
+            id
+        }
+    })
+}
+
+function toHomeDjradioCategory(id: number) {
+    router.push({
+        path: '/home-djradio-category',
+        query: {
+            id
+        }
+    })
+}
 
 </script>
 
