@@ -4,7 +4,7 @@
             <h3>
                 <span class="text-hov">推荐节目</span>
             </h3>
-            <span class="more text-hov">更多 ></span>
+            <span class="more text-hov" @click="toHomeDjradioRecommend">更多 ></span>
         </div>
         <ul class="toplist">
             <li class="item" :class="{'even' : index % 2 !== 0}" v-for="(item, index) in list" :key="index">
@@ -96,6 +96,12 @@ function toHomeDjradioCategory(id: number) {
         query: {
             id
         }
+    })
+}
+
+function toHomeDjradioRecommend() {
+    router.push({
+        path: '/home-djradio-recommend'
     })
 }
 

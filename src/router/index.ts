@@ -159,6 +159,14 @@ const routes: Array<RouteRecordRaw> = [
           import(
             /* webpackChunkName: "download" */ '../views/home-djradio/homeDjradioCategory.vue')
       },
+      {
+        /** 首页-主播电台-推荐节目 */
+        path: '/home-djradio-recommend',
+        name: 'homeDjradioRecommend',
+        component: () =>
+          import(
+            /* webpackChunkName: "download" */ '../views/home-djradio/homeDjradioRecommend.vue')
+      },
     ]
   }
 ]
