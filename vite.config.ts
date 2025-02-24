@@ -6,6 +6,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, process.cwd());
   return {
+    base: './',
     plugins: [
       vue(),
     ],
@@ -24,6 +25,30 @@ export default defineConfig(({mode}) => {
           ws: true,
           changeOrigin: true,
           rewrite: path => path.replace(/^\/api/, '')
+        }
+      }
+    },
+    build: {
+      outDir: 'dist',
+      assetsDir: 'static',
+      sourcemap: false,
+      rollupOptions: {
+        // js/css/img分不同文件夹存放
+        output: {
+          chunkFileNames: 'static/js/[name]-[hash].js',
+          entryFileNames: 'static/js/[name]-[hash].js',
+          assetFileNames: 'static/[ext]/name-[hash].[ext]'
+        }
+      },
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+          pure_funcs: ['console.log', 'console.dir']
+        },
+        output: {
+          comments: false
         }
       }
     }
